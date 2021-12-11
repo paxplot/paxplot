@@ -24,7 +24,9 @@ def parallel(
     :param cols: list
         Columns to be plotted
 
-    :return:
+    :return: fig: matplotlib.figure.Figure
+        Matplotlib figure
+
     """
 
     # Input error checking
@@ -33,7 +35,7 @@ def parallel(
 
     # Scale data
 
-    # Create plot
+    # Create empty figures
     fig, axes = plt.subplots(1, len(cols) - 1, sharey=False)
     if len(cols) == 2:
         axes = [axes]
@@ -53,6 +55,8 @@ def parallel(
 
     # Last axis formatting
     axes[-1].set_xticks(list(ax.get_xticks())+[1], cols[-2:])
+    axes[-1].yaxis.set_ticks_position('both')
+    axes[-1].tick_params(labelright=True)
 
     # Remove space between plots
     subplots_adjust_args = {
@@ -61,6 +65,5 @@ def parallel(
     }
     fig.subplots_adjust(**subplots_adjust_args)
 
-    # Remove x axis labels
     # Format ticks
     return fig
