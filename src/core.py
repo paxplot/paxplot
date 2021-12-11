@@ -54,9 +54,10 @@ def parallel(
         ax.set_xticks([0], cols[ax_idx])  # Set label
 
     # Last axis formatting
-    axes[-1].set_xticks(list(ax.get_xticks())+[1], cols[-2:])
-    axes[-1].yaxis.set_ticks_position('both')
-    axes[-1].tick_params(labelright=True)
+    last_ax = axes[-1]
+    last_ax.set_xticks(list(last_ax.get_xticks())+[1], cols[-2:])
+    last_ax.yaxis.set_ticks_position('both')
+    last_ax.tick_params(labelright=True)
 
     # Remove space between plots
     subplots_adjust_args = {
