@@ -1,7 +1,6 @@
 """Core parapy functions"""
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 
 def parallel(
@@ -44,9 +43,16 @@ def parallel(
         # Plot each line
         for row in data:
             y = [row[cols[ax_idx]], row[cols[ax_idx+1]]]
-            x = [0, 1]
+            x = [0, 1]  # Assume each axes has a length between 0 and 1
             ax.plot(x, y)
-            ax.set_xlim([0, 1])
+            ax.set_xlim(x)
+        # X axis formatting
+        ax.spines['top'].set_visible(False)  # Remove axes frame
+        ax.spines['bottom'].set_visible(False)  # Remove axes frame
+        ax.set_xticks([0], cols[ax_idx])  # Set label
+
+    # Last axis formatting
+    axes[-1].set_xticks(list(ax.get_xticks())+[1], cols[-2:])
 
     # Remove space between plots
     subplots_adjust_args = {
@@ -55,7 +61,6 @@ def parallel(
     }
     fig.subplots_adjust(**subplots_adjust_args)
 
+    # Remove x axis labels
     # Format ticks
-
-
     return fig
