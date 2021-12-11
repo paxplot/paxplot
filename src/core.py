@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def parallel(
         data,
         cols
@@ -45,6 +46,7 @@ def parallel(
             y = [row[cols[ax_idx]], row[cols[ax_idx+1]]]
             x = [0, 1]
             ax.plot(x, y)
+            ax.set_xlim([0, 1])
 
     # Remove space between plots
     subplots_adjust_args = {
