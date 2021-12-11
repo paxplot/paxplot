@@ -46,7 +46,12 @@ def parallel(
             x = [0, 1]
             ax.plot(x, y)
 
-    # Format plots
+    # Remove space between plots
+    subplots_adjust_args = {
+        'wspace': 0.0,
+        'hspace': 0.0
+    }
+    fig.subplots_adjust(**subplots_adjust_args)
 
     # Format ticks
 
