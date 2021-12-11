@@ -1,5 +1,7 @@
 """Core parapy functions"""
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 def parallel(
         data,
@@ -24,5 +26,29 @@ def parallel(
 
     :return:
     """
-    fig = 0
+
+    # Input error checking
+
+    # Setting automatic values
+
+    # Scale data
+
+    # Create plot
+    fig, axes = plt.subplots(1, len(cols) - 1, sharey=False)
+    if len(cols) == 2:
+        axes = [axes]
+
+    # Plot each column pair at a time (axes)
+    for ax_idx, ax in enumerate(axes):
+        # Plot each line
+        for row in data:
+            y = [row[cols[ax_idx]], row[cols[ax_idx+1]]]
+            x = [0, 1]
+            ax.plot(x, y)
+
+    # Format plots
+
+    # Format ticks
+
+
     return fig
