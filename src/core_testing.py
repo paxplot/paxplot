@@ -18,7 +18,7 @@ class AnalysisLib(unittest.TestCase):
         ]
 
         # Run
-        fig = core.parallel(data=data)
+        fig = core.parallel(data=data, cols=['A', 'B', 'C'])
 
 
 if __name__ == '__main__':
