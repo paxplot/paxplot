@@ -1,9 +1,10 @@
 """Core parapy functions"""
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 
-def scale_data(val, minimum, maximum):
+def scale_val(val, minimum, maximum):
     """
     Scale a value linearly between a minimum and maximum value
 
@@ -16,8 +17,20 @@ def scale_data(val, minimum, maximum):
     :return: val_scaled:numeric
         Scale `val`
     """
-    val_scaled = (val-minimum)/(maximum-minimum)
+    try:
+        val_scaled = (val-minimum)/(maximum-minimum)
+    except ZeroDivisionError:
+        val_scaled = 0.5
     return val_scaled
+
+
+def get_data_lims(data, cols):
+    cols_lims={}
+    for col in cols:
+        col_data = [row[col] for row in data]
+        cols_lims[col] = [min(col_data), max(col_data)]
+
+    return cols_lims
 
 
 def parallel(
@@ -58,7 +71,11 @@ def parallel(
 
     # Input error checking
 
-    # Setting automatic values
+    # Setting automatic column limits
+    if custom_lims is not None:
+        cols_lims = custom_lims
+    else:
+        cols_lims = get_data_lims(data, cols)
 
     # Create empty figures
     fig, axes = plt.subplots(1, len(cols) - 1, sharey=False)
@@ -70,22 +87,19 @@ def parallel(
         # Plot each line
         for row in data:
             x = [0, 1]  # Assume each axes has a length between 0 and 1
-            if custom_lims is not None:
-                # Custom limits scaling
-                y_0_scaled = scale_data(
-                    val=row[cols[ax_idx]],
-                    minimum=custom_lims[cols[ax_idx]][0],
-                    maximum=custom_lims[cols[ax_idx]][1]
-                )
-                y_1_scaled = scale_data(
-                    val=row[cols[ax_idx + 1]],
-                    minimum=custom_lims[cols[ax_idx + 1]][0],
-                    maximum=custom_lims[cols[ax_idx + 1]][1]
-                )
-                y = [y_0_scaled, y_1_scaled]
-            else:
-                # If no scaling applied
-                y = [row[cols[ax_idx]], row[cols[ax_idx + 1]]]
+            # Scale the data
+            y_0_scaled = scale_val(
+                val=row[cols[ax_idx]],
+                minimum=cols_lims[cols[ax_idx]][0],
+                maximum=cols_lims[cols[ax_idx]][1]
+            )
+            y_1_scaled = scale_val(
+                val=row[cols[ax_idx + 1]],
+                minimum=cols_lims[cols[ax_idx + 1]][0],
+                maximum=cols_lims[cols[ax_idx + 1]][1]
+            )
+            y = [y_0_scaled, y_1_scaled]
+
             # Plot the data
             ax.plot(x, y)
             ax.set_xlim(x)
@@ -93,15 +107,40 @@ def parallel(
         ax.spines['top'].set_visible(False)  # Remove axes frame
         ax.spines['bottom'].set_visible(False)  # Remove axes frame
         ax.set_xticks([0], cols[ax_idx])  # Set label
-        # Y axis formatting
-        if custom_lims is not None:
-            ax.set_ylim([0, 1])
 
-    # Last axis formatting
-    last_ax = axes[-1]
-    last_ax.set_xticks(list(last_ax.get_xticks())+[1], cols[-2:])
-    last_ax.yaxis.set_ticks_position('both')
-    last_ax.tick_params(labelright=True)
+        # Y axis formatting
+        # Set limits
+        ax.set_ylim([0, 1])
+
+        # Change ticks to reflect scaled data
+        n_ticks = 10  # TODO make this a parameter in the future
+        precision = 2  # TODO make this a parameter in the future
+        tick_labels = np.linspace(
+            cols_lims[cols[ax_idx]][0],
+            cols_lims[cols[ax_idx]][1],
+            num=n_ticks+1
+        )
+        tick_labels = tick_labels.round(precision)
+        ticks = np.linspace(0, 1, num=n_ticks+1)
+
+        ax.set_yticks(ticks=ticks, labels=tick_labels)
+
+    # Last axes formatting
+    last_ax = plt.twinx(axes[-1])
+    last_ax.spines['top'].set_visible(False)  # Remove axes frame
+    last_ax.spines['bottom'].set_visible(False)  # Remove axes frame
+    n_ticks = 10  # TODO make this a parameter in the future
+    precision = 2  # TODO make this a parameter in the future
+    tick_labels = np.linspace(
+        cols_lims[cols[-1]][0],
+        cols_lims[cols[-1]][1],
+        num=n_ticks + 1
+    )
+    tick_labels = tick_labels.round(precision)
+    ticks = np.linspace(0, 1, num=n_ticks + 1)
+    last_ax.set_yticks(ticks=ticks, labels=tick_labels)
+    last_ax.set_xticks([0, 1], cols[-2:])  # Set label
+
 
     # Remove space between plots
     subplots_adjust_args = {
