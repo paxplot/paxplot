@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 
 def parallel(
         data,
-        cols
+        cols,
+        custom_lims=None
 ):
     """
     Create static parallel plot in Matplotlib.
@@ -23,6 +24,15 @@ def parallel(
         ]
     :param cols: list
         Columns to be plotted
+    :param custom_lims: dict
+        Dictionary of custom column limits corresponding to columns in `cols`.
+        Must be of the form:
+        {
+            col1: [lower, upper],
+            col2: [lower, upper],
+            ...
+        }
+
 
     :return: fig: matplotlib.figure.Figure
         Matplotlib figure
