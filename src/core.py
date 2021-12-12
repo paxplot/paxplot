@@ -3,6 +3,23 @@
 import matplotlib.pyplot as plt
 
 
+def scale_data(val, minimum, maximum):
+    """
+    Scale a value linearly between a minimum and maximum value
+
+    :param val: numeric
+        Numeric value to be scaled
+    :param minimum: numeric
+        Minimum value to linearly scale between
+    :param maximum: numeric
+        Maximum value to lineraly scale between
+    :return: val_scaled:numeric
+        Scale `val`
+    """
+    val_scaled = (val-minimum)/(maximum-minimum)
+    return val_scaled
+
+
 def parallel(
         data,
         cols,
@@ -43,8 +60,6 @@ def parallel(
 
     # Setting automatic values
 
-    # Scale data
-
     # Create empty figures
     fig, axes = plt.subplots(1, len(cols) - 1, sharey=False)
     if len(cols) == 2:
@@ -54,14 +69,33 @@ def parallel(
     for ax_idx, ax in enumerate(axes):
         # Plot each line
         for row in data:
-            y = [row[cols[ax_idx]], row[cols[ax_idx+1]]]
             x = [0, 1]  # Assume each axes has a length between 0 and 1
+            if custom_lims is not None:
+                # Custom limits scaling
+                y_0_scaled = scale_data(
+                    val=row[cols[ax_idx]],
+                    minimum=custom_lims[cols[ax_idx]][0],
+                    maximum=custom_lims[cols[ax_idx]][1]
+                )
+                y_1_scaled = scale_data(
+                    val=row[cols[ax_idx + 1]],
+                    minimum=custom_lims[cols[ax_idx + 1]][0],
+                    maximum=custom_lims[cols[ax_idx + 1]][1]
+                )
+                y = [y_0_scaled, y_1_scaled]
+            else:
+                # If no scaling applied
+                y = [row[cols[ax_idx]], row[cols[ax_idx + 1]]]
+            # Plot the data
             ax.plot(x, y)
             ax.set_xlim(x)
         # X axis formatting
         ax.spines['top'].set_visible(False)  # Remove axes frame
         ax.spines['bottom'].set_visible(False)  # Remove axes frame
         ax.set_xticks([0], cols[ax_idx])  # Set label
+        # Y axis formatting
+        if custom_lims is not None:
+            ax.set_ylim([0, 1])
 
     # Last axis formatting
     last_ax = axes[-1]
