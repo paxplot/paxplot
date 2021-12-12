@@ -40,7 +40,7 @@ def get_data_lims(data, cols):
             ...
         }
     """
-    cols_lims={}
+    cols_lims = {}
     for col in cols:
         col_data = [row[col] for row in data]
         cols_lims[col] = [min(col_data), max(col_data)]
@@ -155,7 +155,6 @@ def parallel(
     ticks = np.linspace(0, 1, num=n_ticks + 1)
     last_ax.set_yticks(ticks=ticks, labels=tick_labels)
     last_ax.set_xticks([0, 1], cols[-2:])  # Set label
-
 
     # Remove space between plots
     subplots_adjust_args = {
