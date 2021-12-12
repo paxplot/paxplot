@@ -53,7 +53,8 @@ class AnalysisLib(unittest.TestCase):
 
     def test_parallel_subset_last_column_large(self):
         """
-        Testing plotting a subset of all the columns with different values
+        Testing plotting a subset of all the columns last column having larger
+        values
         """
         # Setup
         data = [
