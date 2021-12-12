@@ -48,6 +48,62 @@ def get_data_lims(data, cols):
     return cols_lims
 
 
+def format_axes(
+        ax,
+        labs,
+        minimum,
+        maximum,
+        n_ticks=10,
+        precision=2,
+        last=False
+):
+    """
+    Format AxesSubplot objects. This includes changing limit, ticks, and other
+    various formatting quantities.
+
+    TODO: deal with bug case of singleton point
+
+    :param ax: matplotlib.axes._subplots.AxesSubplot
+        AxesSubplot to be modified
+    :param labs: list
+        List of labels for y axis. If last column this will be a list of length
+        two.
+    :param minimum: numeric
+        Minimum value in column
+    :param maximum: numeric
+        Maximum value in column
+    :param n_ticks: int
+        Number of ticks
+    :param precision: int
+        Number of decimal places for rounding
+    :param last: boolean
+        Is this the last axes?
+    """
+    # Remove axes frame
+    ax.spines['top'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+
+    # Set limit
+    ax.set_ylim([0, 1])
+
+    # Change ticks to reflect scaled data
+    tick_labels = np.linspace(
+        minimum,
+        maximum,
+        num=n_ticks + 1
+    )
+    tick_labels = tick_labels.round(precision)
+    ticks = np.linspace(0, 1, num=n_ticks + 1)
+    ax.set_yticks(ticks=ticks, labels=tick_labels)
+
+    if not last:
+        # Set Label
+        ax.set_xticks([0], labs)
+    else:
+        # Set Label
+        ax.set_xticks([0, 1], labs)
+
+
 def parallel(
         data,
         cols,
@@ -118,43 +174,24 @@ def parallel(
             # Plot the data
             ax.plot(x, y)
             ax.set_xlim(x)
-        # X axis formatting
-        ax.spines['top'].set_visible(False)  # Remove axes frame
-        ax.spines['bottom'].set_visible(False)  # Remove axes frame
-        ax.set_xticks([0], cols[ax_idx])  # Set label
-
-        # Y axis formatting
-        # Set limits
-        ax.set_ylim([0, 1])
-
-        # Change ticks to reflect scaled data
-        n_ticks = 10  # TODO make this a parameter in the future
-        precision = 2  # TODO make this a parameter in the future
-        tick_labels = np.linspace(
-            cols_lims[cols[ax_idx]][0],
-            cols_lims[cols[ax_idx]][1],
-            num=n_ticks+1
+        # Axes formatting
+        format_axes(
+            ax=ax,
+            labs=cols[ax_idx],
+            minimum=cols_lims[cols[ax_idx]][0],
+            maximum=cols_lims[cols[ax_idx]][1]
         )
-        tick_labels = tick_labels.round(precision)
-        ticks = np.linspace(0, 1, num=n_ticks+1)
-
-        ax.set_yticks(ticks=ticks, labels=tick_labels)
 
     # Last axes formatting
     last_ax = plt.twinx(axes[-1])
-    last_ax.spines['top'].set_visible(False)  # Remove axes frame
-    last_ax.spines['bottom'].set_visible(False)  # Remove axes frame
-    n_ticks = 10  # TODO make this a parameter in the future
-    precision = 2  # TODO make this a parameter in the future
-    tick_labels = np.linspace(
-        cols_lims[cols[-1]][0],
-        cols_lims[cols[-1]][1],
-        num=n_ticks + 1
+    format_axes(
+        ax=last_ax,
+        labs=cols[-2:],
+        minimum=cols_lims[cols[-1]][0],
+        maximum=cols_lims[cols[-1]][1],
+        last=True
+
     )
-    tick_labels = tick_labels.round(precision)
-    ticks = np.linspace(0, 1, num=n_ticks + 1)
-    last_ax.set_yticks(ticks=ticks, labels=tick_labels)
-    last_ax.set_xticks([0, 1], cols[-2:])  # Set label
 
     # Remove space between plots
     subplots_adjust_args = {
