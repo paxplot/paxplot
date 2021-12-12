@@ -25,6 +25,21 @@ def scale_val(val, minimum, maximum):
 
 
 def get_data_lims(data, cols):
+    """
+    Get minimum and maximum value for each column
+
+    :param data: list
+        List of dictionaries containing the contents of data from `parallel`
+    :param cols: list
+        Columns to be plotted from `parallel`
+    :return: cols_lims: dict
+        Dictionary of column limits corresponding to columns in `cols` in form:
+        {
+            col1: [lower, upper],
+            col2: [lower, upper],
+            ...
+        }
+    """
     cols_lims={}
     for col in cols:
         col_data = [row[col] for row in data]
