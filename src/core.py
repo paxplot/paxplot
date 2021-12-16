@@ -92,8 +92,6 @@ def format_axes(
     Format AxesSubplot objects. This includes changing limit, ticks, and other
     various formatting quantities.
 
-    TODO: deal with bug case of singleton point
-
     :param ax: matplotlib.axes._subplots.AxesSubplot
         AxesSubplot to be modified
     :param labs: list
