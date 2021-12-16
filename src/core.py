@@ -114,8 +114,9 @@ def format_axes(
     ax.spines['top'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
 
-    # Set limit
+    # Set limits
     ax.set_ylim([0, 1])
+    ax.set_xlim([0, 1])
 
     # Change ticks to reflect scaled data
     tick_labels = np.linspace(
@@ -212,12 +213,14 @@ def parallel(
             )
             y = [y_0_scaled, y_1_scaled]
 
-            # Plot the data
+            # Line Coloring
             if color_col is not None:
-                ax.plot(x, y, data_color[row_idx])
+                color = data_color[row_idx]
             else:
-                ax.plot(x, y)
-            ax.set_xlim(x)
+                color = ''
+
+            # Plot the data
+            ax.plot(x, y, color)
         # Axes formatting
         format_axes(
             ax=ax,
