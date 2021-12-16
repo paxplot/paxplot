@@ -79,6 +79,53 @@ def get_color_gradient(data, color_col, colormap):
     return data_color
 
 
+def create_colorbar(fig, cols_lims, color_col, color_col_colormap):
+    """
+    Create and add colorbar to plot
+
+    :param fig: matplotlib.figure.Figure
+        Matplotlib figure
+    cols_lims: dict
+        Dictionary of column limits corresponding to columns in `cols` in form:
+        {
+            col1: [lower, upper],
+            col2: [lower, upper],
+            ...
+        }
+    :param color_col: str
+        Column in `data` to use for coloring
+    :param color_col_colormap: str
+        Matplotlib colormap to use for coloring
+
+    :return: fig: matplotlib.figure.Figure
+        Matplotlib figure
+    """
+    # Adjusting bounds automatically (based of previous axes)
+    colorbar_bounds = list(fig.axes[-2].get_position().bounds)
+    colorbar_bounds[0] = colorbar_bounds[0] + 0.1  # Left starting
+    colorbar_bounds[2] = colorbar_bounds[2] / 5  # Width
+
+    # Create colorbar
+    colorbar_ax = plt.axes(colorbar_bounds)
+    cmap = cm.get_cmap(color_col_colormap)
+    norm = mpl.colors.Normalize(
+        vmin=cols_lims[color_col][0],
+        vmax=cols_lims[color_col][1]
+    )
+    mpl.colorbar.ColorbarBase(
+        colorbar_ax,
+        cmap=cmap,
+        norm=norm,
+        orientation='vertical',
+        label=color_col
+    )
+
+    # Add colorbar
+    fig.axes[-1] = colorbar_ax
+
+    return fig
+
+
 def format_axes(
         ax,
         labs,
@@ -142,7 +189,8 @@ def parallel(
         cols,
         color_col=None,
         color_col_colormap='viridis',
-        custom_lims=None
+        custom_lims=None,
+        colorbar=False
 ):
     """
     Create static parallel plot in Matplotlib.
@@ -172,6 +220,8 @@ def parallel(
             col2: [lower, upper],
             ...
         }
+    :param colorbar: boolean
+        Should a colorbar be created?
 
 
     :return: fig: matplotlib.figure.Figure
@@ -191,9 +241,17 @@ def parallel(
     else:
         cols_lims = get_data_lims(data, cols)
 
-    # Create empty figures
-    fig, axes = plt.subplots(1, len(cols) - 1, sharey=False)
-    if len(cols) == 2:
+    # Initializing figures
+    if colorbar:
+        # Create extra axes for colorbar (creates space)
+        fig, axes = plt.subplots(1, len(cols), sharey=False)
+        fig.axes[-1].axis('off')  # Don't show axes though
+        # Don't consider that axes for plotting
+        axes = axes[:-1]
+
+    else:
+        fig, axes = plt.subplots(1, len(cols) - 1, sharey=False)
+    if len(cols) == 2:  # If only two columns are plotted
         axes = [axes]
 
     # Plot each column pair at a time (axes)
@@ -247,6 +305,10 @@ def parallel(
         'hspace': 0.0
     }
     fig.subplots_adjust(**subplots_adjust_args)
+
+    # Add colorbar
+    if colorbar:
+        create_colorbar(fig, cols_lims, color_col, color_col_colormap)
 
     # Format ticks
     return fig
