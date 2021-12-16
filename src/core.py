@@ -119,14 +119,17 @@ def format_axes(
     ax.set_xlim([0, 1])
 
     # Change ticks to reflect scaled data
-    tick_labels = np.linspace(
-        minimum,
-        maximum,
-        num=n_ticks + 1
-    )
-    tick_labels = tick_labels.round(precision)
-    ticks = np.linspace(0, 1, num=n_ticks + 1)
-    ax.set_yticks(ticks=ticks, labels=tick_labels)
+    if maximum == minimum:
+        ax.set_yticks(ticks=[0.5], labels=[maximum])
+    else:
+        tick_labels = np.linspace(
+            minimum,
+            maximum,
+            num=n_ticks + 1
+        )
+        tick_labels = tick_labels.round(precision)
+        ticks = np.linspace(0, 1, num=n_ticks + 1)
+        ax.set_yticks(ticks=ticks, labels=tick_labels)
 
     if not last:
         # Set Label
