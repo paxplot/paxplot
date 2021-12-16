@@ -92,6 +92,26 @@ class AnalysisLib(unittest.TestCase):
         )
         fig.show()
 
+    def test_parallel_color(self):
+        """
+        Testing color column
+        """
+        # Setup
+        data = [
+            {'A': 0.0, 'B': 0.0, 'C': 0.0},
+            {'A': 1.0, 'B': 1.0, 'C': 1.0},
+            {'A': 2.0, 'B': 2.0, 'C': 2.0},
+        ]
+        color_col = 'A'
+
+        # Run
+        fig = core.parallel(
+            data=data,
+            cols=['A', 'B', 'C'],
+            color_col=color_col
+        )
+        fig.show()
+
 
 if __name__ == '__main__':
     unittest.main()
