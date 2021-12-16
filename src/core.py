@@ -1,6 +1,8 @@
 """Core parapy functions"""
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib import cm
 import numpy as np
 
 
@@ -46,6 +48,35 @@ def get_data_lims(data, cols):
         cols_lims[col] = [min(col_data), max(col_data)]
 
     return cols_lims
+
+
+def get_color_gradient(data, color_col, colormap):
+    """
+    Get color gradient values for the `color_col` in `data` based on the
+    `colormap` specification.
+
+    :param data: list
+        List of dictionaries containing the contents of data from `parallel`
+    :param color_col: str
+        Column in `data` to use for coloring
+    :param colormap: str
+        Matplotlib colormap to use for coloring
+    :return: data_color: list
+        List of hex values corresponding to each row in `data`
+    """
+    # Get Data
+    color_cor_data = [row[color_col] for row in data]
+
+    # Scale Data and get color
+    minimum = min(color_cor_data)
+    maximum = max(color_cor_data)
+    data_color = [
+        mpl.colors.rgb2hex(cm.get_cmap(colormap)(
+            scale_val(i, minimum, maximum))[:3]
+        ) for i in color_cor_data
+    ]
+
+    return data_color
 
 
 def format_axes(
@@ -107,6 +138,8 @@ def format_axes(
 def parallel(
         data,
         cols,
+        color_col=None,
+        color_col_colormap='viridis',
         custom_lims=None
 ):
     """
@@ -125,6 +158,10 @@ def parallel(
         ]
     :param cols: list
         Columns to be plotted
+    :param color_col: str
+        Column in `data` to use for coloring
+    :param color_col_colormap: str
+        Matplotlib colormap to use for coloring
     :param custom_lims: dict
         Dictionary of custom column limits corresponding to columns in `cols`.
         Must be of the form:
@@ -142,6 +179,10 @@ def parallel(
 
     # Input error checking
 
+    # Getting color data
+    if color_col is not None:
+        data_color = get_color_gradient(data, color_col, color_col_colormap)
+
     # Setting automatic column limits
     if custom_lims is not None:
         cols_lims = custom_lims
@@ -156,7 +197,7 @@ def parallel(
     # Plot each column pair at a time (axes)
     for ax_idx, ax in enumerate(axes):
         # Plot each line
-        for row in data:
+        for row_idx, row in enumerate(data):
             x = [0, 1]  # Assume each axes has a length between 0 and 1
             # Scale the data
             y_0_scaled = scale_val(
@@ -172,7 +213,10 @@ def parallel(
             y = [y_0_scaled, y_1_scaled]
 
             # Plot the data
-            ax.plot(x, y)
+            if color_col is not None:
+                ax.plot(x, y, data_color[row_idx])
+            else:
+                ax.plot(x, y)
             ax.set_xlim(x)
         # Axes formatting
         format_axes(
