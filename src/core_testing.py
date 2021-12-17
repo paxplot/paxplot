@@ -241,6 +241,29 @@ class AnalysisLib(unittest.TestCase):
         )
         fig.show()
 
+    def test_parallel_custom_ticks(self):
+        """
+        Test for custom ticks
+        """
+        # Setup
+        data = [
+            {'A': 0.0, 'B': 0.0, 'C': 0.0},
+            {'A': 1.0, 'B': 1.0, 'C': 1.0},
+            {'A': 2.0, 'B': 2.0, 'C': 2.0},
+        ]
+
+        # Run
+        fig = core.parallel(
+            data=data,
+            cols=['A', 'B', 'C'],
+            custom_ticks={
+                'A': [0.0, 0.1, 0.5, 1.0],
+                'B': [0.5],
+                'C': [0.0, 2.0]
+            }
+        )
+        fig.show()
+
 
 if __name__ == '__main__':
     unittest.main()
