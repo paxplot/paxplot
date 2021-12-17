@@ -85,7 +85,7 @@ def create_colorbar(fig, cols_lims, color_col, color_col_colormap):
 
     :param fig: matplotlib.figure.Figure
         Matplotlib figure
-    cols_lims: dict
+    :param cols_lims: dict
         Dictionary of column limits corresponding to columns in `cols` in form:
         {
             col1: [lower, upper],
