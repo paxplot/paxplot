@@ -190,7 +190,8 @@ def parallel(
         color_col=None,
         color_col_colormap='viridis',
         custom_lims=None,
-        colorbar=False
+        colorbar=False,
+        figsize=None
 ):
     """
     Create static parallel plot in Matplotlib.
@@ -222,7 +223,8 @@ def parallel(
         }
     :param colorbar: boolean
         Should a colorbar be created?
-
+    :param figsize: (float, float)
+        Matplotlib figsize argument: width, height in inches.
 
     :return: fig: matplotlib.figure.Figure
         Matplotlib figure
@@ -235,6 +237,12 @@ def parallel(
     if color_col is not None:
         data_color = get_color_gradient(data, color_col, color_col_colormap)
 
+    # Setting automatic figsize
+    if figsize is None:
+        height = 4
+        width = 2 * len(cols)
+        figsize = (width, height)
+
     # Setting automatic column limits
     if custom_lims is not None:
         cols_lims = custom_lims
@@ -244,13 +252,23 @@ def parallel(
     # Initializing figures
     if colorbar:
         # Create extra axes for colorbar (creates space)
-        fig, axes = plt.subplots(1, len(cols), sharey=False)
+        fig, axes = plt.subplots(
+            1,
+            len(cols),
+            sharey=False,
+            figsize=figsize
+        )
         fig.axes[-1].axis('off')  # Don't show axes though
         # Don't consider that axes for plotting
         axes = axes[:-1]
 
     else:
-        fig, axes = plt.subplots(1, len(cols) - 1, sharey=False)
+        fig, axes = plt.subplots(
+            1,
+            len(cols) - 1,
+            sharey=False,
+            figsize=figsize
+        )
     if len(cols) == 2:  # If only two columns are plotted
         axes = [axes]
 
