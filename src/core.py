@@ -313,7 +313,7 @@ def parallel(
         )
 
     # Checking if columns are in data
-    if cols not in list(data[0].keys()):
+    if not set(cols) <= set(data[0].keys()):
         raise ValueError(
             f'Specified columns in `cols` do not appear in `data`. You '
             f'specified cols as {cols} but `data` has columns'
