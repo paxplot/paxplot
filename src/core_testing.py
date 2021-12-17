@@ -316,7 +316,7 @@ class AnalysisLib(unittest.TestCase):
         """
         with self.assertRaises(TypeError):
             core.parallel(
-                data=[1, 2],
+                data={1, 2},
                 cols=['A', 'B', 'C']
             )
             core.parallel(
