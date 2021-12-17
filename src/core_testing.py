@@ -341,6 +341,23 @@ class AnalysisLib(unittest.TestCase):
                 cols=['A', 'B', 'C']
             )
 
+    def test_parallel_columns_in_data(self):
+        """
+        Check if specified columns are in data
+        """
+        # Setup
+        data = [
+            {'A': 0.0, 'B': 0.0, 'C': 0.0},
+            {'A': 1.0, 'B': 1.0, 'C': 1.0},
+            {'A': 2.0, 'B': 2.0, 'C': 2.0},
+        ]
+
+        with self.assertRaises(ValueError):
+            core.parallel(
+                data=data,
+                cols=['A', 'D']
+            )
+
 
 if __name__ == '__main__':
     unittest.main()
