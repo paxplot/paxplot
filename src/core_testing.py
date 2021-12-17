@@ -1,6 +1,9 @@
 """Tests for core parapy functions"""
 
 import unittest
+import random
+from string import ascii_lowercase
+import numpy as np
 
 import core
 
@@ -167,6 +170,25 @@ class AnalysisLib(unittest.TestCase):
             data=data,
             cols=['A', 'B', 'C', 'D', 'E', 'F'],
             color_col='A',
+            colorbar=True
+        )
+        fig.show()
+
+    def test_parallel_colorbar_stupid_many(self):
+        """
+        Test a stupid number of columns
+        """
+        random.seed(1008)
+        n_cols = 50
+        n_observations = 40
+        cols = [''.join(random.choice(ascii_lowercase) for _ in range(5)) for _ in range(n_cols)]
+        data = [dict(zip(cols, np.random.random(size=n_cols))) for _ in range(n_observations)]
+
+        # Run
+        fig = core.parallel(
+            data=data,
+            cols=cols,
+            color_col=cols[0],
             colorbar=True
         )
         fig.show()
