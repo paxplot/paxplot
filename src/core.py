@@ -1,9 +1,39 @@
 """Core parapy functions"""
 
+import csv
+import ast
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib import cm
 import numpy as np
+
+
+def file_reader(path):
+    """
+    Read contents of external files
+
+    Parameters
+    ----------
+    path: str
+        Path to file
+    Returns
+    -------
+    data: list
+        List of dictionaries containing the contents of dataset stored in
+        `path`. This has the form
+        [
+            {col1: val1, col2: val1},
+            {col1: val2, col2: val2}
+            ...
+        ]
+    """
+    with open(path, 'r') as read_obj:
+        data = []
+        dict_reader = csv.DictReader(read_obj, skipinitialspace=True)
+        for row in dict_reader:
+            data.append({k: ast.literal_eval(v) for k, v in row.items()})
+
+    return data
 
 
 def scale_val(val, minimum, maximum):
