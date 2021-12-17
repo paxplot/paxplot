@@ -131,6 +131,7 @@ def format_axes(
         labs,
         minimum,
         maximum,
+        custom_ticks,
         invert=False,
         n_ticks=10,
         precision=2,
@@ -149,6 +150,8 @@ def format_axes(
         Minimum value in column
     :param maximum: numeric
         Maximum value in column
+    :param custom_ticks: dictionary
+        Dictionary of custom column tick values
     :param invert: boolean
         Whether or not column is inverted
     :param n_ticks: int
@@ -170,19 +173,25 @@ def format_axes(
     if maximum == minimum:
         ax.set_yticks(ticks=[0.5], labels=[maximum])
     else:
-        # Get tick locations
+        # Default tick setup
         if invert:
             ticks = np.linspace(1, 0, num=n_ticks + 1)
         else:
             ticks = np.linspace(0, 1, num=n_ticks + 1)
-
-        # Get tick labels
         tick_labels = np.linspace(
             minimum,
             maximum,
             num=n_ticks + 1
         )
         tick_labels = tick_labels.round(precision)
+
+        # Custom ticks
+        if custom_ticks is not None and not last:
+            tick_labels = custom_ticks[labs]
+            ticks = [scale_val(i, minimum, maximum) for i in tick_labels]
+        elif custom_ticks is not None and last:
+            tick_labels = custom_ticks[labs[1]]
+            ticks = [scale_val(i, minimum, maximum) for i in tick_labels]
 
         # Set Ticks
         ax.set_yticks(ticks=ticks, labels=tick_labels)
@@ -202,6 +211,7 @@ def parallel(
         color_col=None,
         color_col_colormap='viridis',
         custom_lims=None,
+        custom_ticks=None,
         colorbar=False,
         figsize=None
 ):
@@ -233,6 +243,14 @@ def parallel(
         {
             col1: [lower, upper],
             col2: [lower, upper],
+            ...
+        }
+    :param custom_ticks: dictionary
+        Dictionary of lists of numeric values reflecting custom column ticks.
+        Must be of the form
+        {
+            col1: [tick1, tick2, ...]
+            col2: [tick1, tick2, ...]
             ...
         }
     :param colorbar: boolean
@@ -328,7 +346,8 @@ def parallel(
             labs=cols[ax_idx],
             minimum=cols_lims[cols[ax_idx]][0],
             maximum=cols_lims[cols[ax_idx]][1],
-            invert=invert
+            invert=invert,
+            custom_ticks=custom_ticks
         )
 
     # Last axes formatting
@@ -338,8 +357,8 @@ def parallel(
         labs=cols[-2:],
         minimum=cols_lims[cols[-1]][0],
         maximum=cols_lims[cols[-1]][1],
+        custom_ticks=custom_ticks,
         last=True
-
     )
 
     # Remove space between plots
