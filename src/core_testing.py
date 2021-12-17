@@ -289,7 +289,5 @@ class AnalysisLib(unittest.TestCase):
         fig.show()
 
 
-
-
 if __name__ == '__main__':
     unittest.main()
