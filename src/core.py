@@ -178,7 +178,7 @@ def format_axes(
 
     if not last:
         # Set Label
-        ax.set_xticks([0], labs)
+        ax.set_xticks([0], [labs])
     else:
         # Set Label
         ax.set_xticks([0, 1], labs)
