@@ -315,15 +315,31 @@ class AnalysisLib(unittest.TestCase):
         Basic parallel type error
         """
         with self.assertRaises(TypeError):
-            fig = core.parallel(
+            core.parallel(
                 data=[1, 2],
                 cols=['A', 'B', 'C']
             )
-            fig = core.parallel(
+            core.parallel(
                 data=[1, 2],
                 cols={'A', 'B'}
             )
 
+    def test_parallel_consistent_columns(self):
+        """
+        Check consistent column names
+        """
+        # Test
+        data_wrong = [
+            {'A': 1, 'B': 0.1, 'C': '1'},
+            {'B': 2, 'C': 0.2, 'D': '2'},
+            {'E': 3, 'F': 0.3, 'G': '3'}
+        ]
+
+        with self.assertRaises(ValueError):
+            core.parallel(
+                data=data_wrong,
+                cols=['A', 'B', 'C']
+            )
 
 
 if __name__ == '__main__':
