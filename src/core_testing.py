@@ -1,6 +1,7 @@
 """Tests for core parapy functions"""
 
 import unittest
+import os
 import random
 from string import ascii_lowercase
 import numpy as np
@@ -287,6 +288,27 @@ class AnalysisLib(unittest.TestCase):
             cols_invert=['A', 'B']
         )
         fig.show()
+
+    def test_file_reader_import(self):
+        """
+        Basic test for the file reader
+        """
+        # Setup
+        test_file = open('test.txt', 'w')
+        test_file.write("A,B,C\n1,0.1,'1'\n 2,0.2,'2'\n3,0.3,'3'")
+        test_file.close()
+
+        # Run
+        result = core.file_reader('test.txt')
+        os.remove('test.txt')
+
+        # Test
+        expect = [
+            {'A': 1, 'B': 0.1, 'C': '1'},
+            {'A': 2, 'B': 0.2, 'C': '2'},
+            {'A': 3, 'B': 0.3, 'C': '3'}
+        ]
+        self.assertEqual(expect, result)
 
 
 if __name__ == '__main__':
