@@ -131,6 +131,7 @@ def format_axes(
         labs,
         minimum,
         maximum,
+        invert=False,
         n_ticks=10,
         precision=2,
         last=False
@@ -148,6 +149,8 @@ def format_axes(
         Minimum value in column
     :param maximum: numeric
         Maximum value in column
+    :param invert: boolean
+        Whether or not column is inverted
     :param n_ticks: int
         Number of ticks
     :param precision: int
@@ -167,13 +170,21 @@ def format_axes(
     if maximum == minimum:
         ax.set_yticks(ticks=[0.5], labels=[maximum])
     else:
+        # Get tick locations
+        if invert:
+            ticks = np.linspace(1, 0, num=n_ticks + 1)
+        else:
+            ticks = np.linspace(0, 1, num=n_ticks + 1)
+
+        # Get tick labels
         tick_labels = np.linspace(
             minimum,
             maximum,
             num=n_ticks + 1
         )
         tick_labels = tick_labels.round(precision)
-        ticks = np.linspace(0, 1, num=n_ticks + 1)
+
+        # Set Ticks
         ax.set_yticks(ticks=ticks, labels=tick_labels)
 
     if not last:
@@ -187,6 +198,7 @@ def format_axes(
 def parallel(
         data,
         cols,
+        cols_invert=(),
         color_col=None,
         color_col_colormap='viridis',
         custom_lims=None,
@@ -209,6 +221,8 @@ def parallel(
         ]
     :param cols: list
         Columns to be plotted
+    :param cols_invert: list
+        Columns to invert in plotted. Must be a subset of cols.
     :param color_col: str
         Column in `data` to use for coloring
     :param color_col_colormap: str
@@ -234,6 +248,8 @@ def parallel(
     # Input error checking
 
     # Getting color data
+    if cols_invert is None:
+        cols_invert = []
     if color_col is not None:
         data_color = get_color_gradient(data, color_col, color_col_colormap)
 
@@ -276,19 +292,21 @@ def parallel(
     for ax_idx, ax in enumerate(axes):
         # Plot each line
         for row_idx, row in enumerate(data):
-            x = [0, 1]  # Assume each axes has a length between 0 and 1
             # Scale the data
             y_0_scaled = scale_val(
                 val=row[cols[ax_idx]],
                 minimum=cols_lims[cols[ax_idx]][0],
                 maximum=cols_lims[cols[ax_idx]][1]
             )
+            if cols[ax_idx] in cols_invert:
+                y_0_scaled = 0.5 - y_0_scaled + 0.5
             y_1_scaled = scale_val(
                 val=row[cols[ax_idx + 1]],
                 minimum=cols_lims[cols[ax_idx + 1]][0],
                 maximum=cols_lims[cols[ax_idx + 1]][1]
             )
-            y = [y_0_scaled, y_1_scaled]
+            if cols[ax_idx + 1] in cols_invert:
+                y_1_scaled = 0.5 - y_1_scaled + 0.5
 
             # Line Coloring
             if color_col is not None:
@@ -297,13 +315,20 @@ def parallel(
                 color = ''
 
             # Plot the data
+            x = [0, 1]  # Assume each axes has a length between 0 and 1
+            y = [y_0_scaled, y_1_scaled]
             ax.plot(x, y, color)
         # Axes formatting
+        if cols[ax_idx] in cols_invert:
+            invert = True
+        else:
+            invert = False
         format_axes(
             ax=ax,
             labs=cols[ax_idx],
             minimum=cols_lims[cols[ax_idx]][0],
-            maximum=cols_lims[cols[ax_idx]][1]
+            maximum=cols_lims[cols[ax_idx]][1],
+            invert=invert
         )
 
     # Last axes formatting
