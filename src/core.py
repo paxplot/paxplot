@@ -294,7 +294,18 @@ def parallel(
 
     """
 
-    # Input error checking
+    # Checking data types
+    if type(data) is not dict:
+        raise TypeError(
+            f'Argument `data` must be a list of dictionaries. `data` was '
+            f'supplied as a {type(data)}. See docstring for guidance'
+        )
+    if type(cols) is not list:
+        raise TypeError(
+            f'Argument `cols` must be a list. `cols` was supplied as a '
+            f'{type(cols)}. See docstring for guidance'
+        )
+
 
     # Getting color data
     if cols_invert is None:
