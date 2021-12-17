@@ -181,15 +181,20 @@ class AnalysisLib(unittest.TestCase):
         random.seed(1008)
         n_cols = 50
         n_observations = 40
-        cols = [''.join(random.choice(ascii_lowercase) for _ in range(5)) for _ in range(n_cols)]
-        data = [dict(zip(cols, np.random.random(size=n_cols))) for _ in range(n_observations)]
+        cols = [
+            ''.join(random.choice(ascii_lowercase) for _ in range(5))
+            for _ in range(n_cols)
+        ]
+        data = [
+            dict(zip(cols, np.random.random(size=n_cols)))
+            for _ in range(n_observations)
+        ]
 
         # Run
         fig = core.parallel(
             data=data,
             cols=cols,
             color_col=cols[0],
-            colorbar=True
         )
         fig.show()
 
