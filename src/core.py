@@ -174,10 +174,7 @@ def format_axes(
         ax.set_yticks(ticks=[0.5], labels=[maximum])
     else:
         # Default tick setup
-        if invert:
-            ticks = np.linspace(1, 0, num=n_ticks + 1)
-        else:
-            ticks = np.linspace(0, 1, num=n_ticks + 1)
+        ticks = np.linspace(0, 1, num=n_ticks + 1)
         tick_labels = np.linspace(
             minimum,
             maximum,
@@ -192,6 +189,10 @@ def format_axes(
         elif custom_ticks is not None and last:
             tick_labels = custom_ticks[labs[1]]
             ticks = [scale_val(i, minimum, maximum) for i in tick_labels]
+
+        # Check for invert
+        if invert:
+            ticks = [0.5 - i + 0.5 for i in ticks]
 
         # Set Ticks
         ax.set_yticks(ticks=ticks, labels=tick_labels)
