@@ -310,6 +310,21 @@ class AnalysisLib(unittest.TestCase):
         ]
         self.assertEqual(expect, result)
 
+    def test_parallel_type(self):
+        """
+        Basic parallel type error
+        """
+        with self.assertRaises(TypeError):
+            fig = core.parallel(
+                data=[1, 2],
+                cols=['A', 'B', 'C']
+            )
+            fig = core.parallel(
+                data=[1, 2],
+                cols={'A', 'B'}
+            )
+
+
 
 if __name__ == '__main__':
     unittest.main()
