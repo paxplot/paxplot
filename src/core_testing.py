@@ -198,6 +198,30 @@ class AnalysisLib(unittest.TestCase):
         )
         fig.show()
 
+    def test_parallel_many_observations(self):
+        """
+        Test many observations
+        """
+        random.seed(1008)
+        n_cols = 6
+        n_observations = 1000
+        cols = [
+            ''.join(random.choice(ascii_lowercase) for _ in range(5))
+            for _ in range(n_cols)
+        ]
+        data = [
+            dict(zip(cols, np.random.random(size=n_cols)))
+            for _ in range(n_observations)
+        ]
+
+        # Run
+        fig = core.parallel(
+            data=data,
+            cols=cols,
+            color_col=cols[1],
+        )
+        fig.show()
+
 
 if __name__ == '__main__':
     unittest.main()
