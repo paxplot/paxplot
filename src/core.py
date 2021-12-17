@@ -308,8 +308,16 @@ def parallel(
     # Checking consistent column names
     if data[0].keys() != data[1].keys() != data[-1].keys():
         raise ValueError(
-            f'Columns in `data` are not consistent. Please see documentation'
+            f'Columns in `data` are not consistent. Please see documentation '
             f'for guidance'
+        )
+
+    # Checking if columns are in data
+    if cols not in list(data[0].keys()):
+        raise ValueError(
+            f'Specified columns in `cols` do not appear in `data`. You '
+            f'specified cols as {cols} but `data` has columns'
+            f' {list(data[0].keys())} '
         )
 
     # Getting color data
