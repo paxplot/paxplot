@@ -293,19 +293,24 @@ def parallel(
         Matplotlib figure
 
     """
-
-    # Checking data types
-    if type(data) is not dict:
+    # Checking argument types
+    if type(data) is not list:
         raise TypeError(
             f'Argument `data` must be a list of dictionaries. `data` was '
-            f'supplied as a {type(data)}. See docstring for guidance'
+            f'supplied as a {type(data)}. See documentation for guidance'
         )
     if type(cols) is not list:
         raise TypeError(
             f'Argument `cols` must be a list. `cols` was supplied as a '
-            f'{type(cols)}. See docstring for guidance'
+            f'{type(cols)}. See documentation for guidance'
         )
 
+    # Checking consistent column names
+    if data[0].keys() != data[1].keys() != data[-1].keys():
+        raise ValueError(
+            f'Columns in `data` are not consistent. Please see documentation'
+            f'for guidance'
+        )
 
     # Getting color data
     if cols_invert is None:
