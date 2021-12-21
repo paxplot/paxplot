@@ -1,0 +1,8 @@
+name: paxplot
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - matplotlib
+prefix: C:\Users\kravi\.conda\envs\paxplot
