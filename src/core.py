@@ -1,4 +1,4 @@
-"""Core parapy functions"""
+"""Core paxplot functions"""
 
 import csv
 import ast

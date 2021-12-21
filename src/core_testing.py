@@ -1,4 +1,4 @@
-"""Tests for core parapy functions"""
+"""Tests for core paxplot functions"""
 
 import unittest
 import os
