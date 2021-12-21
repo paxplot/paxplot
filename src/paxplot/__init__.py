@@ -1,1 +1,1 @@
-from paxplot import core
+from paxplot.core import *
