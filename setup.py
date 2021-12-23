@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="paxplot",
-    version="0.0.9",
+    version="0.0.14",
     author="Jacob Kravits",
     author_email="kravitsjacob@gmail.com",
     description="Create static parallel axis plots in Python",
@@ -16,7 +16,8 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/kravitsjacob/paxplot/issues",
     },
     install_requires=[
-        'matplotlib',
+        'numpy>=1.16',
+        'matplotlib>=3.0',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -25,5 +26,5 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
-    python_requires=">=3.9",
+    python_requires=">=3.7",
 )
