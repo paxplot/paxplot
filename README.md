@@ -15,7 +15,10 @@ paxplot
 │   .gitignore
 │   environment.yml: Conda environment for development
 │   LICENSE
+│   pyproject.toml: Pip build specifications
 │   README.md
+│   setup.cfg: Static build details
+│   setup.py: Dynamic build details
 │
 ├───.github: Files for continuous integration
 │   └───workflows
@@ -26,6 +29,8 @@ paxplot
 │       _config.yml
 │
 └───src: Source code
-        core.py: Core functions
-        core_testing.py: Core functions unit tests
+    └───paxplot
+            core.py: Core functions
+            core_testing.py: Core functions unit tests
+            __init__.py
 ```
