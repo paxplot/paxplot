@@ -6,6 +6,18 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib import cm
 import numpy as np
+from matplotlib.figure import Figure
+
+
+class PaxFigure(Figure):
+    def __init__(self, *args, **kwargs):
+        """
+        Paxplot extension of Matplot Figure
+        """
+        super().__init__(*args, **kwargs)
+
+    def parallel(self, data):
+        a = ''
 
 
 def file_reader(path):
