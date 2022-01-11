@@ -9,13 +9,49 @@ import numpy as np
 from matplotlib.figure import Figure
 
 
+def scale_val(val, minimum, maximum):
+    """
+    Scale a value linearly between a minimum and maximum value
+
+    :param val: numeric
+        Numeric value to be scaled
+    :param minimum: numeric
+        Minimum value to linearly scale between
+    :param maximum: numeric
+        Maximum value to lineraly scale between
+    :return: val_scaled:numeric
+        Scale `val`
+    """
+    try:
+        val_scaled = (val-minimum)/(maximum-minimum)
+    except ZeroDivisionError:
+        val_scaled = 0.5
+    return val_scaled
+
+
 class PaxFigure(Figure):
     def __init__(self, *args, data=[], **kwargs):
         """
         Paxplot extension of Matplot Figure
         """
-        # Set arguments
         super().__init__(*args, **kwargs)
+
+        # Remove space between plots
+        subplots_adjust_args = {
+            'wspace': 0.0,
+            'hspace': 0.0
+        }
+        self.subplots_adjust(**subplots_adjust_args)
+
+        for ax in self.axes:
+            # Remove axes frame
+            ax.spines['top'].set_visible(False)
+            ax.spines['bottom'].set_visible(False)
+
+            # Set limits
+            ax.set_ylim([0, 1])
+            ax.set_xlim([0, 1])
+    
 
 
 class PaxAxes:
@@ -23,26 +59,52 @@ class PaxAxes:
         self.axes = axes
 
     def plot(self, data):
+        """Plot the supplied data
+
+        Parameters
+        ----------
+        data : array-like
+            Data to be plotted
+        """
         # Convert to Numpy
         data = np.array(data)
-        print(data)
+
+        # Get data stats
+        data_mins = data.min(axis=0)
+        data_maxs = data.max(axis=0)
+
+        for col_idx, ax in enumerate(self.axes):
+            # Plot each line
+            for row_idx, row in enumerate(data):
+                # Scale the data
+                y_0_scaled = scale_val(
+                    val=row[row_idx],
+                    minimum=data_mins[col_idx],
+                    maximum=data_maxs[col_idx]
+                )
+                y_1_scaled = scale_val(
+                    val=row[row_idx + 1],
+                    minimum=data_mins[col_idx + 1],
+                    maximum=data_maxs[col_idx + 1]
+                )
+
+                # Plot the data
+                x = [0, 1]  # Assume each axes has a length between 0 and 1
+                y = [y_0_scaled, y_1_scaled]
+                ax.plot(x, y)
 
 
-def pax_parallel(data):
-    n_cols = len(data[0])
+def pax_parallel(n_axes):
     fig, axes = plt.subplots(
         1,
-        n_cols - 1,
+        n_axes - 1,
         sharey=False,
         FigureClass=PaxFigure,
-        data=data,
     )
 
     axes = PaxAxes(axes)
 
     return fig, axes
-
-
 
 
 # class PaxFigure(Figure):
@@ -96,50 +158,6 @@ def file_reader(path):
             data.append({k: ast.literal_eval(v) for k, v in row.items()})
 
     return data
-
-
-def scale_val(val, minimum, maximum):
-    """
-    Scale a value linearly between a minimum and maximum value
-
-    :param val: numeric
-        Numeric value to be scaled
-    :param minimum: numeric
-        Minimum value to linearly scale between
-    :param maximum: numeric
-        Maximum value to lineraly scale between
-    :return: val_scaled:numeric
-        Scale `val`
-    """
-    try:
-        val_scaled = (val-minimum)/(maximum-minimum)
-    except ZeroDivisionError:
-        val_scaled = 0.5
-    return val_scaled
-
-
-def get_data_lims(data, cols):
-    """
-    Get minimum and maximum value for each column
-
-    :param data: list
-        List of dictionaries containing the contents of data from `parallel`
-    :param cols: list
-        Columns to be plotted from `parallel`
-    :return: cols_lims: dict
-        Dictionary of column limits corresponding to columns in `cols` in form:
-        {
-            col1: [lower, upper],
-            col2: [lower, upper],
-            ...
-        }
-    """
-    cols_lims = {}
-    for col in cols:
-        col_data = [row[col] for row in data]
-        cols_lims[col] = [min(col_data), max(col_data)]
-
-    return cols_lims
 
 
 def get_color_gradient(data, color_col, colormap):
