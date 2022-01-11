@@ -17,7 +17,14 @@ class PaxFigure(Figure):
         super().__init__(*args, **kwargs)
 
     def parallel(self, data):
-        a = ''
+        """Core function to make parallel plots
+
+        Parameters
+        ----------
+        data : array-like
+            Data to be plotted
+        """
+        a = 1
 
 
 def file_reader(path):
