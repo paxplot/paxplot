@@ -23,12 +23,10 @@ class AnalysisLib(unittest.TestCase):
         ]
 
         # Run
-        fig = plt.figure(FigureClass=core.PaxFigure)
-        ax = fig.subplots()
-        ax.parallel(data=data)
-
-        # fig = core.parallel(data=data, cols=['A', 'B', 'C'])
+        fig, axes = core.pax_parallel(data=data)
+        a = 1
         # fig.show()
+
 
     # def test_parallel_subset_columns(self):
     #     """
