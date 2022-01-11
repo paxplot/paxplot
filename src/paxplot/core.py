@@ -10,21 +10,64 @@ from matplotlib.figure import Figure
 
 
 class PaxFigure(Figure):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, data=[], **kwargs):
         """
         Paxplot extension of Matplot Figure
         """
+        # Set arguments
         super().__init__(*args, **kwargs)
 
-    def parallel(self, data):
-        """Core function to make parallel plots
 
-        Parameters
-        ----------
-        data : array-like
-            Data to be plotted
-        """
-        a = 1
+class PaxAxes:
+    def __init__(self, axes):
+        self.axes = axes
+
+    def plot(self, data):
+        # Convert to Numpy
+        data = np.array(data)
+        print(data)
+
+
+def pax_parallel(data):
+    n_cols = len(data[0])
+    fig, axes = plt.subplots(
+        1,
+        n_cols - 1,
+        sharey=False,
+        FigureClass=PaxFigure,
+        data=data,
+    )
+
+    axes = PaxAxes(axes)
+
+    return fig, axes
+
+
+
+
+# class PaxFigure(Figure):
+#     def __init__(self, *args, data=[], **kwargs):
+#         """
+#         Paxplot extension of Matplot Figure
+#         """
+#         super().__init__(*args, **kwargs)
+
+
+#     def parallel(self):
+#         """Create custom parallel axes
+
+#         Returns
+#         -------
+#         PaxAx class
+#             Custom paxplot axes
+#         """
+#         class PaxAx():
+#             def plot(data):
+#                 # Convert to NumPy
+#                 data = np.array(data)
+#                 # Plot
+#                 a = 1
+#         return PaxAx
 
 
 def file_reader(path):
