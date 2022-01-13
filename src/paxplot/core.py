@@ -1,10 +1,6 @@
 """Core paxplot functions"""
 
-import csv
-import ast
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-from matplotlib import cm
 import numpy as np
 from matplotlib.figure import Figure
 
@@ -59,6 +55,11 @@ class PaxFigure(Figure):
 
             # Set x ticks
             ax.set_xticks([0], [' '])
+
+        # Last axis formatting
+        self.axes[-1].tick_params(direction='in', pad=-22)  # TODO add test
+        # self.axes[-1].set_box_aspect(0.1)
+        # self.add_gridspec(width_ratios=[1.0, 1.0, 1.0, 0.1]) # TODO set here
 
 
 class PaxAxes:
@@ -121,10 +122,13 @@ def pax_parallel(n_axes):
     axes : PaxAxes
         Paxplot axes class
     """
+    width_ratios = [1.0]*(n_axes-1)
+    width_ratios.append(0.0)  # Last axis small
     fig, axes = plt.subplots(
         1,
         n_axes,
         sharey=False,
+        gridspec_kw={'width_ratios': width_ratios},
         FigureClass=PaxFigure,
     )
     fig.default_format()
