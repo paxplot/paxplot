@@ -22,12 +22,12 @@ class AnalysisLib(unittest.TestCase):
         # Test
         image = open('temp.png', 'rb')
         image_test = open('test_solution_images/test_parallel_blank.png', 'rb')
-        self.assertEqual(image.read(), image_test.read())
-
-        # Cleanup
+        image_contents = image.read()
+        image_test_contents = image_test.read()
         image.close()
         image_test.close()
         os.remove('temp.png')
+        self.assertEqual(image_contents, image_test_contents)
 
     def test_parallel_basic(self):
         """
@@ -48,12 +48,12 @@ class AnalysisLib(unittest.TestCase):
         # Test
         image = open('temp.png', 'rb')
         image_test = open('test_solution_images/test_parallel_basic.png', 'rb')
-        self.assertEqual(image.read(), image_test.read())
-
-        # Cleanup
+        image_contents = image.read()
+        image_test_contents = image_test.read()
         image.close()
         image_test.close()
         os.remove('temp.png')
+        self.assertEqual(image_contents, image_test_contents)
 
 
 if __name__ == '__main__':
