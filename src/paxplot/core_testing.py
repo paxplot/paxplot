@@ -13,14 +13,14 @@ import core
 class AnalysisLib(unittest.TestCase):
     def test_parallel_blank(self):
         """
-        Basic test of blank figure
+        Test of blank figure
         """
         # Run
         fig, axes = core.pax_parallel(n_axes=4)
         fig.savefig('temp.png')
-        image = open('temp.png', 'rb')
 
         # Test
+        image = open('temp.png', 'rb')
         image_test = open('test_solution_images/test_parallel_blank.png', 'rb')
         self.assertEqual(image.read(), image_test.read())
 
@@ -44,6 +44,17 @@ class AnalysisLib(unittest.TestCase):
         # Run
         fig, axes = core.pax_parallel(n_axes=len(data[0]))
         axes.plot(data)
+        fig.savefig('temp.png')
+
+        # Test
+        image = open('temp.png', 'rb')
+        image_test = open('test_solution_images/test_parallel_basic.png', 'rb')
+        self.assertEqual(image.read(), image_test.read())
+
+        # Cleanup
+        image.close()
+        image_test.close()
+        os.remove('temp.png')
 
 
 if __name__ == '__main__':
