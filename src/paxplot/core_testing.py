@@ -28,7 +28,6 @@ class AnalysisLib(unittest.TestCase):
         image.close()
         image_test.close()
         os.remove('temp.png')
-        
 
     def test_parallel_basic(self):
         """
