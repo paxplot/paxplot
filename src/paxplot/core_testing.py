@@ -17,7 +17,18 @@ class AnalysisLib(unittest.TestCase):
         """
         # Run
         fig, axes = core.pax_parallel(n_axes=4)
-        fig.show()
+        fig.savefig('temp.png')
+        image = open('temp.png', 'rb')
+
+        # Test
+        image_test = open('test_solution_images/test_parallel_blank.png', 'rb')
+        self.assertEqual(image.read(), image_test.read())
+
+        # Cleanup
+        image.close()
+        image_test.close()
+        os.remove('temp.png')
+        
 
     def test_parallel_basic(self):
         """
@@ -33,7 +44,6 @@ class AnalysisLib(unittest.TestCase):
         # Run
         fig, axes = core.pax_parallel(n_axes=len(data[0]))
         axes.plot(data)
-        fig.show()
 
 
 if __name__ == '__main__':
