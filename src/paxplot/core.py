@@ -57,7 +57,8 @@ class PaxFigure(Figure):
             ax.set_xticks([0], [' '])
 
         # Last axis formatting
-        self.axes[-1].tick_params(direction='in', pad=-22)  # TODO add test
+        self.axes[-1].yaxis.tick_right()  # TODO add test
+        # self.axes[-1].tick_params(direction='in', pad=-22)  # TODO add test
         # self.axes[-1].set_box_aspect(0.1)
         # self.add_gridspec(width_ratios=[1.0, 1.0, 1.0, 0.1]) # TODO set here
 
