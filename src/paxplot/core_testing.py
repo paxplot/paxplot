@@ -1,5 +1,6 @@
 """Tests for core paxplot functions"""
 
+import enum
 import unittest
 import os
 
@@ -12,20 +13,20 @@ class AnalysisLib(unittest.TestCase):
         Test of blank figure
         """
         # Run
-        fig, axes = core.pax_parallel(n_axes=4)
+        paxfig, paxes = core.pax_parallel(n_axes=4)
 
         # Test
-        fig.show()
-        self.assertEqual(fig.axes.__len__(), 4)
+        paxfig.show()
+        self.assertEqual(paxfig.axes.__len__(), 4)
         self.assertEqual(
-            fig.subplotpars.__getattribute__('wspace'),
+            paxfig.subplotpars.__getattribute__('wspace'),
             0.0
         )
         self.assertEqual(
-            fig.subplotpars.__getattribute__('hspace'),
+            paxfig.subplotpars.__getattribute__('hspace'),
             0.0
         )
-        for ax in fig.axes:
+        for ax in paxes.axes:
             self.assertEqual(
                 ax.spines['top'].get_visible(),
                 False
@@ -48,17 +49,26 @@ class AnalysisLib(unittest.TestCase):
         """
         # Setup
         data = [
-            [0.0, 0.0, 0.0, 0.0],
-            [1.0, 1.0, 1.0, 1.0],
-            [2.0, 2.0, 2.0, 2.0]
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
         ]
 
         # Run
-        fig, axes = core.pax_parallel(n_axes=len(data[0]))
-        axes.plot(data)
+        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
+        paxes.plot(data)
 
         # Test
-        fig.show()
+        paxfig.show()
+        self.assertTrue(
+            (paxfig.axes[0].lines[0].get_ydata() == [0.0, 0.0]).all()
+        )
+        self.assertTrue(
+            (paxfig.axes[0].lines[1].get_ydata() == [0.5, 0.5]).all()
+        )
+        self.assertTrue(
+            (paxfig.axes[0].lines[2].get_ydata() == [1.0, 1.0]).all()
+        )
 
 
 if __name__ == '__main__':
