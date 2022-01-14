@@ -1,8 +1,6 @@
 """Tests for core paxplot functions"""
 
-import enum
 import unittest
-import os
 
 import core
 
@@ -16,7 +14,6 @@ class AnalysisLib(unittest.TestCase):
         paxfig, paxes = core.pax_parallel(n_axes=4)
 
         # Test
-        paxfig.show()
         self.assertEqual(paxfig.axes.__len__(), 4)
         self.assertEqual(
             paxfig.subplotpars.__getattribute__('wspace'),
@@ -59,7 +56,6 @@ class AnalysisLib(unittest.TestCase):
         paxes.plot(data)
 
         # Test
-        paxfig.show()
         self.assertTrue(
             (paxfig.axes[0].lines[0].get_ydata() == [0.0, 0.0]).all()
         )
