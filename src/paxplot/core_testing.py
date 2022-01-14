@@ -55,15 +55,25 @@ class AnalysisLib(unittest.TestCase):
         paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
         paxes.plot(data)
 
-        # Test
+        # Test plotted data
         self.assertTrue(
-            (paxfig.axes[0].lines[0].get_ydata() == [0.0, 0.0]).all()
+            (paxes.axes[0].lines[0].get_ydata() == [0.0, 0.0]).all()
         )
         self.assertTrue(
-            (paxfig.axes[0].lines[1].get_ydata() == [0.5, 0.5]).all()
+            (paxes.axes[0].lines[1].get_ydata() == [0.5, 0.5]).all()
         )
         self.assertTrue(
-            (paxfig.axes[0].lines[2].get_ydata() == [1.0, 1.0]).all()
+            (paxes.axes[0].lines[2].get_ydata() == [1.0, 1.0]).all()
+        )
+
+        # Test ticks
+        self.assertEqual(paxes.axes[0].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(
+            paxes.axes[0].get_yticklabels()[0].get_position()[1], 0.0
+        )
+        self.assertEqual(paxes.axes[0].get_yticklabels()[-1].get_text(), '2.0')
+        self.assertEqual(
+            paxes.axes[0].get_yticklabels()[-1].get_position()[1], 1.0
         )
 
 
