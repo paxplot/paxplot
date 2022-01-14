@@ -105,6 +105,40 @@ class PaxAxes:
                     y = [y_0_scaled, y_1_scaled]
                     self.axes[col_idx].plot(x, y)
 
+            # Defaults ticks
+            self.set_even_ticks(
+                    ax=self.axes[col_idx],
+                    n_ticks=6,
+                    minimum=data_mins[col_idx],
+                    maximum=data_maxs[col_idx],
+                    precision=2
+                )
+
+    def set_even_ticks(self, ax, n_ticks, minimum, maximum, precision):
+        """Set evenly spaced axis ticks between minimum and maximum value
+
+        Parameters
+        ----------
+        ax : AxesSubplot
+            Matplotlib axes
+        n_ticks : int
+            Number of ticks
+        minimum : numeric
+            minimum value for ticks
+        maximum : numeric
+            maximum value for ticks
+        precision : int
+            number of decimal points for tick labels
+        """
+        ticks = np.linspace(0, 1, num=n_ticks + 1)
+        tick_labels = np.linspace(
+            minimum,
+            maximum,
+            num=n_ticks + 1
+        )
+        tick_labels = tick_labels.round(precision)
+        ax.set_yticks(ticks=ticks, labels=tick_labels)
+
 
 def pax_parallel(n_axes):
     """
