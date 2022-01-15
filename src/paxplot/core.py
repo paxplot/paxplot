@@ -154,6 +154,9 @@ class PaxAxes:
         top : numeric
             Upper y limit
         """
+        # Set default limits
+        ax.set_ylim([0.0, 1.0])
+
         # Get axis index
         ax_idx = np.where(self.axes == ax)[0][0]
 
@@ -211,6 +214,35 @@ class PaxAxes:
                 maximum=top,
                 precision=2
             )
+
+    def set_yticks(self, ax, ticks, labels=None):
+        """Set the yaxis' tick locations and optionally labels.
+
+        Parameters
+        ----------
+        ax : AxesSubplot
+            Matplotlib axes
+        ticks : list of floats
+            List of tick locations.
+        labels : list of str, optional
+            List of tick labels. If not set, the labels show the data value.
+        """
+        # Set the limits (this preserves matplotlib's
+        # mandatory expansion of the view limits)
+        self.set_ylim(
+            ax,
+            bottom=min(ticks),
+            top=max(ticks)
+        )
+
+        # Scale the ticks
+        minimum = min(ticks)
+        maximum = max(ticks)
+        tick_scaled = [scale_val(i, minimum, maximum) for i in ticks]
+
+        # Set the ticks
+        ax.set_yticks(ticks=tick_scaled)
+        ax.set_yticklabels(labels=ticks)
 
 
 def pax_parallel(n_axes):
