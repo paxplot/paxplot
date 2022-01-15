@@ -140,12 +140,11 @@ class AnalysisLib(unittest.TestCase):
         paxes.set_yticks(paxes.axes[0], ticks=[0.0, 1.0, 2.0])
         paxes.set_yticks(paxes.axes[1], ticks=[0.0, 0.5, 1.0, 2.0, 2.5])
 
-        # Test tick labels
+        # Test ticks
         self.assertEqual(paxes.axes[0].get_yticklabels()[0].get_text(), '0.0')
         self.assertEqual(paxes.axes[0].get_yticklabels()[2].get_text(), '2.0')
         self.assertEqual(paxes.axes[1].get_yticklabels()[0].get_text(), '0.0')
         self.assertEqual(paxes.axes[1].get_yticklabels()[4].get_text(), '2.5')
-
         self.assertEqual(
             paxes.axes[0].get_yticklabels()[0].get_position()[1], 0.0
         )
@@ -159,8 +158,37 @@ class AnalysisLib(unittest.TestCase):
             paxes.axes[1].get_yticklabels()[4].get_position()[1], 1.0
         )
 
-        import matplotlib.pyplot as plt
-        plt.show()
+    def test_parallel_custom_ticks(self):
+        """
+        Testing plotting with custom ticks
+        """
+        # Setup
+        data = [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
+        ]
+
+        # Run
+        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
+        paxes.plot(data)
+        paxes.set_yticks(
+            paxes.axes[0],
+            ticks=[0.0, 1.0, 2.0],
+            labels=['my heart', 'is the \ncode to', '1612']
+        )
+
+        # Test ticks
+        self.assertEqual(
+            paxes.axes[0].get_yticklabels()[0].get_text(), 'my heart'
+        )
+        self.assertEqual(paxes.axes[0].get_yticklabels()[2].get_text(), '1612')
+        self.assertEqual(
+            paxes.axes[0].get_yticklabels()[0].get_position()[1], 0.0
+        )
+        self.assertEqual(
+            paxes.axes[0].get_yticklabels()[2].get_position()[1], 1.0
+        )
 
 
 if __name__ == '__main__':
