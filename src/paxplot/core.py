@@ -243,6 +243,8 @@ class PaxAxes:
         # Set the ticks
         ax.set_yticks(ticks=tick_scaled)
         ax.set_yticklabels(labels=ticks)
+        if labels is not None:
+            ax.set_yticklabels(labels=labels)
 
 
 def pax_parallel(n_axes):
