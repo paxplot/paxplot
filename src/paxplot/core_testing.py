@@ -123,7 +123,7 @@ class AnalysisLib(unittest.TestCase):
             paxes.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
         )
 
-    def test_parallel_ticks(self):
+    def test_parallel_yticks(self):
         """
         Testing plotting with modified ticks
         """
@@ -158,7 +158,7 @@ class AnalysisLib(unittest.TestCase):
             paxes.axes[1].get_yticklabels()[4].get_position()[1], 1.0
         )
 
-    def test_parallel_custom_ticks(self):
+    def test_parallel_custom_yticks(self):
         """
         Testing plotting with custom ticks
         """
@@ -188,6 +188,34 @@ class AnalysisLib(unittest.TestCase):
         )
         self.assertEqual(
             paxes.axes[0].get_yticklabels()[2].get_position()[1], 1.0
+        )
+
+    def test_parallel_xlabel(self):
+        # Setup
+        data = [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
+        ]
+
+        # Run
+        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
+        paxes.plot(data)
+        paxes.set_xlabel(
+            paxes.axes[0],
+            xlabel='Em7-G7-Cmaj7'
+        )
+        paxes.set_xlabel(
+            paxes.axes[1],
+            xlabel='F#m7-B7'
+        )
+
+        # Test
+        self.assertEqual(
+            paxes.axes[0].get_xticklabels()[0].get_text(), 'Em7-G7-Cmaj7'
+        )
+        self.assertEqual(
+            paxes.axes[1].get_xticklabels()[0].get_text(), 'F#m7-B7'
         )
 
 
