@@ -212,10 +212,10 @@ class AnalysisLib(unittest.TestCase):
 
         # Test
         self.assertEqual(
-            paxes.axes[0].get_xticklabels()[0].get_text(), 'Em7-G7-Cmaj7'
+            paxes.axes[0].get_xticklabels()[0].get_text(), 'Em7-Dm7-G7'
         )
         self.assertEqual(
-            paxes.axes[1].get_xticklabels()[0].get_text(), 'F#m7-B7'
+            paxes.axes[1].get_xticklabels()[0].get_text(), 'Cmaj7-B7'
         )
 
 
