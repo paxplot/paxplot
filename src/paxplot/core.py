@@ -246,6 +246,19 @@ class PaxAxes:
         if labels is not None:
             ax.set_yticklabels(labels=labels)
 
+    def set_xlabel(self, ax, xlabel):
+        """Set the label for the axis
+
+        Parameters
+        ----------
+        ax : AxesSubplot
+            Matplotlib axes
+        xlabel : str
+            The label text
+        """
+        ax.set_xticks(ticks=[0.0])
+        ax.set_xticklabels([xlabel])
+
 
 def pax_parallel(n_axes):
     """
