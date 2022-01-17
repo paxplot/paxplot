@@ -203,11 +203,11 @@ class AnalysisLib(unittest.TestCase):
         paxes.plot(data)
         paxes.set_xlabel(
             paxes.axes[0],
-            xlabel='Em7-G7-Cmaj7'
+            xlabel='Em7-Dm7-G7'
         )
         paxes.set_xlabel(
             paxes.axes[1],
-            xlabel='F#m7-B7'
+            xlabel='Cmaj7-B7'
         )
 
         # Test
