@@ -262,6 +262,48 @@ class AnalysisLib(unittest.TestCase):
             paxes.axes[2].get_yticklabels()[-1].get_position()[1], 0.0
         )
 
+    def test_parallel_legend(self):
+        """
+        Test creating legend
+        """
+        # Setup
+        data = [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
+        ]
+
+        # # Run
+        # paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
+        # paxes.plot(data, label=['A', 'B', 'C'])
+        # paxes.legend()
+
+    def test_parallel_colorbar(self):
+        """
+        Test creating colorbar
+        """
+        # Setup
+        data = [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
+        ]
+
+        # Run
+        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
+        paxes.plot(data)
+
+        # import matplotlib.pyplot as plt
+        # sm = plt.cm.ScalarMappable(norm=plt.Normalize(vmin=0, vmax=1))
+        # colorbar_bounds = list(paxfig.axes[-1].get_position().bounds)
+        # colorbar_bounds[0] = colorbar_bounds[0] - 0.1  # Left starting
+        # colorbar_bounds[2] = 0.05  # Width
+        # colorbar_ax = plt.axes(colorbar_bounds)
+        # paxfig.colorbar(sm, cax=colorbar_ax, orientation='vertical')
+        # paxfig.subplots_adjust(right=0.7)
+
+        # plt.show()
+
 
 if __name__ == '__main__':
     unittest.main()
