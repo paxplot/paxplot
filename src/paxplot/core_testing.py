@@ -191,6 +191,9 @@ class AnalysisLib(unittest.TestCase):
         )
 
     def test_parallel_xlabel(self):
+        """
+        Testing setting x labels
+        """
         # Setup
         data = [
             [0.0, 0.0],
@@ -217,6 +220,26 @@ class AnalysisLib(unittest.TestCase):
         self.assertEqual(
             paxes.axes[1].get_xticklabels()[0].get_text(), 'Cmaj7-B7'
         )
+
+    def test_parallel_invert(self):
+        """
+        Test inverting axis
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 0.0],
+            [1.0, 1.0, 1.0],
+            [2.0, 1.0, 2.0]
+        ]
+
+        # Run
+        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
+        paxes.plot(data)
+        paxes.invert_yaxis(paxes.axes[0])
+        paxes.invert_yaxis(paxes.axes[1])
+
+        import matplotlib.pyplot as plt
+        plt.show()
 
 
 if __name__ == '__main__':
