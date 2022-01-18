@@ -259,6 +259,44 @@ class PaxAxes:
         ax.set_xticks(ticks=[0.0])
         ax.set_xticklabels([xlabel])
 
+    def invert_yaxis(self, ax):
+        """Invert the y-axis.
+
+        Parameters
+        ----------
+        ax : AxesSubplot
+            Matplotlib axes
+        """
+        # Get axis index
+        ax_idx = np.where(self.axes == ax)[0][0]
+
+        # Invert line data
+
+        # For non-last axis
+        if ax_idx < len(self.axes)-1:
+            for line in ax.lines:
+                # Flip y value about 0.5
+                y_0_scaled = 1.0 - line.get_ydata()[0]
+
+                # Replace the second y value
+                line.set_ydata([y_0_scaled, line.get_ydata()[1]])
+
+        # For last axis
+        elif ax_idx == len(self.axes)-1:
+            for line in self.axes[-2].lines:
+                # Flip y value about 0.5
+                y_1_scaled = 1.0 - line.get_ydata()[1]
+
+                # Replace the second y value
+                line.set_ydata([line.get_ydata()[0], y_1_scaled])
+
+        # Invert ticks
+        ticks = ax.get_yticks()
+        ticks_scaled = 1.0 - ticks
+        labels = [i.get_text() for i in ax.get_yticklabels()]
+        ax.set_yticks(ticks=ticks_scaled)
+        ax.set_yticklabels(labels=labels)
+
 
 def pax_parallel(n_axes):
     """
