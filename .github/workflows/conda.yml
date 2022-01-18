@@ -31,4 +31,4 @@ jobs:
     - name: Test with unittest
       run: |
         cd src/paxplot
-        python core_testing.py
+        python test_core.py
