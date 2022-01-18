@@ -229,17 +229,38 @@ class AnalysisLib(unittest.TestCase):
         data = [
             [0.0, 0.0, 0.0],
             [1.0, 1.0, 1.0],
-            [2.0, 1.0, 2.0]
+            [2.0, 2.0, 2.0]
         ]
 
         # Run
         paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
         paxes.plot(data)
         paxes.invert_yaxis(paxes.axes[0])
-        paxes.invert_yaxis(paxes.axes[1])
+        paxes.invert_yaxis(paxes.axes[2])
 
-        import matplotlib.pyplot as plt
-        plt.show()
+        # Test plotted data
+        self.assertEqual(paxes.axes[0].lines[0].get_ydata()[0], 1.0)
+        self.assertEqual(paxes.axes[0].lines[2].get_ydata()[0], 0.0)
+        self.assertEqual(paxes.axes[1].lines[0].get_ydata()[1], 1.0)
+        self.assertEqual(paxes.axes[1].lines[2].get_ydata()[1], 0.0)
+
+        # Test ticks
+        self.assertEqual(paxes.axes[0].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(paxes.axes[0].get_yticklabels()[-1].get_text(), '2.0')
+        self.assertEqual(paxes.axes[2].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(paxes.axes[2].get_yticklabels()[-1].get_text(), '2.0')
+        self.assertEqual(
+            paxes.axes[0].get_yticklabels()[0].get_position()[1], 1.0
+        )
+        self.assertEqual(
+            paxes.axes[0].get_yticklabels()[-1].get_position()[1], 0.0
+        )
+        self.assertEqual(
+            paxes.axes[2].get_yticklabels()[0].get_position()[1], 1.0
+        )
+        self.assertEqual(
+            paxes.axes[2].get_yticklabels()[-1].get_position()[1], 0.0
+        )
 
 
 if __name__ == '__main__':
