@@ -56,6 +56,9 @@ class PaxFigure(Figure):
             # Set x ticks
             ax.set_xticks([0], [' '])
 
+            # Set axis intersection point
+            ax.spines['bottom'].set_position(('axes', -1))
+
         # Adjust ticks on last axis
         self.axes[-1].yaxis.tick_right()
 
