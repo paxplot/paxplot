@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.figure import Figure
 import numpy as np
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 def scale_val(val, minimum, maximum):
@@ -296,6 +297,27 @@ class PaxAxes:
         labels = [i.get_text() for i in ax.get_yticklabels()]
         ax.set_yticks(ticks=ticks_scaled)
         ax.set_yticklabels(labels=labels)
+
+    def legend(self, label):
+        # Create blank axis
+        divider = make_axes_locatable(self.axes[-1])
+        ax_blank = divider.append_axes('right', size=0.5, pad=0.5)
+
+        # Set labels
+        for ax in self.axes:
+            for i, line in enumerate(ax.lines):
+                line.set_label(label[i])
+
+        # Create legend
+        lines = self.axes[0].lines
+        labels = [i.get_label() for i in lines]
+        ax_blank.legend(lines, labels, loc='center left')
+
+        # Blank axis formatting
+        ax_blank.set_axis_off()
+        self.axes[-1].spines['right'].set_visible(True)
+        self.axes[-1].spines['left'].set_visible(False)
+        self.axes[0].spines['right'].set_visible(False)
 
 
 def pax_parallel(n_axes):
