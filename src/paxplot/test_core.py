@@ -36,6 +36,11 @@ class AnalysisLib(unittest.TestCase):
             self.assertEqual(ax.get_xlim(), (0.0, 1.0))
             self.assertEqual(ax.get_xticks(), [0])
 
+        # Last axis
+        position = paxes.axes[-1].get_position()
+        width = position.x1 - position.x0
+        self.assertEqual(width, 0.0)
+
     def test_parallel_basic(self):
         """
         Basic test of parallel functionality
