@@ -48,7 +48,6 @@ class PaxFigure(Figure):
             # Remove axes frame
             ax.spines['top'].set_visible(False)
             ax.spines['bottom'].set_visible(False)
-            ax.spines['right'].set_visible(False)
 
             # Set limits
             ax.set_ylim([0, 1])
@@ -57,11 +56,8 @@ class PaxFigure(Figure):
             # Set x ticks
             ax.set_xticks([0], [' '])
 
-        # Last axis formatting
-        self.axes[-1].yaxis.tick_right()  # TODO add test
-        # self.axes[-1].tick_params(direction='in', pad=-22)  # TODO add test
-        # self.axes[-1].set_box_aspect(0.1)
-        # self.add_gridspec(width_ratios=[1.0, 1.0, 1.0, 0.1]) # TODO set here
+        # Adjust ticks on last axis
+        self.axes[-1].yaxis.tick_right()
 
 
 class PaxAxes:
