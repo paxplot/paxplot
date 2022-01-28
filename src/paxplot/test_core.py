@@ -32,10 +32,6 @@ class AnalysisLib(unittest.TestCase):
                 ax.spines['bottom'].get_visible(),
                 False
             )
-            self.assertEqual(
-                ax.spines['right'].get_visible(),
-                False
-            )
             self.assertEqual(ax.get_ylim(), (0.0, 1.0))
             self.assertEqual(ax.get_xlim(), (0.0, 1.0))
             self.assertEqual(ax.get_xticks(), [0])
