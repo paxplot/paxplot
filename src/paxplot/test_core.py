@@ -276,15 +276,17 @@ class AnalysisLib(unittest.TestCase):
         """
         # Setup
         data = [
-            [0.0, 0.0],
-            [1.0, 1.0],
-            [2.0, 2.0]
+            [0.0, 0.0, 2.0],
+            [1.0, 1.0, 1.0],
+            [2.0, 2.0, 0.0],
         ]
 
-        # # Run
-        # paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
-        # paxes.plot(data, label=['A', 'B', 'C'])
-        # paxes.legend()
+        # Run
+        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
+        paxes.plot(data)
+        paxfig.legend(label=['A', 'B', 'C'])
+
+        # TODO Add tests
 
     def test_parallel_colorbar(self):
         """
