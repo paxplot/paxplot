@@ -64,6 +64,37 @@ class PaxFigure(Figure):
         # Adjust ticks on last axis
         self.axes[-1].yaxis.tick_right()
 
+    def legend(self, label):
+        """Create a legend for a specified figure
+
+        Parameters
+        ----------
+        label : list
+            List of data labels
+        """
+        # Set line labels
+        for ax in self.axes:
+            for i, line in enumerate(ax.lines):
+                line.set_label(label[i])
+
+        # Create blank axis for legend
+        n_axes = len(self.axes)
+        width_ratios = self.axes[0].get_gridspec().get_width_ratios()
+        new_n_axes = n_axes + 1
+        new_width_ratios = width_ratios + [1.0]
+        gs = self.add_gridspec(1, new_n_axes, width_ratios=new_width_ratios)
+        ax_legend = self.add_subplot(gs[0, n_axes])
+
+        # Create legend
+        lines = self.axes[0].lines
+        labels = [i.get_label() for i in lines]
+        ax_legend.legend(lines, labels, loc='center right')
+
+        # Figure formatting
+        for i in range(n_axes):
+            self.axes[i].set_subplotspec(gs[0:1, i:i+1])
+        ax_legend.set_axis_off()
+
 
 class PaxAxes:
     def __init__(self, axes):
@@ -297,27 +328,6 @@ class PaxAxes:
         labels = [i.get_text() for i in ax.get_yticklabels()]
         ax.set_yticks(ticks=ticks_scaled)
         ax.set_yticklabels(labels=labels)
-
-    def legend(self, label):
-        # Create blank axis
-        divider = make_axes_locatable(self.axes[-1])
-        ax_blank = divider.append_axes('right', size=0.5, pad=0.5)
-
-        # Set labels
-        for ax in self.axes:
-            for i, line in enumerate(ax.lines):
-                line.set_label(label[i])
-
-        # Create legend
-        lines = self.axes[0].lines
-        labels = [i.get_label() for i in lines]
-        ax_blank.legend(lines, labels, loc='center left')
-
-        # Blank axis formatting
-        ax_blank.set_axis_off()
-        self.axes[-1].spines['right'].set_visible(True)
-        self.axes[-1].spines['left'].set_visible(False)
-        self.axes[0].spines['right'].set_visible(False)
 
 
 def pax_parallel(n_axes):
