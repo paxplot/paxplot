@@ -32,14 +32,21 @@ class AnalysisLib(unittest.TestCase):
                 ax.spines['bottom'].get_visible(),
                 False
             )
+            self.assertEqual(
+                ax.spines['right'].get_visible(),
+                False
+            )
             self.assertEqual(ax.get_ylim(), (0.0, 1.0))
             self.assertEqual(ax.get_xlim(), (0.0, 1.0))
             self.assertEqual(ax.get_xticks(), [0])
+            self.assertEqual(ax.spines['bottom'].get_position(), ('axes', -1))
 
         # Last axis
         position = paxes.axes[-1].get_position()
         width = position.x1 - position.x0
         self.assertEqual(width, 0.0)
+        import matplotlib.pyplot as plt
+        plt.show()
 
     def test_parallel_basic(self):
         """
