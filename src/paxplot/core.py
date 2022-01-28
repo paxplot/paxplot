@@ -48,6 +48,7 @@ class PaxFigure(Figure):
             # Remove axes frame
             ax.spines['top'].set_visible(False)
             ax.spines['bottom'].set_visible(False)
+            ax.spines['right'].set_visible(False)
 
             # Set limits
             ax.set_ylim([0, 1])
