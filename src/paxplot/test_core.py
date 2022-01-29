@@ -94,39 +94,39 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
-        paxes.plot(data)
-        paxes.set_ylim(paxes.axes[0], bottom=-1.0, top=3)
-        paxes.set_ylim(paxes.axes[2], bottom=0.0, top=1.5)
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3)
+        paxfig.set_lim(ax_idx=2, bottom=0.0, top=1.5)
 
         # Test plotted data
-        self.assertEqual(paxes.axes[0].lines[0].get_ydata()[0], 0.25)
-        self.assertEqual(paxes.axes[0].lines[1].get_ydata()[0], 0.50)
-        self.assertEqual(paxes.axes[0].lines[2].get_ydata()[0], 0.75)
-        self.assertEqual(paxes.axes[1].lines[0].get_ydata()[1], 0.0, 1)
+        self.assertEqual(paxfig.axes[0].lines[0].get_ydata()[0], 0.25)
+        self.assertEqual(paxfig.axes[0].lines[1].get_ydata()[0], 0.50)
+        self.assertEqual(paxfig.axes[0].lines[2].get_ydata()[0], 0.75)
+        self.assertEqual(paxfig.axes[1].lines[0].get_ydata()[1], 0.0, 1)
         self.assertAlmostEqual(
-            paxes.axes[1].lines[1].get_ydata()[1], 0.6666, 2
+            paxfig.axes[1].lines[1].get_ydata()[1], 0.6666, 2
         )
         self.assertAlmostEqual(
-            paxes.axes[1].lines[2].get_ydata()[1], 1.3333, 2
+            paxfig.axes[1].lines[2].get_ydata()[1], 1.3333, 2
         )
 
         # Test ticks
-        self.assertEqual(paxes.axes[0].get_yticklabels()[0].get_text(), '-1.0')
+        self.assertEqual(paxfig.axes[0].get_yticklabels()[0].get_text(), '-1.0')
         self.assertEqual(
-            paxes.axes[0].get_yticklabels()[0].get_position()[1], 0.0
+            paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
         )
-        self.assertEqual(paxes.axes[0].get_yticklabels()[-1].get_text(), '3.0')
+        self.assertEqual(paxfig.axes[0].get_yticklabels()[-1].get_text(), '3.0')
         self.assertEqual(
-            paxes.axes[0].get_yticklabels()[-1].get_position()[1], 1.0
+            paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 1.0
         )
-        self.assertEqual(paxes.axes[2].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(paxfig.axes[2].get_yticklabels()[0].get_text(), '0.0')
         self.assertEqual(
-            paxes.axes[2].get_yticklabels()[0].get_position()[1], 0.0
+            paxfig.axes[2].get_yticklabels()[0].get_position()[1], 0.0
         )
-        self.assertEqual(paxes.axes[2].get_yticklabels()[-1].get_text(), '1.5')
+        self.assertEqual(paxfig.axes[2].get_yticklabels()[-1].get_text(), '1.5')
         self.assertEqual(
-            paxes.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
+            paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
         )
 
     def test_parallel_yticks(self):
