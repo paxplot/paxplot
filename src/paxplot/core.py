@@ -183,8 +183,7 @@ class PaxFigure(Figure):
         # Set default limits
         self.axes[ax_idx].set_ylim([0.0, 1.0])
 
-        # For non-last axis
-        if ax_idx < len(self.axes)-1:
+        if ax_idx == 0:
             for i, line in enumerate(self.axes[ax_idx].lines):
                 # Get y values
                 y_data = self.line_data[i][[ax_idx, ax_idx+1]]
@@ -207,8 +206,36 @@ class PaxFigure(Figure):
                 maximum=top,
                 precision=2
             )
+        elif ax_idx < len(self.axes)-1:
+            # Replace y first value
+            for i, line in enumerate(self.axes[ax_idx].lines):
+                y_data = self.line_data[i][[ax_idx, ax_idx+1]]
+                y_0_scaled = scale_val(
+                    val=y_data[0],
+                    minimum=bottom,
+                    maximum=top
+                )
+                line.set_ydata([y_0_scaled, line.get_ydata()[1]])
+            
+            # Replace the second y value
+            for i, line in enumerate(self.axes[ax_idx-1].lines):
+                y_data = self.line_data[i][[ax_idx, ax_idx+1]]
+                y_1_scaled = scale_val(
+                    val=y_data[1],
+                    minimum=bottom,
+                    maximum=top
+                )
+                line.set_ydata([line.get_ydata()[0], y_1_scaled])
 
-        # For last axis, set lines in previous axis
+            # Defaults ticks
+            self.set_even_ticks(
+                ax=self.axes[ax_idx],
+                n_ticks=6,
+                minimum=bottom,
+                maximum=top,
+                precision=2
+            )
+
         elif ax_idx == len(self.axes)-1:
             # Work with second to last axis
             ax = self.axes[-2]
