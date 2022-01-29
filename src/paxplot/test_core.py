@@ -11,7 +11,7 @@ class PaxplotLib(unittest.TestCase):
         Test of blank figure
         """
         # Run
-        paxfig, paxes = core.pax_parallel(n_axes=4)
+        paxfig = core.pax_parallel(n_axes=4)
 
         # Test
         self.assertEqual(paxfig.axes.__len__(), 4)
@@ -23,7 +23,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.subplotpars.__getattribute__('hspace'),
             0.0
         )
-        for ax in paxes.axes:
+        for ax in paxfig.axes:
             self.assertEqual(
                 ax.spines['top'].get_visible(),
                 False
@@ -42,11 +42,9 @@ class PaxplotLib(unittest.TestCase):
             self.assertEqual(ax.spines['bottom'].get_position(), ('axes', -1))
 
         # Last axis
-        position = paxes.axes[-1].get_position()
+        position = paxfig.axes[-1].get_position()
         width = position.x1 - position.x0
         self.assertEqual(width, 0.0)
-        import matplotlib.pyplot as plt
-        plt.show()
 
     def test_parallel_basic(self):
         """
