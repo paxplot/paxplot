@@ -318,8 +318,6 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[0].get_gridspec().get_width_ratios(),
             [1.0, 1.0, 0.0, 1.0]
         )
-        import matplotlib.pyplot as plt
-        plt.show()
 
     def test_parallel_colorbar(self):
         """
@@ -333,9 +331,9 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
-        paxes.plot(data)
-        paxfig.add_colorbar(ax=2, data=data, cmap='viridis')
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.add_colorbar(ax_idx=2, cmap='viridis')
 
         # Line color tests
         self.assertEqual(
@@ -362,6 +360,8 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[0].get_gridspec().get_width_ratios(),
             [1.0, 1.0, 0.0, 0.5]
         )
+        import matplotlib.pyplot as plt
+        plt.show()
 
 
 if __name__ == '__main__':
