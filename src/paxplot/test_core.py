@@ -286,7 +286,17 @@ class AnalysisLib(unittest.TestCase):
         paxes.plot(data)
         paxfig.legend(label=['A', 'B', 'C'])
 
-        # TODO Add tests
+        # Legend tests
+        legend_text = paxfig.axes[-1].get_legend().get_texts()
+        self.assertEqual(legend_text[0].get_text(), 'A')
+        self.assertEqual(legend_text[1].get_text(), 'B')
+        self.assertEqual(legend_text[2].get_text(), 'C')
+
+        # Gridspec tests
+        self.assertEqual(
+            paxfig.axes[0].get_gridspec().get_width_ratios(),
+            [1.0, 1.0, 0.0, 1.0]
+        )
 
     def test_parallel_colorbar(self):
         """
