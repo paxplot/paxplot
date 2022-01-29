@@ -320,7 +320,7 @@ class PaxFigure(Figure):
         ax.set_yticks(ticks=ticks_scaled)
         ax.set_yticklabels(labels=labels)
 
-    def legend(self, label):
+    def add_legend(self, label):
         """Create a legend for a specified figure
 
         Parameters
