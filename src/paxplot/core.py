@@ -216,7 +216,7 @@ class PaxFigure(Figure):
                     maximum=top
                 )
                 line.set_ydata([y_0_scaled, line.get_ydata()[1]])
-            
+
             # Replace the second y value
             for i, line in enumerate(self.axes[ax_idx-1].lines):
                 y_data = self.line_data[i][[ax_idx, ax_idx+1]]

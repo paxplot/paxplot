@@ -1,10 +1,6 @@
 """Tests for core paxplot functions"""
 
-from tokenize import PlainToken
 import unittest
-
-import matplotlib
-from matplotlib.pyplot import plot
 
 import core
 
@@ -158,8 +154,6 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(
             paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
         )
-        import matplotlib.pyplot as plt
-        plt.show()
 
     def test_parallel_ticks(self):
         """
@@ -260,8 +254,6 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(
             paxfig.axes[1].get_xticklabels()[0].get_text(), 'Cmaj7-B7'
         )
-        import matplotlib.pyplot as plt
-        plt.show()
 
     def test_parallel_invert(self):
         """
@@ -429,6 +421,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[0].get_gridspec().get_width_ratios(),
             [1.0, 1.0, 0.0, 0.5]
         )
+
 
 if __name__ == '__main__':
     unittest.main()
