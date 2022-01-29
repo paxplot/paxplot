@@ -164,7 +164,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[1].get_yticklabels()[4].get_position()[1], 1.0
         )
 
-    def test_parallel_custom_yticks(self):
+    def test_parallel_custom_ticks(self):
         """
         Testing plotting with custom ticks
         """
@@ -176,24 +176,24 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
-        paxes.plot(data)
-        paxes.set_yticks(
-            paxes.axes[0],
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.set_ticks(
+            ax_idx=1,
             ticks=[0.0, 1.0, 2.0],
             labels=['my heart', 'is the \ncode to', '1612']
         )
 
         # Test ticks
         self.assertEqual(
-            paxes.axes[0].get_yticklabels()[0].get_text(), 'my heart'
+            paxfig.axes[0].get_yticklabels()[0].get_text(), 'my heart'
         )
-        self.assertEqual(paxes.axes[0].get_yticklabels()[2].get_text(), '1612')
+        self.assertEqual(paxfig.axes[0].get_yticklabels()[2].get_text(), '1612')
         self.assertEqual(
-            paxes.axes[0].get_yticklabels()[0].get_position()[1], 0.0
+            paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
         )
         self.assertEqual(
-            paxes.axes[0].get_yticklabels()[2].get_position()[1], 1.0
+            paxfig.axes[0].get_yticklabels()[2].get_position()[1], 1.0
         )
 
     def test_parallel_xlabel(self):
