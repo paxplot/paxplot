@@ -294,17 +294,25 @@ class PaxFigure(Figure):
         ax_idx : int
             Index of matplotlib axes
         """
+        # Local vars
         ax = self.axes[ax_idx]
-        # For non-last axis
-        if ax_idx < len(self.axes)-1:
+
+        if ax_idx == 0:
             for line in ax.lines:
                 # Flip y value about 0.5
                 y_0_scaled = 1.0 - line.get_ydata()[0]
 
                 # Replace the second y value
                 line.set_ydata([y_0_scaled, line.get_ydata()[1]])
-
-        # For last axis
+        elif ax_idx < len(self.axes)-1:
+            # Flip left value
+            for line in ax.lines:
+                y_0_scaled = 1.0 - line.get_ydata()[0]
+                line.set_ydata([y_0_scaled, line.get_ydata()[1]])
+            # Flip right value
+            for line in self.axes[ax_idx-1].lines:
+                y_1_scaled = 1.0 - line.get_ydata()[1]
+                line.set_ydata([line.get_ydata()[0], y_1_scaled])
         elif ax_idx == len(self.axes)-1:
             for line in self.axes[-2].lines:
                 # Flip y value about 0.5
