@@ -89,9 +89,7 @@ class PaxFigure(Figure):
 
             # Set x ticks
             ax.set_xticks([0], [' '])
-
-            # Set axis intersection point
-            ax.spines['bottom'].set_position(('axes', -1))
+            ax.tick_params(axis='x', length=0.0, pad=10)
 
         # Adjust ticks on last axis
         self.axes[-1].yaxis.tick_right()
@@ -274,6 +272,20 @@ class PaxFigure(Figure):
         if labels is not None:
             ax.set_yticklabels(labels=labels)
 
+    def set_label(self, ax_idx, label):
+        """Set the label for the axis
+
+        Parameters
+        ----------
+        ax_idx : int
+            Index of matplotlib axes
+        label : str
+            The label text
+        """
+        ax = self.axes[ax_idx]
+        ax.set_xticks(ticks=[0.0])
+        ax.set_xticklabels([label])
+
     def legend(self, label):
         """Create a legend for a specified figure
 
@@ -358,19 +370,6 @@ class PaxFigure(Figure):
 class PaxAxes:
     def __init__(self, axes):
         self.axes = axes
-
-    def set_xlabel(self, ax, xlabel):
-        """Set the label for the axis
-
-        Parameters
-        ----------
-        ax : AxesSubplot
-            Matplotlib axes
-        xlabel : str
-            The label text
-        """
-        ax.set_xticks(ticks=[0.0])
-        ax.set_xticklabels([xlabel])
 
     def invert_yaxis(self, ax):
         """Invert the y-axis.
