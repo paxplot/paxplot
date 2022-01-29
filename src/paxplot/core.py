@@ -240,6 +240,40 @@ class PaxFigure(Figure):
                 precision=2
             )
 
+    def set_ticks(self, ax_idx, ticks, labels=None):
+        """Set the axis tick locations and optionally labels.
+
+        Parameters
+        ----------
+        ax_idx : int
+            Index of matplotlib axes
+        ticks : list of floats
+            List of tick locations.
+        labels : list of str, optional
+            List of tick labels. If not set, the labels show the data value.
+        """
+        # Retrieve matplotlib axes
+        ax = self.axes[ax_idx]
+
+        # Set the limits (this preserves matplotlib's
+        # mandatory expansion of the view limits)
+        self.set_lim(
+            ax_idx=ax_idx,
+            bottom=min(ticks),
+            top=max(ticks)
+        )
+
+        # Scale the ticks
+        minimum = min(ticks)
+        maximum = max(ticks)
+        tick_scaled = [scale_val(i, minimum, maximum) for i in ticks]
+
+        # Set the ticks
+        ax.set_yticks(ticks=tick_scaled)
+        ax.set_yticklabels(labels=ticks)
+        if labels is not None:
+            ax.set_yticklabels(labels=labels)
+
     def legend(self, label):
         """Create a legend for a specified figure
 
@@ -324,37 +358,6 @@ class PaxFigure(Figure):
 class PaxAxes:
     def __init__(self, axes):
         self.axes = axes
-
-    def set_yticks(self, ax, ticks, labels=None):
-        """Set the yaxis' tick locations and optionally labels.
-
-        Parameters
-        ----------
-        ax : AxesSubplot
-            Matplotlib axes
-        ticks : list of floats
-            List of tick locations.
-        labels : list of str, optional
-            List of tick labels. If not set, the labels show the data value.
-        """
-        # Set the limits (this preserves matplotlib's
-        # mandatory expansion of the view limits)
-        self.set_ylim(
-            ax,
-            bottom=min(ticks),
-            top=max(ticks)
-        )
-
-        # Scale the ticks
-        minimum = min(ticks)
-        maximum = max(ticks)
-        tick_scaled = [scale_val(i, minimum, maximum) for i in ticks]
-
-        # Set the ticks
-        ax.set_yticks(ticks=tick_scaled)
-        ax.set_yticklabels(labels=ticks)
-        if labels is not None:
-            ax.set_yticklabels(labels=labels)
 
     def set_xlabel(self, ax, xlabel):
         """Set the label for the axis
