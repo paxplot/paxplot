@@ -106,6 +106,7 @@ class PaxplotLib(unittest.TestCase):
         paxfig = core.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3)
+        paxfig.set_lim(ax_idx=1, bottom=-1.0, top=3)
         paxfig.set_lim(ax_idx=2, bottom=0.0, top=1.5)
 
         # Test plotted data
@@ -133,7 +134,21 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 1.0
         )
-        self.assertEqual(paxfig.axes[2].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(
+            paxfig.axes[1].get_yticklabels()[0].get_text(), '-1.0'
+        )
+        self.assertEqual(
+            paxfig.axes[1].get_yticklabels()[0].get_position()[1], 0.0
+        )
+        self.assertEqual(
+            paxfig.axes[1].get_yticklabels()[-1].get_text(), '3.0'
+        )
+        self.assertEqual(
+            paxfig.axes[1].get_yticklabels()[-1].get_position()[1], 1.0
+        )
+        self.assertEqual(
+            paxfig.axes[2].get_yticklabels()[0].get_text(), '0.0'
+        )
         self.assertEqual(
             paxfig.axes[2].get_yticklabels()[0].get_position()[1], 0.0
         )
@@ -143,6 +158,8 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(
             paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
         )
+        import matplotlib.pyplot as plt
+        plt.show()
 
     def test_parallel_ticks(self):
         """
@@ -412,7 +429,6 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[0].get_gridspec().get_width_ratios(),
             [1.0, 1.0, 0.0, 0.5]
         )
-
 
 if __name__ == '__main__':
     unittest.main()
