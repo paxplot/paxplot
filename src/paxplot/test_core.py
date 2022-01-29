@@ -304,25 +304,41 @@ class AnalysisLib(unittest.TestCase):
         """
         # Setup
         data = [
-            [0.0, 0.0],
-            [1.0, 1.0],
-            [2.0, 2.0]
+            [0.0, 0.0, 2.0],
+            [1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0],
         ]
 
         # Run
         paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
         paxes.plot(data)
+        paxfig.add_colorbar(ax=2, data=data, cmap='viridis')
 
-        # import matplotlib.pyplot as plt
-        # sm = plt.cm.ScalarMappable(norm=plt.Normalize(vmin=0, vmax=1))
-        # colorbar_bounds = list(paxfig.axes[-1].get_position().bounds)
-        # colorbar_bounds[0] = colorbar_bounds[0] - 0.1  # Left starting
-        # colorbar_bounds[2] = 0.05  # Width
-        # colorbar_ax = plt.axes(colorbar_bounds)
-        # paxfig.colorbar(sm, cax=colorbar_ax, orientation='vertical')
-        # paxfig.subplots_adjust(right=0.7)
+        # Line color tests
+        self.assertEqual(
+            paxfig.axes[0].lines[0].get_color(),
+            '#fde725'
+        )
+        self.assertEqual(
+            paxfig.axes[0].lines[1].get_color(),
+            '#21918c'
+        )
 
-        # plt.show()
+        # Colorbar tests
+        self.assertEqual(
+            paxfig.axes[-1].get_label(),
+            '<colorbar>'
+        )
+        self.assertEqual(
+            paxfig.axes[-1].get_ylim(),
+            (0.0, 2.0)
+        )
+
+        # Gridspec tests
+        self.assertEqual(
+            paxfig.axes[0].get_gridspec().get_width_ratios(),
+            [1.0, 1.0, 0.0, 0.5]
+        )
 
 
 if __name__ == '__main__':
