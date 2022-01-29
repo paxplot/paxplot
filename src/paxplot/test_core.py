@@ -291,6 +291,50 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 0.0
         )
 
+    def test_parallel_invert_middle(self):
+        """
+        Test inverting middle axes
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0],
+            [1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0],
+        ]
+
+        # Run
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.invert_axis(1)
+
+        # Test plotted data
+        self.assertEqual(paxfig.axes[0].lines[0].get_ydata()[0], 0.0)
+        self.assertEqual(paxfig.axes[0].lines[2].get_ydata()[0], 1.0)
+        self.assertEqual(paxfig.axes[1].lines[0].get_ydata()[1], 1.0)
+        self.assertEqual(paxfig.axes[1].lines[2].get_ydata()[1], 0.0)
+
+        # Test ticks
+        self.assertEqual(paxfig.axes[0].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(
+            paxfig.axes[0].get_yticklabels()[-1].get_text(), '3.0'
+        )
+        self.assertEqual(paxfig.axes[1].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(
+            paxfig.axes[1].get_yticklabels()[-1].get_text(), '2.0'
+        )
+        self.assertEqual(
+            paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
+        )
+        self.assertEqual(
+            paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 1.0
+        )
+        self.assertEqual(
+            paxfig.axes[1].get_yticklabels()[0].get_position()[0], 0.0
+        )
+        self.assertEqual(
+            paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
+        )
+
     def test_parallel_legend(self):
         """
         Test creating legend
