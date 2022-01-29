@@ -39,7 +39,10 @@ class PaxplotLib(unittest.TestCase):
             self.assertEqual(ax.get_ylim(), (0.0, 1.0))
             self.assertEqual(ax.get_xlim(), (0.0, 1.0))
             self.assertEqual(ax.get_xticks(), [0])
-            self.assertEqual(ax.spines['bottom'].get_position(), ('axes', -1))
+            self.assertEqual(
+                ax.xaxis.majorTicks[0].tick1line.get_markersize(),
+                0.0
+            )
 
         # Last axis
         position = paxfig.axes[-1].get_position()
@@ -77,7 +80,9 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
         )
-        self.assertEqual(paxfig.axes[0].get_yticklabels()[-1].get_text(), '2.0')
+        self.assertEqual(
+            paxfig.axes[0].get_yticklabels()[-1].get_text(), '2.0'
+        )
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 1.0
         )
@@ -112,11 +117,15 @@ class PaxplotLib(unittest.TestCase):
         )
 
         # Test ticks
-        self.assertEqual(paxfig.axes[0].get_yticklabels()[0].get_text(), '-1.0')
+        self.assertEqual(
+            paxfig.axes[0].get_yticklabels()[0].get_text(), '-1.0'
+        )
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
         )
-        self.assertEqual(paxfig.axes[0].get_yticklabels()[-1].get_text(), '3.0')
+        self.assertEqual(
+            paxfig.axes[0].get_yticklabels()[-1].get_text(), '3.0'
+        )
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 1.0
         )
@@ -124,7 +133,9 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(
             paxfig.axes[2].get_yticklabels()[0].get_position()[1], 0.0
         )
-        self.assertEqual(paxfig.axes[2].get_yticklabels()[-1].get_text(), '1.5')
+        self.assertEqual(
+            paxfig.axes[2].get_yticklabels()[-1].get_text(), '1.5'
+        )
         self.assertEqual(
             paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
         )
@@ -179,7 +190,7 @@ class PaxplotLib(unittest.TestCase):
         paxfig = core.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.set_ticks(
-            ax_idx=1,
+            ax_idx=0,
             ticks=[0.0, 1.0, 2.0],
             labels=['my heart', 'is the \ncode to', '1612']
         )
@@ -188,7 +199,9 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[0].get_text(), 'my heart'
         )
-        self.assertEqual(paxfig.axes[0].get_yticklabels()[2].get_text(), '1612')
+        self.assertEqual(
+            paxfig.axes[0].get_yticklabels()[2].get_text(), '1612'
+        )
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
         )
@@ -196,9 +209,9 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[0].get_yticklabels()[2].get_position()[1], 1.0
         )
 
-    def test_parallel_xlabel(self):
+    def test_parallel_label(self):
         """
-        Testing setting x labels
+        Testing setting labels
         """
         # Setup
         data = [
@@ -208,24 +221,26 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
-        paxes.plot(data)
-        paxes.set_xlabel(
-            paxes.axes[0],
-            xlabel='Em7-Dm7-G7'
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.set_label(
+            ax_idx=0,
+            label='Em7-Dm7-G7'
         )
-        paxes.set_xlabel(
-            paxes.axes[1],
-            xlabel='Cmaj7-B7'
+        paxfig.set_label(
+            ax_idx=1,
+            label='Cmaj7-B7'
         )
 
         # Test
         self.assertEqual(
-            paxes.axes[0].get_xticklabels()[0].get_text(), 'Em7-Dm7-G7'
+            paxfig.axes[0].get_xticklabels()[0].get_text(), 'Em7-Dm7-G7'
         )
         self.assertEqual(
-            paxes.axes[1].get_xticklabels()[0].get_text(), 'Cmaj7-B7'
+            paxfig.axes[1].get_xticklabels()[0].get_text(), 'Cmaj7-B7'
         )
+        import matplotlib.pyplot as plt
+        plt.show()
 
     def test_parallel_invert(self):
         """
