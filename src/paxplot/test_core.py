@@ -5,7 +5,7 @@ import unittest
 import core
 
 
-class AnalysisLib(unittest.TestCase):
+class PaxplotLib(unittest.TestCase):
     def test_parallel_blank(self):
         """
         Test of blank figure
