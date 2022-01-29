@@ -424,12 +424,10 @@ def pax_parallel(n_axes):
     -------
     fig : PaxFigure
         Paxplot figure class
-    axes : PaxAxes
-        Paxplot axes class
     """
     width_ratios = [1.0]*(n_axes-1)
     width_ratios.append(0.0)  # Last axis small
-    fig, axes = plt.subplots(
+    fig, _ = plt.subplots(
         1,
         n_axes,
         sharey=False,
@@ -437,5 +435,4 @@ def pax_parallel(n_axes):
         FigureClass=PaxFigure,
     )
     fig.default_format()
-    axes = PaxAxes(axes)
-    return fig, axes
+    return fig
