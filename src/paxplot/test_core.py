@@ -303,9 +303,9 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
-        paxes.plot(data)
-        paxfig.legend(label=['A', 'B', 'C'])
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.add_legend(label=['A', 'B', 'C'])
 
         # Legend tests
         legend_text = paxfig.axes[-1].get_legend().get_texts()
@@ -318,6 +318,8 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[0].get_gridspec().get_width_ratios(),
             [1.0, 1.0, 0.0, 1.0]
         )
+        import matplotlib.pyplot as plt
+        plt.show()
 
     def test_parallel_colorbar(self):
         """
