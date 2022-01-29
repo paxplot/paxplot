@@ -1,6 +1,10 @@
 """Tests for core paxplot functions"""
 
+from tokenize import PlainToken
 import unittest
+
+import matplotlib
+from matplotlib.pyplot import plot
 
 import core
 
@@ -254,33 +258,37 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig, paxes = core.pax_parallel(n_axes=len(data[0]))
-        paxes.plot(data)
-        paxes.invert_yaxis(paxes.axes[0])
-        paxes.invert_yaxis(paxes.axes[2])
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.invert_axis(ax_idx=0)
+        paxfig.invert_axis(ax_idx=2)
 
         # Test plotted data
-        self.assertEqual(paxes.axes[0].lines[0].get_ydata()[0], 1.0)
-        self.assertEqual(paxes.axes[0].lines[2].get_ydata()[0], 0.0)
-        self.assertEqual(paxes.axes[1].lines[0].get_ydata()[1], 1.0)
-        self.assertEqual(paxes.axes[1].lines[2].get_ydata()[1], 0.0)
+        self.assertEqual(paxfig.axes[0].lines[0].get_ydata()[0], 1.0)
+        self.assertEqual(paxfig.axes[0].lines[2].get_ydata()[0], 0.0)
+        self.assertEqual(paxfig.axes[1].lines[0].get_ydata()[1], 1.0)
+        self.assertEqual(paxfig.axes[1].lines[2].get_ydata()[1], 0.0)
 
         # Test ticks
-        self.assertEqual(paxes.axes[0].get_yticklabels()[0].get_text(), '0.0')
-        self.assertEqual(paxes.axes[0].get_yticklabels()[-1].get_text(), '2.0')
-        self.assertEqual(paxes.axes[2].get_yticklabels()[0].get_text(), '0.0')
-        self.assertEqual(paxes.axes[2].get_yticklabels()[-1].get_text(), '2.0')
+        self.assertEqual(paxfig.axes[0].get_yticklabels()[0].get_text(), '0.0')
         self.assertEqual(
-            paxes.axes[0].get_yticklabels()[0].get_position()[1], 1.0
+            paxfig.axes[0].get_yticklabels()[-1].get_text(), '2.0'
+        )
+        self.assertEqual(paxfig.axes[2].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(
+            paxfig.axes[2].get_yticklabels()[-1].get_text(), '2.0'
         )
         self.assertEqual(
-            paxes.axes[0].get_yticklabels()[-1].get_position()[1], 0.0
+            paxfig.axes[0].get_yticklabels()[0].get_position()[1], 1.0
         )
         self.assertEqual(
-            paxes.axes[2].get_yticklabels()[0].get_position()[1], 1.0
+            paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 0.0
         )
         self.assertEqual(
-            paxes.axes[2].get_yticklabels()[-1].get_position()[1], 0.0
+            paxfig.axes[2].get_yticklabels()[0].get_position()[1], 1.0
+        )
+        self.assertEqual(
+            paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 0.0
         )
 
     def test_parallel_legend(self):
