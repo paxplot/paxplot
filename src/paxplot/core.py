@@ -351,7 +351,7 @@ class PaxFigure(Figure):
             self.axes[i].set_subplotspec(gs[0:1, i:i+1])
         ax_legend.set_axis_off()
 
-    def add_colorbar(self, ax, data, cmap):
+    def add_colorbar(self, ax_idx, cmap):
         """Add colorbar to paxfigure
 
         Parameters
@@ -363,14 +363,17 @@ class PaxFigure(Figure):
         cmap : str
             Matplotlib colormap to use for coloring
         """
+        # Local vars
         n_lines = len(self.axes[0].lines)
+        n_axes = len(self.axes)
+
         # Change line colors
         for i in range(n_lines):
             # Get value
-            if ax < len(self.axes)-1:
-                scale_val = self.axes[ax].lines[i].get_ydata()[0]
+            if ax_idx < len(self.axes)-1:
+                scale_val = self.axes[ax_idx].lines[i].get_ydata()[0]
             else:
-                scale_val = self.axes[ax-1].lines[i].get_ydata()[1]
+                scale_val = self.axes[ax_idx-1].lines[i].get_ydata()[1]
             # Get color
             color = get_color_gradient(scale_val, 0, 1, cmap)
             # Assign color to line
@@ -378,7 +381,6 @@ class PaxFigure(Figure):
                 j.lines[i].set_color(color)
 
         # Create blank axis for colorbar
-        n_axes = len(self.axes)
         width_ratios = self.axes[0].get_gridspec().get_width_ratios()
         new_n_axes = n_axes + 1
         new_width_ratios = width_ratios + [0.5]
@@ -388,8 +390,8 @@ class PaxFigure(Figure):
         # Create colorbar
         sm = plt.cm.ScalarMappable(
             norm=plt.Normalize(
-                vmin=min([i[ax] for i in data]),
-                vmax=max([i[ax] for i in data])
+                vmin=self.line_data[:, ax_idx].min(),
+                vmax=self.line_data[:, ax_idx].max()
             ),
             cmap=cmap
         )
