@@ -351,7 +351,7 @@ class PaxFigure(Figure):
             self.axes[i].set_subplotspec(gs[0:1, i:i+1])
         ax_legend.set_axis_off()
 
-    def add_colorbar(self, ax_idx, cmap):
+    def add_colorbar(self, ax_idx, cmap, colorbar_kwargs):
         """Add colorbar to paxfigure
 
         Parameters
@@ -362,6 +362,8 @@ class PaxFigure(Figure):
             Data to be plotted
         cmap : str
             Matplotlib colormap to use for coloring
+        colorbar_kwargs : dict
+            Matplotlib colorbar keyword arguments
         """
         # Local vars
         n_lines = len(self.axes[0].lines)
@@ -395,7 +397,7 @@ class PaxFigure(Figure):
             ),
             cmap=cmap
         )
-        self.colorbar(sm, orientation='vertical')
+        self.colorbar(sm, orientation='vertical', **colorbar_kwargs)
 
         # Figure formatting
         for i in range(n_axes):
