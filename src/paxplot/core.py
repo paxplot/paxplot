@@ -96,6 +96,80 @@ class PaxFigure(Figure):
         # Adjust ticks on last axis
         self.axes[-1].yaxis.tick_right()
 
+    def set_even_ticks(self, ax, n_ticks, minimum, maximum, precision):
+        """Set evenly spaced axis ticks between minimum and maximum value
+
+        Parameters
+        ----------
+        ax : AxesSubplot
+            Matplotlib axes
+        n_ticks : int
+            Number of ticks
+        minimum : numeric
+            minimum value for ticks
+        maximum : numeric
+            maximum value for ticks
+        precision : int
+            number of decimal points for tick labels
+        """
+        ticks = np.linspace(0, 1, num=n_ticks + 1)
+        tick_labels = np.linspace(
+            minimum,
+            maximum,
+            num=n_ticks + 1
+        )
+        tick_labels = tick_labels.round(precision)
+        ax.set_yticks(ticks=ticks, labels=tick_labels)
+
+    def plot(self, data):
+        """
+        Plot the supplied data
+
+        Parameters
+        ----------
+        data : array-like
+            Data to be plotted
+        """
+        # Convert to Numpy
+        data = np.array(data)
+        self.__setattr__('line_data', data)
+
+        # Get data stats
+        data_mins = data.min(axis=0)
+        data_maxs = data.max(axis=0)
+        n_rows = data.shape[0]
+        n_cols = data.shape[1]
+
+        for col_idx in range(n_cols):
+            # Plot each line
+            for row_idx in range(n_rows):
+                if col_idx < n_cols - 1:  # Ignore last axis
+                    # Scale the data
+                    y_0_scaled = scale_val(
+                        val=data[row_idx, col_idx],
+                        minimum=data_mins[col_idx],
+                        maximum=data_maxs[col_idx]
+                    )
+                    y_1_scaled = scale_val(
+                        val=data[row_idx, col_idx + 1],
+                        minimum=data_mins[col_idx + 1],
+                        maximum=data_maxs[col_idx + 1]
+                    )
+
+                    # Plot the data
+                    x = [0, 1]  # Assume each axes has a length between 0 and 1
+                    y = [y_0_scaled, y_1_scaled]
+                    self.axes[col_idx].plot(x, y)
+
+            # Defaults ticks
+            self.set_even_ticks(
+                    ax=self.axes[col_idx],
+                    n_ticks=6,
+                    minimum=data_mins[col_idx],
+                    maximum=data_maxs[col_idx],
+                    precision=2
+                )
+
     def legend(self, label):
         """Create a legend for a specified figure
 
@@ -180,80 +254,6 @@ class PaxFigure(Figure):
 class PaxAxes:
     def __init__(self, axes):
         self.axes = axes
-
-    def plot(self, data):
-        """
-        Plot the supplied data
-
-        Parameters
-        ----------
-        data : array-like
-            Data to be plotted
-        """
-        # Convert to Numpy
-        data = np.array(data)
-        self.__setattr__('data', data)
-
-        # Get data stats
-        data_mins = data.min(axis=0)
-        data_maxs = data.max(axis=0)
-        n_rows = data.shape[0]
-        n_cols = data.shape[1]
-
-        for col_idx in range(n_cols):
-            # Plot each line
-            for row_idx in range(n_rows):
-                if col_idx < n_cols - 1:  # Ignore last axis
-                    # Scale the data
-                    y_0_scaled = scale_val(
-                        val=data[row_idx, col_idx],
-                        minimum=data_mins[col_idx],
-                        maximum=data_maxs[col_idx]
-                    )
-                    y_1_scaled = scale_val(
-                        val=data[row_idx, col_idx + 1],
-                        minimum=data_mins[col_idx + 1],
-                        maximum=data_maxs[col_idx + 1]
-                    )
-
-                    # Plot the data
-                    x = [0, 1]  # Assume each axes has a length between 0 and 1
-                    y = [y_0_scaled, y_1_scaled]
-                    self.axes[col_idx].plot(x, y)
-
-            # Defaults ticks
-            self.set_even_ticks(
-                    ax=self.axes[col_idx],
-                    n_ticks=6,
-                    minimum=data_mins[col_idx],
-                    maximum=data_maxs[col_idx],
-                    precision=2
-                )
-
-    def set_even_ticks(self, ax, n_ticks, minimum, maximum, precision):
-        """Set evenly spaced axis ticks between minimum and maximum value
-
-        Parameters
-        ----------
-        ax : AxesSubplot
-            Matplotlib axes
-        n_ticks : int
-            Number of ticks
-        minimum : numeric
-            minimum value for ticks
-        maximum : numeric
-            maximum value for ticks
-        precision : int
-            number of decimal points for tick labels
-        """
-        ticks = np.linspace(0, 1, num=n_ticks + 1)
-        tick_labels = np.linspace(
-            minimum,
-            maximum,
-            num=n_ticks + 1
-        )
-        tick_labels = tick_labels.round(precision)
-        ax.set_yticks(ticks=ticks, labels=tick_labels)
 
     def set_ylim(self, ax, bottom, top):
         """Set custom y limits on axis
