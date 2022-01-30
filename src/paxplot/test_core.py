@@ -64,6 +64,14 @@ class PaxplotLib(unittest.TestCase):
         paxfig = core.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
+        # Test attribute data
+        self.assertEqual(
+            paxfig.axes[0].paxfig_lim, (0.0, 2.0)
+        )
+        self.assertEqual(
+            paxfig.axes[1].paxfig_lim, (0.0, 2.0)
+        )
+
         # Test plotted data
         self.assertTrue(
             (paxfig.axes[0].lines[0].get_ydata() == [0.0, 0.0]).all()
