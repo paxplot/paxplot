@@ -219,7 +219,7 @@ class PaxFigure(Figure):
 
             # Replace the second y value
             for i, line in enumerate(self.axes[ax_idx-1].lines):
-                y_data = self.line_data[i][[ax_idx, ax_idx+1]]
+                y_data = self.line_data[i][[ax_idx-1, ax_idx]]
                 y_1_scaled = scale_val(
                     val=y_data[1],
                     minimum=bottom,
@@ -280,18 +280,28 @@ class PaxFigure(Figure):
         # Retrieve matplotlib axes
         ax = self.axes[ax_idx]
 
-        # Set the limits (this preserves matplotlib's
+        # Set the limits if needed (this preserves matplotlib's
         # mandatory expansion of the view limits)
-        self.set_lim(
-            ax_idx=ax_idx,
-            bottom=min(ticks),
-            top=max(ticks)
-        )
+        try:
+            [float(tick.get_text()) for tick in ax.get_yticklabels()]
+        except ValueError:
+            pass
+        else:
+            # Expand limits
+            current_ticks = [
+                float(tick.get_text()) for tick in ax.get_yticklabels()
+            ]
+            ticks_combined = current_ticks+ticks
+            self.set_lim(
+                    ax_idx=ax_idx,
+                    bottom=min(ticks_combined),
+                    top=max(ticks_combined)
+                )
 
-        # Scale the ticks
-        minimum = min(ticks)
-        maximum = max(ticks)
-        tick_scaled = [scale_val(i, minimum, maximum) for i in ticks]
+            # Scale the ticks
+            minimum = min(ticks_combined)
+            maximum = max(ticks_combined)
+            tick_scaled = [scale_val(i, minimum, maximum) for i in ticks]
 
         # Set the ticks
         ax.set_yticks(ticks=tick_scaled)
