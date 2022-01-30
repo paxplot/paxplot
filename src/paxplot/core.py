@@ -159,6 +159,12 @@ class PaxFigure(Figure):
                     y = [y_0_scaled, y_1_scaled]
                     self.axes[col_idx].plot(x, y)
 
+            # Set attribute data
+            self.axes[col_idx].__setattr__(
+                'paxfig_lim',
+                (data_mins[col_idx], data_maxs[col_idx])
+            )
+
             # Defaults ticks
             self.set_even_ticks(
                     ax=self.axes[col_idx],
@@ -182,6 +188,7 @@ class PaxFigure(Figure):
         """
         # Set default limits
         self.axes[ax_idx].set_ylim([0.0, 1.0])
+        self.axes[ax_idx].__setattr__('paxfig_lim', (bottom, top))
 
         if ax_idx == 0:
             for i, line in enumerate(self.axes[ax_idx].lines):
@@ -288,19 +295,16 @@ class PaxFigure(Figure):
             pass
         else:
             # Expand limits
-            current_ticks = [
-                float(tick.get_text()) for tick in ax.get_yticklabels()
-            ]
-            ticks_combined = current_ticks+ticks
+            ticks_with_limits = list(ax.paxfig_lim)+ticks
             self.set_lim(
                     ax_idx=ax_idx,
-                    bottom=min(ticks_combined),
-                    top=max(ticks_combined)
+                    bottom=min(ticks_with_limits),
+                    top=max(ticks_with_limits)
                 )
 
             # Scale the ticks
-            minimum = min(ticks_combined)
-            maximum = max(ticks_combined)
+            minimum = min(ticks_with_limits)
+            maximum = max(ticks_with_limits)
             tick_scaled = [scale_val(i, minimum, maximum) for i in ticks]
 
         # Set the ticks
@@ -396,7 +400,7 @@ class PaxFigure(Figure):
             self.axes[i].set_subplotspec(gs[0:1, i:i+1])
         ax_legend.set_axis_off()
 
-    def add_colorbar(self, ax_idx, cmap, colorbar_kwargs):
+    def add_colorbar(self, ax_idx, cmap='viridis', colorbar_kwargs={}):
         """Add colorbar to paxfigure
 
         Parameters
@@ -437,8 +441,8 @@ class PaxFigure(Figure):
         # Create colorbar
         sm = plt.cm.ScalarMappable(
             norm=plt.Normalize(
-                vmin=self.line_data[:, ax_idx].min(),
-                vmax=self.line_data[:, ax_idx].max()
+                vmin=self.axes[ax_idx].paxfig_lim[0],
+                vmax=self.axes[ax_idx].paxfig_lim[1]
             ),
             cmap=cmap
         )
