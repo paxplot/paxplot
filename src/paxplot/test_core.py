@@ -444,6 +444,70 @@ class PaxplotLib(unittest.TestCase):
             [1.0, 1.0, 0.0, 0.5]
         )
 
+    def test_parallel_combo(self):
+        """
+        Test applying multiple functions. This is more of an
+        integration test that can quickly check functionality
+        the many methods working together.
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0],
+            [1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0],
+        ]
+        # Run
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.set_lim(0, bottom=0, top=4)
+        paxfig.set_lim(1, bottom=0, top=4)
+        paxfig.set_lim(2, bottom=0, top=5)
+        paxfig.set_ticks(0, [0, 1, 2, 3])
+        paxfig.set_ticks(1, [0, 0.5, 2.0], ['a 0', 'b 0.5', 'c 2.0'])
+        paxfig.set_ticks(2, [-1.0, 0.0, 0.5, 1.0, 2.0, 5.0])
+        paxfig.set_label(0, 'foo')
+        paxfig.invert_axis(1)
+        paxfig.add_colorbar(0)
+
+        # Y data tests (random)
+        self.assertEqual(paxfig.axes[0].lines[1].get_ydata()[0], 0.25)
+        self.assertEqual(paxfig.axes[1].lines[2].get_ydata()[0], 0.50)
+
+        # Tick label tests (random)
+        self.assertEqual(
+            paxfig.axes[0].get_yticklabels()[0].get_text(),
+            '0'
+        )
+        self.assertEqual(
+            paxfig.axes[1].get_yticklabels()[1].get_text(),
+            'b 0.5'
+        )
+
+        # Tick positioning tests (random)
+        self.assertEqual(
+            paxfig.axes[1].get_yticklabels()[-1].get_position()[1],
+            0.5
+        )
+        self.assertEqual(
+            paxfig.axes[0].get_yticklabels()[-1].get_position()[1],
+            0.75
+        )
+
+        # Label test
+        self.assertEqual(
+            paxfig.axes[0].get_xticklabels()[0].get_text(), 'foo'
+        )
+
+        # Colorbar tests
+        self.assertEqual(
+            paxfig.axes[-1].get_label(),
+            '<colorbar>'
+        )
+        self.assertEqual(
+            paxfig.axes[-1].get_ylim(),
+            (0.0, 4.0)
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
