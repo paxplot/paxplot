@@ -161,33 +161,47 @@ class PaxplotLib(unittest.TestCase):
         """
         # Setup
         data = [
-            [0.0, 0.0],
-            [1.0, 1.0],
-            [2.0, 2.0]
+            [0.0, 0.0, 2.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0, 3.0],
         ]
 
         # Run
         paxfig = core.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
-        paxfig.set_ticks(ax_idx=0, ticks=[0.0, 1.0, 2.0])
-        paxfig.set_ticks(ax_idx=1, ticks=[0.0, 0.5, 1.0, 2.0, 2.5])
+        tick_lists = [
+            [0.0, 1.0, 3.0],
+            [0.0, 1.0, 2.5],
+            [-1.0, 1.0, 2.0],
+            [0.0, 1.0, 3.5]
+        ]
+        for i, ticks in enumerate(tick_lists):
+            paxfig.set_ticks(ax_idx=i, ticks=ticks)
 
-        # Test ticks
-        self.assertEqual(paxfig.axes[0].get_yticklabels()[0].get_text(), '0.0')
-        self.assertEqual(paxfig.axes[0].get_yticklabels()[2].get_text(), '2.0')
-        self.assertEqual(paxfig.axes[1].get_yticklabels()[0].get_text(), '0.0')
-        self.assertEqual(paxfig.axes[1].get_yticklabels()[4].get_text(), '2.5')
-        self.assertEqual(
-            paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
-        )
+        # Test tick labels
+        for i, ax in enumerate(paxfig.axes):
+            for j, label in enumerate(ax.get_yticklabels()):
+                self.assertEqual(
+                    label.get_text(),
+                    str(tick_lists[i][j])
+                )
+
+        # Test tick positioning (random)
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[2].get_position()[1], 1.0
         )
         self.assertEqual(
-            paxfig.axes[1].get_yticklabels()[0].get_position()[1], 0.0
+            paxfig.axes[1].get_yticklabels()[1].get_position()[1], 0.4
         )
-        self.assertEqual(
-            paxfig.axes[1].get_yticklabels()[4].get_position()[1], 1.0
+        self.assertAlmostEqual(
+            paxfig.axes[2].get_yticklabels()[1].get_position()[1],
+            0.6666,
+            2
+        )
+        self.assertAlmostEqual(
+            paxfig.axes[3].get_yticklabels()[1].get_position()[1],
+            0.28571,
+            2
         )
 
     def test_parallel_custom_ticks(self):
