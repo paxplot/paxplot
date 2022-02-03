@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-      pip install pydata_sphinx_theme
+        pip install pydata_sphinx_theme
     - name: Build HTML
       uses: ammaraskar/sphinx-action@0.4
     - name: Upload artifacts
