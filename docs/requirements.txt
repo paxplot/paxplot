@@ -1,0 +1,1 @@
+pip install pydata_sphinx_theme
