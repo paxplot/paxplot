@@ -526,21 +526,35 @@ class PaxplotException(unittest.TestCase):
         """
         Various ways paxfig.plot can fail
         """
-        data = [
-            [0.0, 0.0, 2.0],
-            [1.0, 1.0, 1.0],
-            [3.0, 2.0, 0.0],
-        ]
-
         # Too few axes
         with self.assertWarns(Warning):
             paxfig = core.pax_parallel(n_axes=4)
-            paxfig.plot(data)
+            paxfig.plot(
+                [
+                    [0.0, 0.0, 2.0],
+                    [1.0, 1.0, 1.0],
+                ]
+            )
 
         # Too many axes
         with self.assertRaises(ValueError):
             paxfig = core.pax_parallel(n_axes=2)
-            paxfig.plot(data)
+            paxfig.plot(
+                [
+                    [0.0, 0.0, 2.0],
+                    [1.0, 1.0, 1.0],
+                ]
+            )
+
+        # Non-plottable data
+        with self.assertRaises(TypeError):
+            paxfig = core.pax_parallel(n_axes=3)
+            paxfig.plot(
+                [
+                    ['foo', 0.0, 2.0],
+                    ['bar', 1.0, 1.0],
+                ]
+            )
 
 
 if __name__ == '__main__':
