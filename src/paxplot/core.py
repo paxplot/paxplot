@@ -148,8 +148,15 @@ class PaxFigure(Figure):
         self.__setattr__('line_data', data)
 
         # Get data stats
-        data_mins = data.min(axis=0)
-        data_maxs = data.max(axis=0)
+        try:
+            data_mins = data.min(axis=0)
+            data_maxs = data.max(axis=0)
+        except np.core._exceptions._UFuncNoLoopError:
+            raise TypeError(
+                'Non-plottable data has been supplied to argument `data`. '
+                'Often this is caused by supplying non-numeric entries in '
+                '`data`'
+            )
         n_rows = data.shape[0]
         n_cols = data.shape[1]
 
