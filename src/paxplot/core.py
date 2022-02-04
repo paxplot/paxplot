@@ -208,8 +208,33 @@ class PaxFigure(Figure):
         top : numeric
             Upper limit
         """
+        # Check bottom top values
+        try:
+            if bottom > top:
+                raise ValueError(
+                    'Value for `bottom` cannot be greater than `top`. To '
+                    'invert axis use the `invert_axis` function.'
+                )
+        except TypeError:
+            raise TypeError(
+                f'Both `bottom` and `top` must be numeric values. Currently '
+                f'`bottom` is of type {type(bottom)} and `top` is of type'
+                f'{type(top)}'
+            )
+
         # Set default limits
-        self.axes[ax_idx].set_ylim([0.0, 1.0])
+        try:
+            self.axes[ax_idx].set_ylim([0.0, 1.0])
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, only {len(self.axes)} axes exist.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
+
         self.axes[ax_idx].__setattr__('paxfig_lim', (bottom, top))
 
         if ax_idx == 0:
