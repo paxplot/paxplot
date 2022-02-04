@@ -513,10 +513,14 @@ class PaxplotException(unittest.TestCase):
         """
         Various ways to fail figure creation
         """
+        # Nothing supplied
+        with self.assertRaises(TypeError):
+            core.pax_parallel()
+
         # Non-int n_axes
         with self.assertRaises(TypeError):
             core.pax_parallel(n_axes=0.1)
-
+        
 
 if __name__ == '__main__':
     unittest.main()
