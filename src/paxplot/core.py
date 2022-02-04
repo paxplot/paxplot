@@ -468,7 +468,15 @@ def pax_parallel(n_axes):
     fig : PaxFigure
         Paxplot figure class
     """
-    width_ratios = [1.0]*(n_axes-1)
+    # Check type of n_axes
+    try:
+        width_ratios = [1.0]*(n_axes-1)
+    except:
+        raise TypeError(
+            f'n_axes should by of type int. You have supplied a type {type(n_axes)}'
+        )
+
+    # Create figure
     width_ratios.append(0.0)  # Last axis small
     fig, _ = plt.subplots(
         1,
