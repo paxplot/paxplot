@@ -1,11 +1,13 @@
 """Core paxplot functions"""
 
+from logging import warning
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.figure import Figure
 import numpy as np
 import matplotlib as mpl
 from matplotlib import cm
+import warnings
 
 
 def scale_val(val, minimum, maximum):
@@ -128,6 +130,19 @@ class PaxFigure(Figure):
         data : array-like
             Data to be plotted
         """
+        # Check n_axes
+        if len(data[0]) < len(self.axes):
+            warnings.warn(
+                'Supplied data has fewer columns than figure. Figure created '
+                'with empty column(s)',
+                Warning
+            )
+        elif len(data[0]) > len(self.axes):
+            raise ValueError(
+                'Supplied data has fewer columns than figure. Please recreate '
+                'paxfigure with appropriate n_axes'
+            )
+
         # Convert to Numpy
         data = np.array(data)
         self.__setattr__('line_data', data)
@@ -471,9 +486,10 @@ def pax_parallel(n_axes):
     # Check type of n_axes
     try:
         width_ratios = [1.0]*(n_axes-1)
-    except:
+    except TypeError:
         raise TypeError(
-            f'n_axes should by of type int. You have supplied a type {type(n_axes)}'
+            f'n_axes should by of type int. You have supplied a type'
+            f'{type(n_axes)}'
         )
 
     # Create figure
