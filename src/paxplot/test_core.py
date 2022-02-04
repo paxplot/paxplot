@@ -556,6 +556,39 @@ class PaxplotException(unittest.TestCase):
                 ]
             )
 
+    def test_lim(self):
+        """
+        Various ways paxfig.set_lim can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 0.0],
+            [1.0, 1.0, 1.0],
+            [2.0, 2.0, 2.0]
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
+        with self.assertRaises(IndexError):
+            paxfig.set_lim(ax_idx=4, bottom=-1.0, top=3)
+
+        # Bottom larger than top
+        with self.assertRaises(ValueError):
+            paxfig.set_lim(ax_idx=0, bottom=3, top=1)
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.set_lim(ax_idx='foo', bottom=0, top=1)
+
+        # Non numeric value for bottom
+        with self.assertRaises(TypeError):
+            paxfig.set_lim(ax_idx=0, bottom='foo', top=1)
+
+        # Non numeric value for top
+        with self.assertRaises(TypeError):
+            paxfig.set_lim(ax_idx=0, bottom=0, top='foo')
+
 
 if __name__ == '__main__':
     unittest.main()
