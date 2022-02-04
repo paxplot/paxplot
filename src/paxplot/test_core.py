@@ -508,6 +508,7 @@ class PaxplotLib(unittest.TestCase):
             (0.0, 4.0)
         )
 
+
 class PaxplotException(unittest.TestCase):
     def test_paxfig_creation(self):
         """
@@ -520,7 +521,27 @@ class PaxplotException(unittest.TestCase):
         # Non-int n_axes
         with self.assertRaises(TypeError):
             core.pax_parallel(n_axes=0.1)
-        
+
+    def test_plot(self):
+        """
+        Various ways paxfig.plot can fail
+        """
+        data = [
+            [0.0, 0.0, 2.0],
+            [1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0],
+        ]
+
+        # Too few axes
+        with self.assertWarns(Warning):
+            paxfig = core.pax_parallel(n_axes=4)
+            paxfig.plot(data)
+
+        # Too many axes
+        with self.assertRaises(ValueError):
+            paxfig = core.pax_parallel(n_axes=2)
+            paxfig.plot(data)
+
 
 if __name__ == '__main__':
     unittest.main()
