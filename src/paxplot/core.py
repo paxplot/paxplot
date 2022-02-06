@@ -1,5 +1,6 @@
 """Core paxplot functions"""
 
+from ast import Index
 from logging import warning
 import matplotlib.pyplot as plt
 import numpy as np
@@ -400,7 +401,18 @@ class PaxFigure(Figure):
         label : str
             The label text
         """
-        ax = self.axes[ax_idx]
+        try:
+            ax = self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, only {len(self.axes)} axes exist.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
+
         ax.set_xticks(ticks=[0.0])
         ax.set_xticklabels([label])
 
