@@ -331,6 +331,21 @@ class PaxFigure(Figure):
         labels : list of str, optional
             List of tick labels. If not set, the labels show the data value.
         """
+        # Tick tests ('ask permission' mindset as nested try/except gets nasty)
+        try:
+            ticks+[1]
+        except TypeError:
+            raise TypeError(
+                f'`ticks` must be array-like not type {type(ticks)}'
+            )
+        try:
+            min(ticks)
+        except TypeError:
+            raise TypeError(
+                f'All entries in `ticks` must be numeric. To set string ticks,'
+                f' use the `label` argument'
+            )
+
         # Retrieve matplotlib axes
         try:
             ax = self.axes[ax_idx]
@@ -352,12 +367,7 @@ class PaxFigure(Figure):
             pass
         else:
             # Expand limits
-            try:
-                ticks_with_limits = list(ax.paxfig_lim)+ticks
-            except TypeError:
-                raise TypeError(
-                    f'`ticks` must be array-like not type {type(ticks)}'
-                )
+            ticks_with_limits = list(ax.paxfig_lim)+ticks
             self.set_lim(
                     ax_idx=ax_idx,
                     bottom=min(ticks_with_limits),
