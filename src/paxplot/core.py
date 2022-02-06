@@ -344,7 +344,6 @@ class PaxFigure(Figure):
                 f'Type of `ax_idx` must be integer not {type(ax_idx)}'
             )
 
-
         # Set the limits if needed (this preserves matplotlib's
         # mandatory expansion of the view limits)
         try:
@@ -353,7 +352,12 @@ class PaxFigure(Figure):
             pass
         else:
             # Expand limits
-            ticks_with_limits = list(ax.paxfig_lim)+ticks
+            try:
+                ticks_with_limits = list(ax.paxfig_lim)+ticks
+            except TypeError:
+                raise TypeError(
+                    f'`ticks` must be array-like not type {type(ticks)}'
+                )
             self.set_lim(
                     ax_idx=ax_idx,
                     bottom=min(ticks_with_limits),
