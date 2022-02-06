@@ -624,6 +624,27 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(ValueError):
             paxfig.set_ticks(ax_idx=0, ticks=[1, 2, 3], labels='A')
 
+    def test_labels(self):
+        """
+        Various ways paxfig.set_label can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
+        ]
+
+        # Requesting axis that doesn't exist
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        with self.assertRaises(IndexError):
+            paxfig.set_label(ax_idx=3, label='foo')
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.set_label(ax_idx='foo', label='bar')
+        
 
 if __name__ == '__main__':
     unittest.main()
