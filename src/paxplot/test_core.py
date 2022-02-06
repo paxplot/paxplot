@@ -611,6 +611,8 @@ class PaxplotException(unittest.TestCase):
             paxfig.set_ticks(ax_idx='foo', ticks=[0, 1, 2])
 
         # Tick no array-like
+        with self.assertRaises(TypeError):
+            paxfig.set_ticks(ax_idx=0, ticks='foo')
 
         # Non-numeric ticks
 
