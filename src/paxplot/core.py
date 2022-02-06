@@ -425,7 +425,17 @@ class PaxFigure(Figure):
             Index of matplotlib axes
         """
         # Local vars
-        ax = self.axes[ax_idx]
+        try:
+            ax = self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, only {len(self.axes)} axes exist.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
 
         if ax_idx == 0:
             for line in ax.lines:
