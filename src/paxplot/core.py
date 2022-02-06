@@ -332,7 +332,18 @@ class PaxFigure(Figure):
             List of tick labels. If not set, the labels show the data value.
         """
         # Retrieve matplotlib axes
-        ax = self.axes[ax_idx]
+        try:
+            ax = self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, only {len(self.axes)} axes exist.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
+
 
         # Set the limits if needed (this preserves matplotlib's
         # mandatory expansion of the view limits)
