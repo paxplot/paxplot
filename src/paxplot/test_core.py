@@ -1,5 +1,7 @@
 """Tests for core paxplot functions"""
 
+from cProfile import label
+from multiprocessing.sharedctypes import Value
 import unittest
 
 import core
@@ -618,7 +620,9 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(TypeError):
             paxfig.set_ticks(ax_idx=0, ticks=[1, 2, 'three'])
 
-        # Non-displayable labels
+        # Labels non array-like or different lengths
+        with self.assertRaises(ValueError):
+            paxfig.set_ticks(ax_idx=0, ticks=[1, 2, 3], labels='A')
 
 
 if __name__ == '__main__':
