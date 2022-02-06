@@ -229,7 +229,8 @@ class PaxFigure(Figure):
         except IndexError:
             raise IndexError(
                 f'You are trying to set the limits of axis with index '
-                f'{ax_idx}. However, only {len(self.axes)} axes exist.'
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
             )
         except TypeError:
             raise TypeError(
@@ -353,7 +354,8 @@ class PaxFigure(Figure):
         except IndexError:
             raise IndexError(
                 f'You are trying to set the limits of axis with index '
-                f'{ax_idx}. However, only {len(self.axes)} axes exist.'
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
             )
         except TypeError:
             raise TypeError(
@@ -406,7 +408,8 @@ class PaxFigure(Figure):
         except IndexError:
             raise IndexError(
                 f'You are trying to set the limits of axis with index '
-                f'{ax_idx}. However, only {len(self.axes)} axes exist.'
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
             )
         except TypeError:
             raise TypeError(
@@ -430,7 +433,8 @@ class PaxFigure(Figure):
         except IndexError:
             raise IndexError(
                 f'You are trying to set the limits of axis with index '
-                f'{ax_idx}. However, only {len(self.axes)} axes exist.'
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
             )
         except TypeError:
             raise TypeError(
