@@ -343,7 +343,7 @@ class PaxFigure(Figure):
         except TypeError:
             raise TypeError(
                 f'All entries in `ticks` must be numeric. To set string ticks,'
-                f' use the `label` argument'
+                f' use the `labels` argument'
             )
 
         # Retrieve matplotlib axes
@@ -383,7 +383,12 @@ class PaxFigure(Figure):
         ax.set_yticks(ticks=tick_scaled)
         ax.set_yticklabels(labels=ticks)
         if labels is not None:
-            ax.set_yticklabels(labels=labels)
+            try:
+                ax.set_yticklabels(labels=labels)
+            except ValueError:
+                raise ValueError(
+                    f'Length of `labels` must be same as length of `ticks`'
+                )
 
     def set_label(self, ax_idx, label):
         """Set the label for the axis
