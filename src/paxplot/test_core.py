@@ -610,11 +610,13 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(TypeError):
             paxfig.set_ticks(ax_idx='foo', ticks=[0, 1, 2])
 
-        # Tick no array-like
+        # Ticks non array-like
         with self.assertRaises(TypeError):
             paxfig.set_ticks(ax_idx=0, ticks='foo')
 
         # Non-numeric ticks
+        with self.assertRaises(TypeError):
+            paxfig.set_ticks(ax_idx=0, ticks=[1, 2, 'three'])
 
         # Non-displayable labels
 
