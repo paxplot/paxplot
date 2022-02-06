@@ -601,10 +601,10 @@ class PaxplotException(unittest.TestCase):
             [1.0, 1.0, 1.0, 1.0],
             [3.0, 2.0, 0.0, 3.0],
         ]
-
-        # Requesting axis that doesn't exist
         paxfig = core.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
         with self.assertRaises(IndexError):
             paxfig.set_ticks(ax_idx=5, ticks=[0, 1, 2])
 
@@ -634,17 +634,38 @@ class PaxplotException(unittest.TestCase):
             [1.0, 1.0],
             [2.0, 2.0]
         ]
-
-        # Requesting axis that doesn't exist
         paxfig = core.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
         with self.assertRaises(IndexError):
             paxfig.set_label(ax_idx=3, label='foo')
 
         # Non integer value for ax_idx
         with self.assertRaises(TypeError):
             paxfig.set_label(ax_idx='foo', label='bar')
-        
+
+    def test_invert(self):
+        """
+        Various ways paxfig.invert_axis can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 0.0],
+            [1.0, 1.0, 1.0],
+            [2.0, 2.0, 2.0]
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
+        with self.assertRaises(IndexError):
+            paxfig.invert_axis(ax_idx=3)
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.invert_axis(ax_idx='foo')
+
 
 if __name__ == '__main__':
     unittest.main()
