@@ -666,6 +666,27 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(TypeError):
             paxfig.invert_axis(ax_idx='foo')
 
+    def test_legend(self):
+        """
+        Various ways paxfig.set_legend can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0],
+            [1.0, 1.0, 1.0],
+            [2.0, 2.0, 0.0],
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Not enough labels provided
+        with self.assertRaises(IndexError):
+            paxfig.add_legend(label=['A', 'B'])
+
+        # Too many labels provided
+        with self.assertWarns(Warning):
+            paxfig.add_legend(label=['A', 'B', 'C', 'D'])
+
 
 if __name__ == '__main__':
     unittest.main()
