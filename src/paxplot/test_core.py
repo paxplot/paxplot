@@ -687,6 +687,40 @@ class PaxplotException(unittest.TestCase):
         with self.assertWarns(Warning):
             paxfig.add_legend(labels=['A', 'B', 'C', 'D'])
 
+    def test_colorbar(self):
+        """
+        Various ways paxfig.add_colorbar can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0],
+            [1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0],
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
+        with self.assertRaises(IndexError):
+            paxfig.add_colorbar(
+                ax_idx=4,
+                cmap='viridis',
+            )
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.add_colorbar(
+                ax_idx='foo',
+                cmap='viridis',
+            )
+
+        # Colorbar that doesn't exist (default message helpful enough)
+        with self.assertRaises(ValueError):
+            paxfig.add_colorbar(
+                ax_idx=0,
+                cmap='foo',
+            )
+
 
 if __name__ == '__main__':
     unittest.main()
