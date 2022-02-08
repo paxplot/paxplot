@@ -534,6 +534,20 @@ class PaxFigure(Figure):
         n_lines = len(self.axes[0].lines)
         n_axes = len(self.axes)
 
+        # Testing
+        try:
+            self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
+
         # Change line colors
         for i in range(n_lines):
             # Get value
