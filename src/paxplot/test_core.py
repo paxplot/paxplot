@@ -382,7 +382,7 @@ class PaxplotLib(unittest.TestCase):
         # Run
         paxfig = core.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
-        paxfig.add_legend(label=['A', 'B', 'C'])
+        paxfig.add_legend(labels=['A', 'B', 'C'])
 
         # Legend tests
         legend_text = paxfig.axes[-1].get_legend().get_texts()
@@ -668,7 +668,7 @@ class PaxplotException(unittest.TestCase):
 
     def test_legend(self):
         """
-        Various ways paxfig.set_legend can fail
+        Various ways paxfig.add_legend can fail
         """
         # Setup
         data = [
@@ -681,11 +681,11 @@ class PaxplotException(unittest.TestCase):
 
         # Not enough labels provided
         with self.assertRaises(IndexError):
-            paxfig.add_legend(label=['A', 'B'])
+            paxfig.add_legend(labels=['A', 'B'])
 
         # Too many labels provided
         with self.assertWarns(Warning):
-            paxfig.add_legend(label=['A', 'B', 'C', 'D'])
+            paxfig.add_legend(labels=['A', 'B', 'C', 'D'])
 
 
 if __name__ == '__main__':
