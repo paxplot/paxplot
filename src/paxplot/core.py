@@ -480,10 +480,23 @@ class PaxFigure(Figure):
         label : list
             List of data labels
         """
+        # Check if too many labels supplied
+        if len(label) > len(self.axes[0].lines):
+            warnings.warn(
+                'More labels supplied than data. Some labels are unused.',
+                Warning
+            )
+
         # Set line labels
-        for ax in self.axes:
-            for i, line in enumerate(ax.lines):
-                line.set_label(label[i])
+        try:
+            for ax in self.axes:
+                for i, line in enumerate(ax.lines):
+                    line.set_label(label[i])
+        except IndexError:
+            raise IndexError(
+                f'Incorrect number of labels specified. You have supplied '
+                f'{len(label)} labels, but {len(ax.lines)} were expected'
+            )
 
         # Create blank axis for legend
         n_axes = len(self.axes)
