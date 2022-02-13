@@ -111,6 +111,12 @@ class PaxFigure(Figure):
         precision : int
             number of decimal points for tick labels
         """
+        # Minimum/maximum check
+        if minimum > maximum:
+            raise ValueError(
+                f'Value for `minimum` cannot be greater than `maximum`'
+            )
+
         # Retrieve matplotlib axes
         try:
             ax = self.axes[ax_idx]
@@ -124,7 +130,14 @@ class PaxFigure(Figure):
             raise TypeError(
                 f'Type of `ax_idx` must be integer not {type(ax_idx)}'
             )
-        ticks = np.linspace(0, 1, num=n_ticks + 1)
+        
+        # Setting ticks
+        try:
+            ticks = np.linspace(0, 1, num=n_ticks + 1)
+        except TypeError:
+            raise TypeError(
+                f'Type of `n_ticks` must be integer not {type(n_ticks)}'
+            )
         tick_labels = np.linspace(
             minimum,
             maximum,
