@@ -1,7 +1,5 @@
 """Core paxplot functions"""
 
-from ast import Index
-from logging import warning
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.figure import Figure
@@ -97,13 +95,13 @@ class PaxFigure(Figure):
         # Adjust ticks on last axis
         self.axes[-1].yaxis.tick_right()
 
-    def set_even_ticks(self, ax, n_ticks, minimum, maximum, precision):
+    def set_even_ticks(self, ax_idx, n_ticks, minimum, maximum, precision=2):
         """Set evenly spaced axis ticks between minimum and maximum value
 
         Parameters
         ----------
-        ax : AxesSubplot
-            Matplotlib axes
+        ax_idx : int
+            Index of matplotlib axes
         n_ticks : int
             Number of ticks
         minimum : numeric
@@ -113,6 +111,19 @@ class PaxFigure(Figure):
         precision : int
             number of decimal points for tick labels
         """
+        # Retrieve matplotlib axes
+        try:
+            ax = self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
         ticks = np.linspace(0, 1, num=n_ticks + 1)
         tick_labels = np.linspace(
             minimum,
@@ -190,7 +201,7 @@ class PaxFigure(Figure):
 
             # Defaults ticks
             self.set_even_ticks(
-                    ax=self.axes[col_idx],
+                    ax_idx=col_idx,
                     n_ticks=6,
                     minimum=data_mins[col_idx],
                     maximum=data_maxs[col_idx],
@@ -256,7 +267,7 @@ class PaxFigure(Figure):
 
             # Defaults ticks
             self.set_even_ticks(
-                ax=self.axes[ax_idx],
+                ax_idx=ax_idx,
                 n_ticks=6,
                 minimum=bottom,
                 maximum=top,
@@ -285,7 +296,7 @@ class PaxFigure(Figure):
 
             # Defaults ticks
             self.set_even_ticks(
-                ax=self.axes[ax_idx],
+                ax_idx=ax_idx,
                 n_ticks=6,
                 minimum=bottom,
                 maximum=top,
@@ -314,7 +325,7 @@ class PaxFigure(Figure):
 
             # Defaults ticks
             self.set_even_ticks(
-                ax=self.axes[-1],
+                ax_idx=-1,
                 n_ticks=6,
                 minimum=bottom,
                 maximum=top,
