@@ -103,7 +103,10 @@ class PaxFigure(Figure):
         maximum=None,
         precision=2
     ):
-        """Set evenly spaced axis ticks between minimum and maximum value
+        """
+        Set evenly spaced axis ticks between minimum and maximum value. If
+        no minimum and maximum values are specified, the limits of the
+        underlying plotted data are assumed.
 
         Parameters
         ----------
