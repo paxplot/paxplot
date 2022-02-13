@@ -118,7 +118,7 @@ class PaxFigure(Figure):
         precision : int
             number of decimal points for tick labels
         """
-        # Set automatic min and maximum 
+        # Set automatic min and maximum
         if minimum is None and maximum is None:
             minimum = self.line_data[:, ax_idx].min()
             maximum = self.line_data[:, ax_idx].max()
