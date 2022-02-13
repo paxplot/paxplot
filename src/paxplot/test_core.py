@@ -1,9 +1,6 @@
 """Tests for core paxplot functions"""
 
-from cProfile import label
-from multiprocessing.sharedctypes import Value
 import unittest
-
 import core
 
 
@@ -213,6 +210,42 @@ class PaxplotLib(unittest.TestCase):
             0.28571,
             2
         )
+
+    def test_parallel_even_ticks(self):
+        """
+        Test even tick setting
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0, 3.0],
+        ]
+
+        # Run
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.set_even_ticks(
+            ax_idx=0,
+            n_ticks=30,
+            minimum=0.0,
+            maximum=3.0
+        )
+
+        # Test tick position
+        for i in range(31):
+            self.assertAlmostEqual(
+                paxfig.axes[0].get_yticklabels()[i].get_position()[1],
+                i*0.03333,
+                3
+            )
+
+        # Test tick labels
+        for i in range(31):
+            self.assertEqual(
+                paxfig.axes[0].get_yticklabels()[i].get_text(),
+                str(round(i*0.1, 2)),
+            )
 
     def test_parallel_custom_ticks(self):
         """
