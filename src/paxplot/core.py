@@ -95,7 +95,14 @@ class PaxFigure(Figure):
         # Adjust ticks on last axis
         self.axes[-1].yaxis.tick_right()
 
-    def set_even_ticks(self, ax_idx, n_ticks, minimum, maximum, precision=2):
+    def set_even_ticks(
+        self,
+        ax_idx,
+        n_ticks=6,
+        minimum=None,
+        maximum=None,
+        precision=2
+    ):
         """Set evenly spaced axis ticks between minimum and maximum value
 
         Parameters
@@ -111,6 +118,11 @@ class PaxFigure(Figure):
         precision : int
             number of decimal points for tick labels
         """
+        # Set automatic min and maximum 
+        if minimum is None and maximum is None:
+            minimum = self.line_data[:, ax_idx].min()
+            maximum = self.line_data[:, ax_idx].max()
+
         # Minimum/maximum check
         if minimum > maximum:
             raise ValueError(
@@ -130,7 +142,7 @@ class PaxFigure(Figure):
             raise TypeError(
                 f'Type of `ax_idx` must be integer not {type(ax_idx)}'
             )
-        
+
         # Setting ticks
         try:
             ticks = np.linspace(0, 1, num=n_ticks + 1)
