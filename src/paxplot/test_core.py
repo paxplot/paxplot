@@ -1,5 +1,6 @@
 """Tests for core paxplot functions"""
 
+from multiprocessing.sharedctypes import Value
 import unittest
 import core
 
@@ -656,6 +657,57 @@ class PaxplotException(unittest.TestCase):
         # Labels non array-like or different lengths
         with self.assertRaises(ValueError):
             paxfig.set_ticks(ax_idx=0, ticks=[1, 2, 3], labels='A')
+
+    def test_even_ticks(self):
+        """
+        Various ways paxfig.set_even_ticks can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0, 3.0],
+        ]
+
+        # Run
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
+        with self.assertRaises(IndexError):    
+            paxfig.set_even_ticks(
+                ax_idx=5,
+                n_ticks=30,
+                minimum=0.0,
+                maximum=3.0
+            )
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.set_even_ticks(
+                ax_idx='foo',
+                n_ticks=30,
+                minimum=0.0,
+                maximum=3.0
+            )
+
+        # Non integer value for n_ticks
+        with self.assertRaises(TypeError):
+            paxfig.set_even_ticks(
+                ax_idx=0,
+                n_ticks='foo',
+                minimum=0.0,
+                maximum=3.0
+            )
+
+        # Maximum greater than minimum
+        with self.assertRaises(ValueError):
+            paxfig.set_even_ticks(
+                ax_idx=0,
+                n_ticks=10,
+                minimum=3.0,
+                maximum=0.0
+            )
 
     def test_labels(self):
         """
