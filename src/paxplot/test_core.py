@@ -229,8 +229,6 @@ class PaxplotLib(unittest.TestCase):
         paxfig.set_even_ticks(
             ax_idx=0,
             n_ticks=30,
-            minimum=0.0,
-            maximum=3.0
         )
 
         # Test tick position
@@ -674,7 +672,7 @@ class PaxplotException(unittest.TestCase):
         paxfig.plot(data)
 
         # Requesting axis that doesn't exist
-        with self.assertRaises(IndexError):    
+        with self.assertRaises(IndexError):
             paxfig.set_even_ticks(
                 ax_idx=5,
                 n_ticks=30,
