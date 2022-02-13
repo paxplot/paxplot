@@ -6,6 +6,7 @@ from matplotlib.figure import Figure
 import numpy as np
 import matplotlib as mpl
 from matplotlib import cm
+import warnings
 
 
 def scale_val(val, minimum, maximum):
@@ -94,13 +95,23 @@ class PaxFigure(Figure):
         # Adjust ticks on last axis
         self.axes[-1].yaxis.tick_right()
 
-    def set_even_ticks(self, ax, n_ticks, minimum, maximum, precision):
-        """Set evenly spaced axis ticks between minimum and maximum value
+    def set_even_ticks(
+        self,
+        ax_idx,
+        n_ticks=6,
+        minimum=None,
+        maximum=None,
+        precision=2
+    ):
+        """
+        Set evenly spaced axis ticks between minimum and maximum value. If
+        no minimum and maximum values are specified, the limits of the
+        underlying plotted data are assumed.
 
         Parameters
         ----------
-        ax : AxesSubplot
-            Matplotlib axes
+        ax_idx : int
+            Index of matplotlib axes
         n_ticks : int
             Number of ticks
         minimum : numeric
@@ -110,7 +121,38 @@ class PaxFigure(Figure):
         precision : int
             number of decimal points for tick labels
         """
-        ticks = np.linspace(0, 1, num=n_ticks + 1)
+        # Set automatic min and maximum
+        if minimum is None and maximum is None:
+            minimum = self.line_data[:, ax_idx].min()
+            maximum = self.line_data[:, ax_idx].max()
+
+        # Minimum/maximum check
+        if minimum > maximum:
+            raise ValueError(
+                f'Value for `minimum` cannot be greater than `maximum`'
+            )
+
+        # Retrieve matplotlib axes
+        try:
+            ax = self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
+
+        # Setting ticks
+        try:
+            ticks = np.linspace(0, 1, num=n_ticks + 1)
+        except TypeError:
+            raise TypeError(
+                f'Type of `n_ticks` must be integer not {type(n_ticks)}'
+            )
         tick_labels = np.linspace(
             minimum,
             maximum,
@@ -128,13 +170,33 @@ class PaxFigure(Figure):
         data : array-like
             Data to be plotted
         """
+        # Check n_axes
+        if len(data[0]) < len(self.axes):
+            warnings.warn(
+                'Supplied data has fewer columns than figure. Figure created '
+                'with empty column(s)',
+                Warning
+            )
+        elif len(data[0]) > len(self.axes):
+            raise ValueError(
+                'Supplied data has fewer columns than figure. Please recreate '
+                'paxfigure with appropriate n_axes'
+            )
+
         # Convert to Numpy
         data = np.array(data)
         self.__setattr__('line_data', data)
 
         # Get data stats
-        data_mins = data.min(axis=0)
-        data_maxs = data.max(axis=0)
+        try:
+            data_mins = data.min(axis=0)
+            data_maxs = data.max(axis=0)
+        except np.core._exceptions._UFuncNoLoopError:
+            raise TypeError(
+                'Non-plottable data has been supplied to argument `data`. '
+                'Often this is caused by supplying non-numeric entries in '
+                '`data`'
+            )
         n_rows = data.shape[0]
         n_cols = data.shape[1]
 
@@ -167,7 +229,7 @@ class PaxFigure(Figure):
 
             # Defaults ticks
             self.set_even_ticks(
-                    ax=self.axes[col_idx],
+                    ax_idx=col_idx,
                     n_ticks=6,
                     minimum=data_mins[col_idx],
                     maximum=data_maxs[col_idx],
@@ -186,8 +248,34 @@ class PaxFigure(Figure):
         top : numeric
             Upper limit
         """
+        # Check bottom top values
+        try:
+            if bottom > top:
+                raise ValueError(
+                    'Value for `bottom` cannot be greater than `top`. To '
+                    'invert axis use the `invert_axis` function.'
+                )
+        except TypeError:
+            raise TypeError(
+                f'Both `bottom` and `top` must be numeric values. Currently '
+                f'`bottom` is of type {type(bottom)} and `top` is of type'
+                f'{type(top)}'
+            )
+
         # Set default limits
-        self.axes[ax_idx].set_ylim([0.0, 1.0])
+        try:
+            self.axes[ax_idx].set_ylim([0.0, 1.0])
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
+
         self.axes[ax_idx].__setattr__('paxfig_lim', (bottom, top))
 
         if ax_idx == 0:
@@ -207,7 +295,7 @@ class PaxFigure(Figure):
 
             # Defaults ticks
             self.set_even_ticks(
-                ax=self.axes[ax_idx],
+                ax_idx=ax_idx,
                 n_ticks=6,
                 minimum=bottom,
                 maximum=top,
@@ -236,7 +324,7 @@ class PaxFigure(Figure):
 
             # Defaults ticks
             self.set_even_ticks(
-                ax=self.axes[ax_idx],
+                ax_idx=ax_idx,
                 n_ticks=6,
                 minimum=bottom,
                 maximum=top,
@@ -265,7 +353,7 @@ class PaxFigure(Figure):
 
             # Defaults ticks
             self.set_even_ticks(
-                ax=self.axes[-1],
+                ax_idx=-1,
                 n_ticks=6,
                 minimum=bottom,
                 maximum=top,
@@ -284,8 +372,34 @@ class PaxFigure(Figure):
         labels : list of str, optional
             List of tick labels. If not set, the labels show the data value.
         """
+        # Tick tests ('ask permission' mindset as nested try/except gets nasty)
+        try:
+            ticks+[1]
+        except TypeError:
+            raise TypeError(
+                f'`ticks` must be array-like not type {type(ticks)}'
+            )
+        try:
+            min(ticks)
+        except TypeError:
+            raise TypeError(
+                f'All entries in `ticks` must be numeric. To set string ticks,'
+                f' use the `labels` argument'
+            )
+
         # Retrieve matplotlib axes
-        ax = self.axes[ax_idx]
+        try:
+            ax = self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
 
         # Set the limits if needed (this preserves matplotlib's
         # mandatory expansion of the view limits)
@@ -311,7 +425,12 @@ class PaxFigure(Figure):
         ax.set_yticks(ticks=tick_scaled)
         ax.set_yticklabels(labels=ticks)
         if labels is not None:
-            ax.set_yticklabels(labels=labels)
+            try:
+                ax.set_yticklabels(labels=labels)
+            except ValueError:
+                raise ValueError(
+                    f'Length of `labels` must be same as length of `ticks`'
+                )
 
     def set_label(self, ax_idx, label):
         """Set the label for the axis
@@ -323,7 +442,19 @@ class PaxFigure(Figure):
         label : str
             The label text
         """
-        ax = self.axes[ax_idx]
+        try:
+            ax = self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
+
         ax.set_xticks(ticks=[0.0])
         ax.set_xticklabels([label])
 
@@ -336,7 +467,18 @@ class PaxFigure(Figure):
             Index of matplotlib axes
         """
         # Local vars
-        ax = self.axes[ax_idx]
+        try:
+            ax = self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
 
         if ax_idx == 0:
             for line in ax.lines:
@@ -369,18 +511,31 @@ class PaxFigure(Figure):
         ax.set_yticks(ticks=ticks_scaled)
         ax.set_yticklabels(labels=labels)
 
-    def add_legend(self, label):
+    def add_legend(self, labels):
         """Create a legend for a specified figure
 
         Parameters
         ----------
-        label : list
+        labels : list
             List of data labels
         """
+        # Check if too many labels supplied
+        if len(labels) > len(self.axes[0].lines):
+            warnings.warn(
+                'More labels supplied than data. Some labels are unused.',
+                Warning
+            )
+
         # Set line labels
-        for ax in self.axes:
-            for i, line in enumerate(ax.lines):
-                line.set_label(label[i])
+        try:
+            for ax in self.axes:
+                for i, line in enumerate(ax.lines):
+                    line.set_label(labels[i])
+        except IndexError:
+            raise IndexError(
+                f'Incorrect number of labels specified. You have supplied '
+                f'{len(labels)} labels, but {len(ax.lines)} were expected'
+            )
 
         # Create blank axis for legend
         n_axes = len(self.axes)
@@ -417,6 +572,20 @@ class PaxFigure(Figure):
         # Local vars
         n_lines = len(self.axes[0].lines)
         n_axes = len(self.axes)
+
+        # Testing
+        try:
+            self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
 
         # Change line colors
         for i in range(n_lines):
@@ -468,7 +637,16 @@ def pax_parallel(n_axes):
     fig : PaxFigure
         Paxplot figure class
     """
-    width_ratios = [1.0]*(n_axes-1)
+    # Check type of n_axes
+    try:
+        width_ratios = [1.0]*(n_axes-1)
+    except TypeError:
+        raise TypeError(
+            f'n_axes should by of type int. You have supplied a type'
+            f'{type(n_axes)}'
+        )
+
+    # Create figure
     width_ratios.append(0.0)  # Last axis small
     fig, _ = plt.subplots(
         1,
