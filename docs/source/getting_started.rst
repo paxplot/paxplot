@@ -35,4 +35,4 @@ First, we will create a simple plot of our :code:`data`
    paxfig.plot(data)
    plt.show()
 
-.. image:: images/test.png
+.. image:: images/basic.svg
