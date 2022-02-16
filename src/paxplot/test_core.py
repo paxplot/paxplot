@@ -1,7 +1,7 @@
 """Tests for core paxplot functions"""
 
+from multiprocessing.sharedctypes import Value
 import unittest
-
 import core
 
 
@@ -212,6 +212,40 @@ class PaxplotLib(unittest.TestCase):
             2
         )
 
+    def test_parallel_even_ticks(self):
+        """
+        Test even tick setting
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0, 3.0],
+        ]
+
+        # Run
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.set_even_ticks(
+            ax_idx=0,
+            n_ticks=30,
+        )
+
+        # Test tick position
+        for i in range(31):
+            self.assertAlmostEqual(
+                paxfig.axes[0].get_yticklabels()[i].get_position()[1],
+                i*0.03333,
+                3
+            )
+
+        # Test tick labels
+        for i in range(31):
+            self.assertEqual(
+                paxfig.axes[0].get_yticklabels()[i].get_text(),
+                str(round(i*0.1, 2)),
+            )
+
     def test_parallel_custom_ticks(self):
         """
         Testing plotting with custom ticks
@@ -380,7 +414,7 @@ class PaxplotLib(unittest.TestCase):
         # Run
         paxfig = core.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
-        paxfig.add_legend(label=['A', 'B', 'C'])
+        paxfig.add_legend(labels=['A', 'B', 'C'])
 
         # Legend tests
         legend_text = paxfig.axes[-1].get_legend().get_texts()
@@ -507,6 +541,268 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[-1].get_ylim(),
             (0.0, 4.0)
         )
+
+
+class PaxplotException(unittest.TestCase):
+    def test_paxfig_creation(self):
+        """
+        Various ways to fail figure creation
+        """
+        # Nothing supplied
+        with self.assertRaises(TypeError):
+            core.pax_parallel()
+
+        # Non-int n_axes
+        with self.assertRaises(TypeError):
+            core.pax_parallel(n_axes=0.1)
+
+    def test_plot(self):
+        """
+        Various ways paxfig.plot can fail
+        """
+        # Too few axes
+        with self.assertWarns(Warning):
+            paxfig = core.pax_parallel(n_axes=4)
+            paxfig.plot(
+                [
+                    [0.0, 0.0, 2.0],
+                    [1.0, 1.0, 1.0],
+                ]
+            )
+
+        # Too many axes
+        with self.assertRaises(ValueError):
+            paxfig = core.pax_parallel(n_axes=2)
+            paxfig.plot(
+                [
+                    [0.0, 0.0, 2.0],
+                    [1.0, 1.0, 1.0],
+                ]
+            )
+
+        # Non-plottable data
+        with self.assertRaises(TypeError):
+            paxfig = core.pax_parallel(n_axes=3)
+            paxfig.plot(
+                [
+                    ['foo', 0.0, 2.0],
+                    ['bar', 1.0, 1.0],
+                ]
+            )
+
+    def test_lim(self):
+        """
+        Various ways paxfig.set_lim can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 0.0],
+            [1.0, 1.0, 1.0],
+            [2.0, 2.0, 2.0]
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
+        with self.assertRaises(IndexError):
+            paxfig.set_lim(ax_idx=4, bottom=-1.0, top=3)
+
+        # Bottom larger than top
+        with self.assertRaises(ValueError):
+            paxfig.set_lim(ax_idx=0, bottom=3, top=1)
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.set_lim(ax_idx='foo', bottom=0, top=1)
+
+        # Non numeric value for bottom
+        with self.assertRaises(TypeError):
+            paxfig.set_lim(ax_idx=0, bottom='foo', top=1)
+
+        # Non numeric value for top
+        with self.assertRaises(TypeError):
+            paxfig.set_lim(ax_idx=0, bottom=0, top='foo')
+
+    def test_ticks(self):
+        """
+        Various ways paxfig.set_ticks can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0, 3.0],
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
+        with self.assertRaises(IndexError):
+            paxfig.set_ticks(ax_idx=5, ticks=[0, 1, 2])
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.set_ticks(ax_idx='foo', ticks=[0, 1, 2])
+
+        # Ticks non array-like
+        with self.assertRaises(TypeError):
+            paxfig.set_ticks(ax_idx=0, ticks='foo')
+
+        # Non-numeric ticks
+        with self.assertRaises(TypeError):
+            paxfig.set_ticks(ax_idx=0, ticks=[1, 2, 'three'])
+
+        # Labels non array-like or different lengths
+        with self.assertRaises(ValueError):
+            paxfig.set_ticks(ax_idx=0, ticks=[1, 2, 3], labels='A')
+
+    def test_even_ticks(self):
+        """
+        Various ways paxfig.set_even_ticks can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0, 3.0],
+        ]
+
+        # Run
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
+        with self.assertRaises(IndexError):
+            paxfig.set_even_ticks(
+                ax_idx=5,
+                n_ticks=30,
+                minimum=0.0,
+                maximum=3.0
+            )
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.set_even_ticks(
+                ax_idx='foo',
+                n_ticks=30,
+                minimum=0.0,
+                maximum=3.0
+            )
+
+        # Non integer value for n_ticks
+        with self.assertRaises(TypeError):
+            paxfig.set_even_ticks(
+                ax_idx=0,
+                n_ticks='foo',
+                minimum=0.0,
+                maximum=3.0
+            )
+
+        # Maximum greater than minimum
+        with self.assertRaises(ValueError):
+            paxfig.set_even_ticks(
+                ax_idx=0,
+                n_ticks=10,
+                minimum=3.0,
+                maximum=0.0
+            )
+
+    def test_labels(self):
+        """
+        Various ways paxfig.set_label can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
+        with self.assertRaises(IndexError):
+            paxfig.set_label(ax_idx=3, label='foo')
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.set_label(ax_idx='foo', label='bar')
+
+    def test_invert(self):
+        """
+        Various ways paxfig.invert_axis can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 0.0],
+            [1.0, 1.0, 1.0],
+            [2.0, 2.0, 2.0]
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
+        with self.assertRaises(IndexError):
+            paxfig.invert_axis(ax_idx=3)
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.invert_axis(ax_idx='foo')
+
+    def test_legend(self):
+        """
+        Various ways paxfig.add_legend can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0],
+            [1.0, 1.0, 1.0],
+            [2.0, 2.0, 0.0],
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Not enough labels provided
+        with self.assertRaises(IndexError):
+            paxfig.add_legend(labels=['A', 'B'])
+
+        # Too many labels provided
+        with self.assertWarns(Warning):
+            paxfig.add_legend(labels=['A', 'B', 'C', 'D'])
+
+    def test_colorbar(self):
+        """
+        Various ways paxfig.add_colorbar can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0, 2.0],
+            [1.0, 1.0, 1.0],
+            [3.0, 2.0, 0.0],
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting axis that doesn't exist
+        with self.assertRaises(IndexError):
+            paxfig.add_colorbar(
+                ax_idx=4,
+                cmap='viridis',
+            )
+
+        # Non integer value for ax_idx
+        with self.assertRaises(TypeError):
+            paxfig.add_colorbar(
+                ax_idx='foo',
+                cmap='viridis',
+            )
+
+        # Colorbar that doesn't exist (default message helpful enough)
+        with self.assertRaises(ValueError):
+            paxfig.add_colorbar(
+                ax_idx=0,
+                cmap='foo',
+            )
 
 
 if __name__ == '__main__':
