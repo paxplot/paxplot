@@ -36,3 +36,40 @@ First, we will create a simple plot of our :code:`data`
    plt.show()
 
 .. image:: images/basic.svg
+
+Adding Labels
+^^^^^^^^^^^^^
+Let's say these columns in :code:`data` correspond to some the labels A, B, and C. We can add those labels!
+
+.. code-block:: python
+
+   import paxplot
+   import matplotlib.pyplot as plt
+
+   paxfig = paxplot.pax_parallel(n_axes=3)
+   paxfig.plot(data)
+   paxfig.set_label(
+      ax_idx=0,
+      label='A'
+   )
+   paxfig.set_label(
+      ax_idx=1,
+      label='B'
+   )
+   paxfig.set_label(
+      ax_idx=2,
+      label='C'
+   )
+   plt.show()
+
+.. image:: images/labels.svg
+
+Saving Your Plot
+^^^^^^^^^^^^^^^^
+You can easily export your plot in many standard vector and raster formats.
+
+.. code-block:: python
+
+   paxfig.savefig('my_plot.png')
+
+Paxplot has lots of additionall functionality. Continue onto the advanced usage to see additional examples.
