@@ -1,6 +1,5 @@
 """Tests for core paxplot functions"""
 
-from multiprocessing.sharedctypes import Value
 import unittest
 import core
 
