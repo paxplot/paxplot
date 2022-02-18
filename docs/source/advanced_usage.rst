@@ -80,5 +80,15 @@ Sometimes it's helpful to invert (flip) an axis.
 
 .. image:: images/invert.svg
 
+Adding a Legend
+---------------
+It can be nice to plot a legend to identify each line. This works well if you have a few observations.
 
+.. code-block:: python
 
+    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig.plot(data)
+    paxfig.add_legend(labels=['Line A', 'Line B', 'Line C'])
+    plt.show()
+
+.. image:: images/legend.svg

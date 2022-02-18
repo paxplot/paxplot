@@ -48,3 +48,9 @@ paxfig.plot(data)
 paxfig.invert_axis(ax_idx=0)
 paxfig.invert_axis(ax_idx=1)
 plt.show()
+
+# Add legend
+paxfig = paxplot.pax_parallel(n_axes=3)
+paxfig.plot(data)
+paxfig.add_legend(labels=['Line A', 'Line B', 'Line C'])
+plt.show()
