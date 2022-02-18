@@ -18,6 +18,7 @@ setuptools.setup(
     install_requires=[
         'numpy>=1.16',
         'matplotlib>=3.5',
+        'pkg_resources'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -27,4 +28,6 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.7",
+    include_package_data=True,
+    package_data={'': ['data/tradeoff.csv']},
 )
