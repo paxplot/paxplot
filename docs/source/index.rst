@@ -24,6 +24,7 @@ Contents
 
    getting_started
    advanced_usage
+   pandas_usage
    api
 
 
