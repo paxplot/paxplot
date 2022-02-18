@@ -34,3 +34,10 @@ paxfig.set_ticks(
     ticks=[0.0, 1.0, 1.5, 2.0],
 )
 plt.show()
+
+# Limits
+paxfig = paxplot.pax_parallel(n_axes=3)
+paxfig.plot(data)
+paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
+paxfig.set_lim(ax_idx=2, bottom=1.0, top=3.0)
+plt.show()

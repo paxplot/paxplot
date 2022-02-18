@@ -13,7 +13,7 @@ We run through the advanced functionality of paxplot using the following synthet
 
 Change Number of Ticks
 ----------------------
-By default, paxplot chooses evenly-spaced ticks between the upper and lower limits of a plotted data. You can change that option!
+By default, paxplot chooses evenly-spaced ticks between the upper and lower limits of the plotted data. You can change that option!
 
 .. code-block:: python
 
@@ -52,3 +52,16 @@ Paxplot also gives you the flexibility to set whatever ticks you want, and they 
 
 .. image:: images/custom_ticks.svg
 
+Change Axis Limits
+------------------
+By default, paxplot chooses the axis limits as bounds of the plotted data. You can also change that!
+
+.. code-block:: python
+
+    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig.plot(data)
+    paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
+    paxfig.set_lim(ax_idx=2, bottom=1.0, top=3.0)
+    plt.show()
+
+.. image:: images/limits.svg
