@@ -68,3 +68,10 @@ paxfig.add_colorbar(
     colorbar_kwargs={'label': 'Column C'}
 )
 plt.show()
+
+# Accessing matplotlib objects
+paxfig = paxplot.pax_parallel(n_axes=3)
+paxfig.plot(data)
+paxfig.axes[0].annotate('My Label', (0.3, 0.6))
+paxfig.axes[0].arrow(0.42, 0.56, 0.0, -0.09, head_width=0.03)
+plt.show()

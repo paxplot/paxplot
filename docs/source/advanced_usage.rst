@@ -113,3 +113,21 @@ If you have many observations, it is helpful to use a colorbar to identify each 
     plt.show()
 
 .. image:: images/colorbar.svg
+
+Accessing Matplotlib Objects
+----------------------------
+Paxplot is an extension of matplotlib's `subplots <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html>`_ wrapper. Paxplot gives you the ability to acess the individual matplotlib axes as well as all the associated functionality using :code:`paxfig.axes`. To demonstrate this, imagine you want to annotate your paxplot with a label and arrow. That functionality has not been explicitly added to paxplot, however it does exit for matplotlib `axes <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.arrow.html>`_. Paxplot still allows us to axcess that functionality!
+
+.. code-block:: python
+
+    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig.plot(data)
+    paxfig.axes[0].annotate('My Label', (0.3, 0.6))
+    paxfig.axes[0].arrow(0.42, 0.56, 0.0, -0.09, head_width=0.03)
+    plt.show()
+
+.. warning::
+    
+    Access matplotib axes with caution. Some axes functions can break your paxfig object.
+
+.. image:: images/arrow.svg
