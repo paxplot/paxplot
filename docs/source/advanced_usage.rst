@@ -65,3 +65,20 @@ By default, paxplot chooses the axis limits as bounds of the plotted data. You c
     plt.show()
 
 .. image:: images/limits.svg
+
+Axis Inversion
+--------------
+Sometimes it's helpful to invert (flip) an axis.
+
+.. code-block:: python
+
+    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig.plot(data)
+    paxfig.invert_axis(ax_idx=0)
+    paxfig.invert_axis(ax_idx=1)
+    plt.show()
+
+.. image:: images/invert.svg
+
+
+

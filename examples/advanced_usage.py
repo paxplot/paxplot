@@ -41,3 +41,10 @@ paxfig.plot(data)
 paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
 paxfig.set_lim(ax_idx=2, bottom=1.0, top=3.0)
 plt.show()
+
+# Invert
+paxfig = paxplot.pax_parallel(n_axes=3)
+paxfig.plot(data)
+paxfig.invert_axis(ax_idx=0)
+paxfig.invert_axis(ax_idx=1)
+plt.show()
