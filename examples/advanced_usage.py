@@ -54,3 +54,17 @@ paxfig = paxplot.pax_parallel(n_axes=3)
 paxfig.plot(data)
 paxfig.add_legend(labels=['Line A', 'Line B', 'Line C'])
 plt.show()
+
+# Add colorbar
+paxfig = paxplot.pax_parallel(n_axes=3)
+paxfig.plot(data)
+paxfig.set_label(
+    ax_idx=2,
+    label='Column C'
+)
+paxfig.add_colorbar(
+    ax_idx=2,
+    cmap='viridis',
+    colorbar_kwargs={'label': 'Column C'}
+)
+plt.show()

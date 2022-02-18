@@ -92,3 +92,24 @@ It can be nice to plot a legend to identify each line. This works well if you ha
     plt.show()
 
 .. image:: images/legend.svg
+
+Adding a Legend
+---------------
+If you have many observations, it is helpful to use a colorbar to identify each line. You should also reference the pandas integration example for another example of using a colorbar.
+
+.. code-block:: python
+
+    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig.plot(data)
+    paxfig.set_label(
+        ax_idx=2,
+        label='Column C'
+    )
+    paxfig.add_colorbar(
+        ax_idx=2,
+        cmap='viridis',
+        colorbar_kwargs={'label': 'Column C'}
+    )
+    plt.show()
+
+.. image:: images/colorbar.svg
