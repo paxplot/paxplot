@@ -29,7 +29,7 @@ By default, paxplot chooses evenly-spaced ticks between the upper and lower limi
         precision=3
     )
 
-.. image:: images/even_ticks.svg
+.. image:: _static/even_ticks.svg
 
 Custom Ticks
 ------------
@@ -50,7 +50,7 @@ Paxplot also gives you the flexibility to set whatever ticks you want, and they 
     )
     plt.show()
 
-.. image:: images/custom_ticks.svg
+.. image:: _static/custom_ticks.svg
 
 Change Axis Limits
 ------------------
@@ -64,7 +64,7 @@ By default, paxplot chooses the axis limits as bounds of the plotted data. You c
     paxfig.set_lim(ax_idx=2, bottom=1.0, top=3.0)
     plt.show()
 
-.. image:: images/limits.svg
+.. image:: _static/limits.svg
 
 Axis Inversion
 --------------
@@ -78,7 +78,7 @@ Sometimes it's helpful to invert (flip) an axis.
     paxfig.invert_axis(ax_idx=1)
     plt.show()
 
-.. image:: images/invert.svg
+.. image:: _static/invert.svg
 
 Adding a Legend
 ---------------
@@ -91,7 +91,7 @@ It can be nice to plot a legend to identify each line. This works well if you ha
     paxfig.add_legend(labels=['Line A', 'Line B', 'Line C'])
     plt.show()
 
-.. image:: images/legend.svg
+.. image:: _static/legend.svg
 
 Adding a Legend
 ---------------
@@ -112,7 +112,7 @@ If you have many observations, it is helpful to use a colorbar to identify each 
     )
     plt.show()
 
-.. image:: images/colorbar.svg
+.. image:: _static/colorbar.svg
 
 Accessing Matplotlib Objects
 ----------------------------
@@ -130,4 +130,4 @@ Paxplot is an extension of matplotlib's `subplots <https://matplotlib.org/stable
     
     Access matplotib axes with caution. Some axes functions can break your paxfig object.
 
-.. image:: images/arrow.svg
+.. image:: _static/arrow.svg

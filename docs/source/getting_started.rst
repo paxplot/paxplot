@@ -35,7 +35,7 @@ First, we will create a simple plot of our :code:`data`
    paxfig.plot(data)
    plt.show()
 
-.. image:: images/basic.svg
+.. image:: _static/basic.svg
 
 Adding Labels
 ^^^^^^^^^^^^^
@@ -62,7 +62,7 @@ Let's say these columns in :code:`data` correspond to some the labels A, B, and 
    )
    plt.show()
 
-.. image:: images/labels.svg
+.. image:: _static/labels.svg
 
 Saving Your Plot
 ^^^^^^^^^^^^^^^^

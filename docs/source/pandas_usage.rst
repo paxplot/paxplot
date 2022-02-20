@@ -33,4 +33,4 @@ The `Pandas <https://pandas.pydata.org/>`_ library offers many tools for importi
     plt.show()
 
 
-.. image:: images/pandas.svg
+.. image:: _static/pandas.svg
