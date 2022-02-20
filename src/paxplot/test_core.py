@@ -828,6 +828,36 @@ class PaxplotException(unittest.TestCase):
                 cmap='foo',
             )
 
+    def test_no_data(self):
+        """
+        Various ways paxfig can fail if no data is plotted
+        """
+        # Setup
+        paxfig = core.pax_parallel(n_axes=3)
+
+        # Setting limits supported
+        paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
+
+        # Setting ticks
+        with self.assertRaises(AttributeError):
+            paxfig.set_ticks(ax_idx=0, ticks=[0.0, 1.0, 2.0])
+
+        # Setting labels supported
+        paxfig.set_label(ax_idx=1, label='foo')
+
+        # axis inversion
+        with self.assertRaises(AttributeError):
+            paxfig.invert_axis(ax_idx=2)
+
+        # Legend won't fail but just creates blank legend
+        paxfig.add_legend(labels=[])
+
+        # Adding colorbar supported
+        paxfig.add_colorbar(
+            ax_idx=0,
+            cmap='viridis',
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
