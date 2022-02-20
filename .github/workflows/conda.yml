@@ -25,3 +25,4 @@ jobs:
       run: |
         cd src/paxplot
         python test_core.py
+        python test_datasets.py
