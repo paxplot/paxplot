@@ -32,7 +32,8 @@ release = 'v1.0'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary'
+    'sphinx.ext.autosummary',
+    'sphinx_sitemap'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -58,3 +59,6 @@ html_static_path = ['_static']
 
 # Import paxplot
 import paxplot
+
+# For sitemap creation
+html_baseurl = 'https://kravitsjacob.github.io/paxplot/'
