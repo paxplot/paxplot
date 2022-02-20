@@ -1,7 +1,7 @@
 # Paxplot
 Paxplot is a Python visualization library for parallel coordinate plots based on matplotlib.
 
-Check out our [homepage](https://kravitsjacob.github.io/paxplot/) for more information
+Check out our [homepage](https://kravitsjacob.github.io/paxplot/) for more information.
 
 # Installation
 The latest stable release (and required dependencies) can be installed from PyPI:
