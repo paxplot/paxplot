@@ -33,7 +33,8 @@ release = 'v1.0'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx_sitemap'
+    'sphinx_sitemap',
+    'sphinx.ext.napoleon'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -62,3 +63,6 @@ html_static_path = ['_static']
 
 # For sitemap creation
 html_baseurl = 'https://kravitsjacob.github.io/paxplot/'
+
+# Numpy Docstrings
+napoleon_numpy_docstring = True
