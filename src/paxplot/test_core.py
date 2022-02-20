@@ -541,6 +541,31 @@ class PaxplotLib(unittest.TestCase):
             (0.0, 4.0)
         )
 
+    def test_parallel_singleton(self):
+        """
+        Testing if axis has all same points and still render plot
+        """
+        # Setup
+        data = [
+            [0.0, 1.0, 2.0],
+            [1.0, 1.0, 1.0],
+            [2.0, 1.0, 0.0],
+        ]
+        # Run
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Y data tests
+        self.assertEqual(paxfig.axes[1].lines[0].get_ydata()[0], 0.50)
+        self.assertEqual(paxfig.axes[1].lines[1].get_ydata()[0], 0.50)
+        self.assertEqual(paxfig.axes[1].lines[2].get_ydata()[0], 0.50)
+
+        # Test tick labels
+        self.assertEqual(paxfig.axes[1].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(
+            paxfig.axes[1].get_yticklabels()[-1].get_text(), '2.0'
+        )
+
 
 class PaxplotException(unittest.TestCase):
     def test_paxfig_creation(self):
