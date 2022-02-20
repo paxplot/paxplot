@@ -200,6 +200,13 @@ class PaxFigure(Figure):
         n_rows = data.shape[0]
         n_cols = data.shape[1]
 
+        # Checking for singleton case
+        for i in range(len(data_maxs)):
+            if data_mins[i] == data_maxs[i]:
+                data_mins[i] = data_mins[i]-1.0
+                data_maxs[i] = data_maxs[i]+1.0
+
+        # Plotting
         for col_idx in range(n_cols):
             # Plot each line
             for row_idx in range(n_rows):
