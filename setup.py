@@ -16,7 +16,7 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/kravitsjacob/paxplot/issues",
     },
     install_requires=[
-        'matplotlib',
+        'matplotlib=>3.5',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
