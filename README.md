@@ -1,3 +1,7 @@
+![PyPI](https://img.shields.io/pypi/v/paxplot)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kravitsjacob/paxplot/Version%20Testing)
+[![GitHub license](https://img.shields.io/github/license/kravitsjacob/paxplot)](https://github.com/kravitsjacob/paxplot/blob/main/LICENSE)
+
 # Paxplot
 Paxplot is a Python visualization library for parallel coordinate plots based on matplotlib.
 
