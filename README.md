@@ -1,5 +1,5 @@
-![PyPI](https://img.shields.io/pypi/v/paxplot)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kravitsjacob/paxplot/Version%20Testing)
+[![PyPI](https://img.shields.io/pypi/v/paxplot)](https://pypi.org/project/paxplot/)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kravitsjacob/paxplot/Version%20Testing)](https://github.com/kravitsjacob/paxplot/actions)
 [![GitHub license](https://img.shields.io/github/license/kravitsjacob/paxplot)](https://github.com/kravitsjacob/paxplot/blob/main/LICENSE)
 
 # Paxplot
