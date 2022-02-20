@@ -394,6 +394,15 @@ class PaxFigure(Figure):
                 f' use the `labels` argument'
             )
 
+        # Checking if data is plotted
+        try:
+            self.line_data
+        except AttributeError:
+            raise AttributeError(
+                'Paxplot does not support set_ticks if no data has been'
+                'plotted'
+            )
+
         # Retrieve matplotlib axes
         try:
             ax = self.axes[ax_idx]
@@ -485,6 +494,15 @@ class PaxFigure(Figure):
         except TypeError:
             raise TypeError(
                 f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
+
+        # Checking if data is plotted
+        try:
+            self.line_data
+        except AttributeError:
+            raise AttributeError(
+                'Paxplot does not support invert_axis if no data has been'
+                'plotted'
             )
 
         if ax_idx == 0:
