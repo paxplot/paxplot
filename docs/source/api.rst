@@ -8,4 +8,4 @@ API
 .. autosummary::
    :toctree: generated
 
-   paxplot
+   PaxFigure
