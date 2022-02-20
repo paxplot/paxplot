@@ -21,7 +21,7 @@ jobs:
       - name: Install Dependencies
         run: pip install matplotlib
       - name: Test with unittest
-      run: |
-        cd src/paxplot
-        python test_core.py
-        python test_datasets.py
+        run: |
+          cd src/paxplot
+          python test_core.py
+          python test_datasets.py
