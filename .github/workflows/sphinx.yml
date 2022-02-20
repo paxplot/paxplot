@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install Paxplot
-      run: pip install -e .
+      run: sudo pip install -e .
     - name: Build HTML
       uses: ammaraskar/sphinx-action@0.4
     - name: Upload artifacts
