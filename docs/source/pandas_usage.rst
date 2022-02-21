@@ -19,8 +19,7 @@ The `Pandas <https://pandas.pydata.org/>`_ library offers many tools for importi
     paxfig.plot(df.to_numpy())
 
     # Add labels
-    for i, col in enumerate(cols):
-        paxfig.set_label(i, col)
+    paxfig.set_labels(cols)
 
     # Add colorbar
     color_col = 0
