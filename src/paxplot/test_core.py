@@ -606,7 +606,7 @@ class PaxplotException(unittest.TestCase):
 
     def test_plot(self):
         """
-        Various ways paxfig.plot can fail
+        Various ways PaxFigure.plot can fail
         """
         # Too few axes
         with self.assertWarns(Warning):
@@ -640,7 +640,7 @@ class PaxplotException(unittest.TestCase):
 
     def test_lim(self):
         """
-        Various ways paxfig.set_lim can fail
+        Various ways PaxFigure.set_lim can fail
         """
         # Setup
         data = [
@@ -673,7 +673,7 @@ class PaxplotException(unittest.TestCase):
 
     def test_ticks(self):
         """
-        Various ways paxfig.set_ticks can fail
+        Various ways PaxFigure.set_ticks can fail
         """
         # Setup
         data = [
@@ -706,7 +706,7 @@ class PaxplotException(unittest.TestCase):
 
     def test_even_ticks(self):
         """
-        Various ways paxfig.set_even_ticks can fail
+        Various ways PaxFigure.set_even_ticks can fail
         """
         # Setup
         data = [
@@ -757,7 +757,7 @@ class PaxplotException(unittest.TestCase):
 
     def test_label(self):
         """
-        Various ways paxfig.set_label can fail
+        Various ways PaxFigure.set_label can fail
         """
         # Setup
         data = [
@@ -778,7 +778,7 @@ class PaxplotException(unittest.TestCase):
 
     def test_labels(self):
         """
-        Various ways paxfig.set_labels can fail
+        Various ways PaxFigure.set_labels can fail
         """
         # Setup
         data = [
@@ -790,11 +790,12 @@ class PaxplotException(unittest.TestCase):
         paxfig.plot(data)
 
         # Requesting too many labels
-        paxfig.set_labels(['A', 'B', 'C'])
+        with self.assertRaises(IndexError):
+            paxfig.set_labels(['A', 'B', 'C'])
 
     def test_invert(self):
         """
-        Various ways paxfig.invert_axis can fail
+        Various ways PaxFigure.invert_axis can fail
         """
         # Setup
         data = [
@@ -815,7 +816,7 @@ class PaxplotException(unittest.TestCase):
 
     def test_legend(self):
         """
-        Various ways paxfig.add_legend can fail
+        Various ways PaxFigure.add_legend can fail
         """
         # Setup
         data = [
@@ -836,7 +837,7 @@ class PaxplotException(unittest.TestCase):
 
     def test_colorbar(self):
         """
-        Various ways paxfig.add_colorbar can fail
+        Various ways PaxFigure.add_colorbar can fail
         """
         # Setup
         data = [
@@ -870,7 +871,7 @@ class PaxplotException(unittest.TestCase):
 
     def test_no_data(self):
         """
-        Various ways paxfig can fail if no data is plotted
+        Various ways PaxFigure can fail if no data is plotted
         """
         # Setup
         paxfig = core.pax_parallel(n_axes=3)
