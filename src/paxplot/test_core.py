@@ -281,7 +281,7 @@ class PaxplotLib(unittest.TestCase):
 
     def test_parallel_label(self):
         """
-        Testing setting labels
+        Testing setting label
         """
         # Setup
         data = [
@@ -308,6 +308,30 @@ class PaxplotLib(unittest.TestCase):
         )
         self.assertEqual(
             paxfig.axes[1].get_xticklabels()[0].get_text(), 'Cmaj7-B7'
+        )
+
+    def test_parallel_labels(self):
+        """
+        Testing setting labels
+        """
+        # Setup
+        data = [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
+        ]
+
+        # Run
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+        paxfig.set_labels(labels=['A', 'B'])
+
+        # Test
+        self.assertEqual(
+            paxfig.axes[0].get_xticklabels()[0].get_text(), 'A'
+        )
+        self.assertEqual(
+            paxfig.axes[1].get_xticklabels()[0].get_text(), 'B'
         )
 
     def test_parallel_invert(self):
