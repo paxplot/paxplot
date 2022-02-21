@@ -474,6 +474,20 @@ class PaxFigure(Figure):
         ax.set_xticks(ticks=[0.0])
         ax.set_xticklabels([label])
 
+    def set_labels(self, labels):
+        """
+        Set labels for all axes. A wrapper for set_label
+
+        Parameters
+        ----------
+        labels : list
+            Labels for each axis. Must be same length as number of axes.
+        """
+
+        # Set labels
+        for i, label in enumerate(labels):
+            self.set_label(i, label)
+
     def invert_axis(self, ax_idx):
         """Invert axis.
 
