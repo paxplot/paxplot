@@ -17,9 +17,9 @@ We run through the basic functionality of paxplot using the following synthetic 
 .. code-block:: python
 
    data = [
-      [0.0, 0.0, 2.0],
-      [1.0, 1.0, 1.0],
-      [3.0, 2.0, 0.0],
+      [0.0, 0.0, 2.0, 0.5],
+      [1.0, 1.0, 1.0, 1.0],
+      [3.0, 2.0, 0.0, 1.0],
    ]
 
 Creating a Simple Plot
@@ -31,7 +31,7 @@ First, we will create a simple plot of our :code:`data`
    import paxplot
    import matplotlib.pyplot as plt
 
-   paxfig = core.pax_parallel(n_axes=3)
+   paxfig = core.pax_parallel(n_axes=4)
    paxfig.plot(data)
    plt.show()
 
@@ -43,10 +43,7 @@ Let's say these columns in :code:`data` correspond to some the labels A, B, and 
 
 .. code-block:: python
 
-   import paxplot
-   import matplotlib.pyplot as plt
-
-   paxfig = paxplot.pax_parallel(n_axes=3)
+   paxfig = paxplot.pax_parallel(n_axes=4)
    paxfig.plot(data)
    paxfig.set_label(
       ax_idx=0,
@@ -59,6 +56,10 @@ Let's say these columns in :code:`data` correspond to some the labels A, B, and 
    paxfig.set_label(
       ax_idx=2,
       label='C'
+   )
+   paxfig.set_label(
+      ax_idx=3,
+      label='D'
    )
    plt.show()
 

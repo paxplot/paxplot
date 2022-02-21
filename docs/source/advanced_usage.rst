@@ -5,11 +5,11 @@ We run through the advanced functionality of paxplot using the following synthet
 
 .. code-block:: python
 
-   data = [
-      [0.0, 0.0, 2.0],
-      [1.0, 1.0, 1.0],
-      [3.0, 2.0, 0.0],
-   ]
+    data = [
+        [0.0, 0.0, 2.0, 0.5],
+        [1.0, 1.0, 1.0, 1.0],
+        [3.0, 2.0, 0.0, 1.0],
+    ]
 
 Change Number of Ticks
 ----------------------
@@ -17,7 +17,7 @@ By default, paxplot chooses evenly-spaced ticks between the upper and lower limi
 
 .. code-block:: python
 
-    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig = paxplot.pax_parallel(n_axes=4)
     paxfig.plot(data)
     paxfig.set_even_ticks(
         ax_idx=0,
@@ -28,6 +28,7 @@ By default, paxplot chooses evenly-spaced ticks between the upper and lower limi
         n_ticks=16,
         precision=3
     )
+    plt.show()
 
 .. image:: _static/even_ticks.svg
 
@@ -37,7 +38,7 @@ Paxplot also gives you the flexibility to set whatever ticks you want, and they 
 
 .. code-block:: python
 
-    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig = paxplot.pax_parallel(n_axes=4)
     paxfig.plot(data)
     paxfig.set_ticks(
         ax_idx=0,
@@ -58,7 +59,7 @@ By default, paxplot chooses the axis limits as bounds of the plotted data. You c
 
 .. code-block:: python
 
-    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig = paxplot.pax_parallel(n_axes=4)
     paxfig.plot(data)
     paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
     paxfig.set_lim(ax_idx=2, bottom=1.0, top=3.0)
@@ -72,7 +73,7 @@ Sometimes it's helpful to invert (flip) an axis.
 
 .. code-block:: python
 
-    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig = paxplot.pax_parallel(n_axes=4)
     paxfig.plot(data)
     paxfig.invert_axis(ax_idx=0)
     paxfig.invert_axis(ax_idx=1)
@@ -86,29 +87,29 @@ It can be nice to plot a legend to identify each line. This works well if you ha
 
 .. code-block:: python
 
-    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig = paxplot.pax_parallel(n_axes=4)
     paxfig.plot(data)
-    paxfig.add_legend(labels=['Line A', 'Line B', 'Line C'])
+    paxfig.add_legend(labels=['A', 'B', 'C'])
     plt.show()
 
 .. image:: _static/legend.svg
 
-Adding a Legend
+Adding a Colorbar
 ---------------
 If you have many observations, it is helpful to use a colorbar to identify each line. You should also reference the pandas integration example for another example of using a colorbar.
 
 .. code-block:: python
 
-    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig = paxplot.pax_parallel(n_axes=4)
     paxfig.plot(data)
     paxfig.set_label(
-        ax_idx=2,
-        label='Column C'
+        ax_idx=0,
+        label='Column A'
     )
     paxfig.add_colorbar(
-        ax_idx=2,
+        ax_idx=0,
         cmap='viridis',
-        colorbar_kwargs={'label': 'Column C'}
+        colorbar_kwargs={'label': 'Column A'}
     )
     plt.show()
 
@@ -120,10 +121,17 @@ Paxplot is an extension of matplotlib's `subplots <https://matplotlib.org/stable
 
 .. code-block:: python
 
-    paxfig = paxplot.pax_parallel(n_axes=3)
+    paxfig = paxplot.pax_parallel(n_axes=4)
     paxfig.plot(data)
-    paxfig.axes[0].annotate('My Label', (0.3, 0.6))
-    paxfig.axes[0].arrow(0.42, 0.56, 0.0, -0.09, head_width=0.03)
+    paxfig.axes[0].annotate('My Label', (0.3, 0.55))
+    paxfig.axes[0].arrow(
+        x=0.5,
+        y=0.52, 
+        dx=0.0, 
+        dy=-0.05, 
+        head_width=0.03, 
+        head_length=0.02
+    ) 
     plt.show()
 
 .. warning::
