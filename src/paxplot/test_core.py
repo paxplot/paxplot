@@ -755,7 +755,7 @@ class PaxplotException(unittest.TestCase):
                 maximum=0.0
             )
 
-    def test_labels(self):
+    def test_label(self):
         """
         Various ways paxfig.set_label can fail
         """
@@ -775,6 +775,22 @@ class PaxplotException(unittest.TestCase):
         # Non integer value for ax_idx
         with self.assertRaises(TypeError):
             paxfig.set_label(ax_idx='foo', label='bar')
+
+    def test_labels(self):
+        """
+        Various ways paxfig.set_labels can fail
+        """
+        # Setup
+        data = [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
+        ]
+        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig.plot(data)
+
+        # Requesting too many labels
+        paxfig.set_labels(['A', 'B', 'C'])
 
     def test_invert(self):
         """
