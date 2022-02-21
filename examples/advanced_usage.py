@@ -75,10 +75,10 @@ paxfig.plot(data)
 paxfig.axes[0].annotate('My Label', (0.3, 0.55))
 paxfig.axes[0].arrow(
     x=0.5,
-    y=0.52, 
-    dx=0.0, 
-    dy=-0.05, 
-    head_width=0.03, 
+    y=0.52,
+    dx=0.0,
+    dy=-0.05,
+    head_width=0.03,
     head_length=0.02
-) 
+)
 plt.show()
