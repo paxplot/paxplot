@@ -61,11 +61,18 @@ def get_color_gradient(val, minimum, maximum, colormap):
 
 
 class PaxFigure(Figure):
-    def __init__(self, *args, data=[], **kwargs):
+    def __init__(self, n_axes, width_ratios, *args, data=[], **kwargs):
         """
         Paxplot extension of Matplot Figure
         """
         super().__init__(*args, **kwargs)
+        self = self.subplots(
+            1,
+            n_axes,
+            sharey=False,
+            gridspec_kw={'width_ratios': width_ratios},
+        )
+
 
     def default_format(self):
         """
@@ -692,12 +699,7 @@ def pax_parallel(n_axes: int):
 
     # Create figure
     width_ratios.append(0.0)  # Last axis small
-    fig, _ = plt.subplots(
-        1,
-        n_axes,
-        sharey=False,
-        gridspec_kw={'width_ratios': width_ratios},
-        FigureClass=PaxFigure,
-    )
+    fig = PaxFigure(n_axes, width_ratios)
     fig.default_format()
+
     return fig
