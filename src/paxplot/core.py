@@ -97,7 +97,7 @@ class PaxFigure(Figure):
 
     def set_even_ticks(
         self,
-        ax_idx,
+        ax_idx: int,
         n_ticks=6,
         minimum=None,
         maximum=None,
@@ -161,7 +161,7 @@ class PaxFigure(Figure):
         tick_labels = tick_labels.round(precision)
         ax.set_yticks(ticks=ticks, labels=tick_labels)
 
-    def plot(self, data):
+    def plot(self, data: list):
         """
         Plot the supplied data
 
@@ -243,7 +243,7 @@ class PaxFigure(Figure):
                     precision=2
                 )
 
-    def set_lim(self, ax_idx, bottom, top):
+    def set_lim(self, ax_idx: int, bottom: float, top: float):
         """Set custom limits on axis
 
         Parameters
@@ -367,7 +367,7 @@ class PaxFigure(Figure):
                 precision=2
             )
 
-    def set_ticks(self, ax_idx, ticks, labels=None):
+    def set_ticks(self, ax_idx: int, ticks: list, labels=None):
         """Set the axis tick locations and optionally labels.
 
         Parameters
@@ -448,7 +448,7 @@ class PaxFigure(Figure):
                     f'Length of `labels` must be same as length of `ticks`'
                 )
 
-    def set_label(self, ax_idx, label):
+    def set_label(self, ax_idx: int, label: str):
         """Set the label for the axis
 
         Parameters
@@ -474,8 +474,27 @@ class PaxFigure(Figure):
         ax.set_xticks(ticks=[0.0])
         ax.set_xticklabels([label])
 
-    def invert_axis(self, ax_idx):
-        """Invert axis.
+    def set_labels(self, labels: list):
+        """
+        Set labels for all axes. A wrapper for set_label
+
+        Parameters
+        ----------
+        labels : list
+            Labels for each axis. Must be same length as number of axes.
+        """
+        # Checking length
+        if len(self.axes) != len(labels):
+            raise IndexError(
+                'Length of `labels` must equal number of axes'
+            )
+
+        # Set labels
+        for i, label in enumerate(labels):
+            self.set_label(i, label)
+
+    def invert_axis(self, ax_idx: int):
+        """Invert axis
 
         Parameters
         ----------
@@ -536,7 +555,7 @@ class PaxFigure(Figure):
         ax.set_yticks(ticks=ticks_scaled)
         ax.set_yticklabels(labels=labels)
 
-    def add_legend(self, labels):
+    def add_legend(self, labels: list):
         """Create a legend for a specified figure
 
         Parameters
@@ -580,7 +599,7 @@ class PaxFigure(Figure):
             self.axes[i].set_subplotspec(gs[0:1, i:i+1])
         ax_legend.set_axis_off()
 
-    def add_colorbar(self, ax_idx, cmap='viridis', colorbar_kwargs={}):
+    def add_colorbar(self, ax_idx: int, cmap='viridis', colorbar_kwargs={}):
         """Add colorbar to paxfigure
 
         Parameters
@@ -648,7 +667,7 @@ class PaxFigure(Figure):
         ax_colorbar.set_axis_off()
 
 
-def pax_parallel(n_axes):
+def pax_parallel(n_axes: int):
     """
     Wrapper for paxplot analagous to the matplotlib.pyplot.subplots function
 

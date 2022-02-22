@@ -10,9 +10,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../../src'))
 
 
 # -- Project information -----------------------------------------------------
@@ -33,7 +33,8 @@ release = 'v1.0'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx_sitemap'
+    'sphinx_sitemap',
+    'sphinx.ext.napoleon'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -58,7 +59,10 @@ html_theme = 'pydata_sphinx_theme'
 html_static_path = ['_static']
 
 # Import paxplot
-import paxplot
+#import paxplot
 
 # For sitemap creation
 html_baseurl = 'https://kravitsjacob.github.io/paxplot/'
+
+# Numpy Docstrings
+napoleon_numpy_docstring = True

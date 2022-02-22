@@ -12,8 +12,7 @@ paxfig = paxplot.pax_parallel(n_axes=len(cols))
 paxfig.plot(df.to_numpy())
 
 # Add labels
-for i, col in enumerate(cols):
-    paxfig.set_label(i, col)
+paxfig.set_labels(cols)
 
 # Add colorbar
 color_col = 0
