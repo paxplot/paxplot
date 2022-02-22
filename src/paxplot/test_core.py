@@ -1,5 +1,6 @@
 """Tests for core paxplot functions"""
 
+import os
 import unittest
 import core
 
@@ -590,6 +591,19 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[1].get_yticklabels()[-1].get_text(), '2.0'
         )
 
+    def test_parallel_savefig(self):
+        """
+        Testing if possible to save figure
+        """
+        # Run
+        paxfig = core.pax_parallel(n_axes=2)
+        paxfig.savefig('test.png')
+
+        # Test if file generated
+        self.assertTrue(os.path.isfile('test.png'))
+
+        # Cleanup
+        os.remove('test.png')
 
 class PaxplotException(unittest.TestCase):
     def test_paxfig_creation(self):
