@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib as mpl
 from matplotlib import cm
 import warnings
+import functools
 
 
 def scale_val(val, minimum, maximum):
@@ -674,6 +675,22 @@ class PaxFigure(Figure):
         ax_colorbar.set_axis_off()
 
 
+def check_support(func):
+    """
+    Generate warning if not supported by Paxplot
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        warnings.warn(
+            f'The function you have called ({func.__name__}) is not official supported by '
+            'Paxplot, but it may still work. Report issues to '
+            'https://github.com/kravitsjacob/paxplot/issues',
+            Warning
+        )
+        return func(*args, **kwargs)
+    return wrapper
+
+
 def pax_parallel(n_axes: int):
     """
     Wrapper for paxplot analagous to the matplotlib.pyplot.subplots function
@@ -701,5 +718,14 @@ def pax_parallel(n_axes: int):
     width_ratios.append(0.0)  # Last axis small
     fig = PaxFigure(n_axes, width_ratios)
     fig.default_format()
+
+    # Support
+    for func_name in dir(Figure):
+        cond_1 = not func_name.startswith('__')
+        cond_2 = not func_name.startswith('_')
+        cond_3 = callable(getattr(Figure, func_name))
+        if cond_1 and cond_2 and cond_3:
+            func = check_support(getattr(fig, func_name))
+            setattr(fig, func_name, func)
 
     return fig
