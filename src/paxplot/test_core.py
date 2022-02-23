@@ -606,6 +606,18 @@ class PaxplotLib(unittest.TestCase):
         # Cleanup
         os.remove('test.png')
 
+
+    def test_parallel_not_supported(self):
+        """
+        Testing if unsupported
+        """
+        # Run
+        paxfig = core.pax_parallel(n_axes=2)
+
+        # Test
+        with self.assertWarns(Warning):
+            paxfig.suptitle('Test')
+
 class PaxplotException(unittest.TestCase):
     def test_paxfig_creation(self):
         """
