@@ -1,5 +1,6 @@
 """Core paxplot functions"""
 
+from faulthandler import disable
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.figure import Figure
@@ -62,11 +63,15 @@ def get_color_gradient(val, minimum, maximum, colormap):
 
 
 class PaxFigure(Figure):
+
+    _safe_inherited_functions = ['savefig']
+
     def __init__(self, n_axes, width_ratios, *args, data=[], **kwargs):
         """
         Paxplot extension of Matplot Figure
         """
         super().__init__(*args, **kwargs)
+        self._show_unsafe_warning = True
         self = self.subplots(
             1,
             n_axes,
@@ -675,19 +680,37 @@ class PaxFigure(Figure):
         ax_colorbar.set_axis_off()
 
 
-def check_support(func):
+def add_unsafe_warning(func, fig):
     """
     Generate warning if not supported by Paxplot
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        warnings.warn(
-            f'The function you have called ({func.__name__}) is not official supported by '
-            'Paxplot, but it may still work. Report issues to '
-            'https://github.com/kravitsjacob/paxplot/issues',
-            Warning
-        )
+        if fig._show_unsafe_warning:
+            warnings.warn(
+                f'The function you have called ({func.__name__}) is not official supported by '
+                'Paxplot, but it may still work. Report issues to '
+                'https://github.com/kravitsjacob/paxplot/issues',
+                Warning
+            )
         return func(*args, **kwargs)
+    return wrapper
+
+
+def disable_unsafe_warnings(func, fig):
+    """
+    Temporarily disables safety warnings for the duration of the function execution.
+
+    This allows a known safe function needs to make safe calls to otherwise
+    unsafe functions without throwing a warning.
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        original_flag_value = fig._show_unsafe_warning
+        fig._show_unsafe_warning = False
+        result = func(*args, **kwargs)
+        fig._show_unsafe_warning = original_flag_value
+        return result
     return wrapper
 
 
@@ -719,13 +742,27 @@ def pax_parallel(n_axes: int):
     fig = PaxFigure(n_axes, width_ratios)
     fig.default_format()
 
-    # Support
+    pax_figure_functions = set(filter(
+        lambda func_name: callable(getattr(PaxFigure, func_name)),
+        vars(PaxFigure).keys()))
+
+    unsafe_functions = set(filter(
+        lambda func_name: (
+            func_name not in PaxFigure._safe_inherited_functions
+            and func_name not in pax_figure_functions),
+        dir(Figure)))
+
+    # Add unsafe function warnings
     for func_name in dir(Figure):
         cond_1 = not func_name.startswith('__')
         cond_2 = not func_name.startswith('_')
         cond_3 = callable(getattr(Figure, func_name))
         if cond_1 and cond_2 and cond_3:
-            func = check_support(getattr(fig, func_name))
+            func = getattr(fig, func_name)
+            if func_name in unsafe_functions:
+                func = add_unsafe_warning(func, fig)
+            else:
+                func = disable_unsafe_warnings(func, fig)
             setattr(fig, func_name, func)
 
     return fig
