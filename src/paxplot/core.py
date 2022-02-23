@@ -66,18 +66,12 @@ class PaxFigure(Figure):
 
     _safe_inherited_functions = ['savefig']
 
-    def __init__(self, n_axes, width_ratios, *args, data=[], **kwargs):
+    def __init__(self, *args, data=[], **kwargs):
         """
         Paxplot extension of Matplot Figure
         """
         super().__init__(*args, **kwargs)
         self._show_unsafe_warning = True
-        self = self.subplots(
-            1,
-            n_axes,
-            sharey=False,
-            gridspec_kw={'width_ratios': width_ratios},
-        )
 
 
     def default_format(self):
@@ -255,6 +249,9 @@ class PaxFigure(Figure):
                     maximum=data_maxs[col_idx],
                     precision=2
                 )
+
+    def show(self):
+        plt.show()
 
     def set_lim(self, ax_idx: int, bottom: float, top: float):
         """Set custom limits on axis
@@ -739,7 +736,14 @@ def pax_parallel(n_axes: int):
 
     # Create figure
     width_ratios.append(0.0)  # Last axis small
-    fig = PaxFigure(n_axes, width_ratios)
+    fig, _ = plt.subplots(
+        1,
+        n_axes,
+        sharey=False,
+        gridspec_kw={'width_ratios': width_ratios},
+        FigureClass=PaxFigure,
+    )
+    # fig = PaxFigure(n_axes, width_ratios)
     fig.default_format()
 
     pax_figure_functions = set(filter(
@@ -753,10 +757,10 @@ def pax_parallel(n_axes: int):
         dir(Figure)))
 
     # Add unsafe function warnings
-    for func_name in dir(Figure):
+    for func_name in dir(PaxFigure):
         cond_1 = not func_name.startswith('__')
         cond_2 = not func_name.startswith('_')
-        cond_3 = callable(getattr(Figure, func_name))
+        cond_3 = callable(getattr(PaxFigure, func_name))
         if cond_1 and cond_2 and cond_3:
             func = getattr(fig, func_name)
             if func_name in unsafe_functions:
