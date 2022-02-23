@@ -64,7 +64,11 @@ def get_color_gradient(val, minimum, maximum, colormap):
 
 class PaxFigure(Figure):
 
-    _safe_inherited_functions = ['savefig']
+    _safe_inherited_functions = [
+        'savefig',
+        'set_size_inches',
+        'draw'
+    ]
 
     def __init__(self, *args, data=[], **kwargs):
         """
@@ -760,8 +764,9 @@ def pax_parallel(n_axes: int):
     for func_name in dir(PaxFigure):
         cond_1 = not func_name.startswith('__')
         cond_2 = not func_name.startswith('_')
-        cond_3 = callable(getattr(PaxFigure, func_name))
-        if cond_1 and cond_2 and cond_3:
+        cond_3 = not func_name.startswith('get')
+        cond_4 = callable(getattr(PaxFigure, func_name))
+        if cond_1 and cond_2 and cond_3 and cond_4:
             func = getattr(fig, func_name)
             if func_name in unsafe_functions:
                 func = add_unsafe_warning(func, fig)
