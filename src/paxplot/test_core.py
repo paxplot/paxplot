@@ -44,10 +44,11 @@ class PaxplotLib(unittest.TestCase):
                 0.0
             )
 
-        # Last axis
-        position = paxfig.axes[-1].get_position()
-        width = position.x1 - position.x0
-        self.assertEqual(width, 0.0)
+        with self.assertWarns(Warning):
+            # Last axis
+            position = paxfig.axes[-1].get_position()
+            width = position.x1 - position.x0
+            self.assertEqual(width, 0.0)
 
     def test_parallel_basic(self):
         """
