@@ -31,7 +31,7 @@ First, we will create a simple plot of our :code:`data`
    import paxplot
    import matplotlib.pyplot as plt
 
-   paxfig = core.pax_parallel(n_axes=4)
+   paxfig = paxplot.pax_parallel(n_axes=4)
    paxfig.plot(data)
    plt.show()
 
