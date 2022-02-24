@@ -624,13 +624,11 @@ class PaxplotLib(unittest.TestCase):
         Testing if top_level functions raise warnings
         """
         # Setup
-        plt.close('all')
         paxfig = core.pax_parallel(n_axes=2)
 
         with warnings.catch_warnings(record=True) as w:
             # Run
-            plt.show()
-            plt.close('all')
+            plt.show(block=False)
 
             # Test
             self.assertEqual(len(w), 0)
