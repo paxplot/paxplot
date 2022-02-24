@@ -1,7 +1,7 @@
 Advanced Usage
 ==============
 
-We run through the advanced functionality of paxplot using the following synthetic dataset. Note that paxplot requires its input be a list of lists or a similar matrix-like format.
+We run through the advanced functionality of Paxplot using the following synthetic dataset. Note, that Paxplot requires its input be a list of lists or a similar matrix-like format.
 
 .. code-block:: python
 
@@ -13,7 +13,7 @@ We run through the advanced functionality of paxplot using the following synthet
 
 Change Number of Ticks
 ----------------------
-By default, paxplot chooses evenly-spaced ticks between the upper and lower limits of the plotted data. You can change that option!
+By default, Paxplot chooses evenly-spaced ticks between the upper and lower limits of the plotted data. You can change that though!
 
 .. code-block:: python
 
@@ -34,7 +34,7 @@ By default, paxplot chooses evenly-spaced ticks between the upper and lower limi
 
 Custom Ticks
 ------------
-Paxplot also gives you the flexibility to set whatever ticks you want, and they can say whatever you want!
+Paxplot also gives you the flexibility to set whatever ticks you want, and they can say `whatever you want <https://www.youtube.com/watch?v=jRHQPG1xd9o>`_!
 
 .. code-block:: python
 
@@ -55,7 +55,7 @@ Paxplot also gives you the flexibility to set whatever ticks you want, and they 
 
 Change Axis Limits
 ------------------
-By default, paxplot chooses the axis limits as bounds of the plotted data. You can also change that!
+By default, Paxplot chooses the axis limits as bounds of the plotted data. You can also change that!
 
 .. code-block:: python
 
@@ -69,7 +69,7 @@ By default, paxplot chooses the axis limits as bounds of the plotted data. You c
 
 Axis Inversion
 --------------
-Sometimes it's helpful to invert (flip) an axis.
+Sometimes it's helpful to invert (flip) an axis. This is particularly helpful when looking high-dimensional `Pareto fronts <https://arxiv.org/pdf/1705.00368.pdf>`_.
 
 .. code-block:: python
 
@@ -96,7 +96,7 @@ It can be nice to plot a legend to identify each line. This works well if you ha
 
 Adding a Colorbar
 ---------------
-If you have many observations, it is helpful to use a colorbar to identify each line. You should also reference the pandas integration example for another example of using a colorbar.
+If you have many observations, it is helpful to use a colorbar to distinguish each line. You should also reference the Pandas integration `example <pandas_usage.html>`_ for another usage of the colorbar.
 
 .. code-block:: python
 
@@ -117,7 +117,7 @@ If you have many observations, it is helpful to use a colorbar to identify each 
 
 Accessing Matplotlib Objects
 ----------------------------
-Paxplot is an extension of matplotlib's `subplots <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html>`_ wrapper. Paxplot gives you the ability to acess the individual matplotlib axes as well as all the associated functionality using :code:`paxfig.axes`. To demonstrate this, imagine you want to annotate your paxplot with a label and arrow. That functionality has not been explicitly added to paxplot, however it does exit for matplotlib `axes <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.arrow.html>`_. Paxplot still allows us to axcess that functionality!
+Paxplot is an extension of Matplotlib's `subplots <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html>`_ wrapper. Paxplot gives you the ability to access the individual Matplotlib axes as well as all the associated functionality using :code:`.axes`. To demonstrate this, imagine you want to annotate your Paxplot with a label and arrow. That functionality has not been explicitly added to Paxplot, however it does exit for Matplotlib `axes <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.arrow.html>`_. Paxplot still allows us to access that functionality!
 
 .. code-block:: python
 
@@ -134,8 +134,8 @@ Paxplot is an extension of matplotlib's `subplots <https://matplotlib.org/stable
     ) 
     plt.show()
 
+.. image:: _static/arrow.svg
+
 .. warning::
     
-    Access matplotib axes with caution. Some axes functions can break your paxfig object.
-
-.. image:: _static/arrow.svg
+    Access Matplotib axes with caution. Some functions can break your Paxfig object. Using many of these functions will generate a warning from Paxplot.

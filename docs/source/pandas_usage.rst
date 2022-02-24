@@ -1,7 +1,7 @@
 Usage with Pandas
 =================
 
-The `Pandas <https://pandas.pydata.org/>`_ library offers many tools for importing and processing data. Here is an example of using paxplot to plot data in a pandas `DataFrame <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html>`_. We will use the :code:`tradeoff` dataset included with paxplot, but the example is fairly generic to any dataframe.
+The `Pandas <https://pandas.pydata.org/>`_ library offers many tools for importing and processing data. Here is an example of using Paxplot to plot data in a Pandas `DataFrame <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html>`_. We will use the :code:`tradeoff` dataset included in Paxplot, but the workflow is fairly generic.
 
 .. code-block:: python
 
