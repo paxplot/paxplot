@@ -254,9 +254,6 @@ class PaxFigure(Figure):
                     precision=2
                 )
 
-    def show(self):
-        plt.show()
-
     def set_lim(self, ax_idx: int, bottom: float, top: float):
         """Set custom limits on axis
 
