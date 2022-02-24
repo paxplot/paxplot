@@ -15,6 +15,7 @@ class PaxplotDatasets(unittest.TestCase):
             stream,
             io.BufferedReader
         )
+        stream.close()
 
 
 if __name__ == '__main__':
