@@ -607,7 +607,6 @@ class PaxplotLib(unittest.TestCase):
         # Cleanup
         os.remove('test.png')
 
-
     def test_parallel_not_supported(self):
         """
         Testing if unsupported
