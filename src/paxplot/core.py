@@ -747,7 +747,6 @@ def pax_parallel(n_axes: int):
         gridspec_kw={'width_ratios': width_ratios},
         FigureClass=PaxFigure,
     )
-    # fig = PaxFigure(n_axes, width_ratios)
     fig.default_format()
 
     pax_figure_functions = set(filter(
