@@ -1,28 +1,29 @@
-.. paxplot documentation master file, created by
-   sphinx-quickstart on Wed Feb  2 19:43:13 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to paxplot's documentation!
+Paxplot
 ===================================
 
-**paxplot** is a simple tool for creating parallel plots in python
+Paxplot is a Python visualization library for parallel coordinate plots based on Matplotlib. Parallel coordinate, or parallel axis, plots are `common way <https://en.wikipedia.org/wiki/Parallel_coordinates>`_ of visualizing high-dimensional datasets. Here is an example!
+
+.. image:: _static/pandas.svg
+
+Want to make to see how this plot is made? Check out the `Usage with Pandas <pandas_usage.html>`_ tutorial.
+
+To install:
 
 .. code-block:: console
 
    $ pip install paxplot
 
-.. note::
-
-   This project is under active development.
-
-
 Contents
 --------
 
 .. toctree::
+   :maxdepth: 1
 
    getting_started
    advanced_usage
    pandas_usage
    api
+
+.. note::
+
+   This project is under active development.
