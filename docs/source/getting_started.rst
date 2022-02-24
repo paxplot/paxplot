@@ -4,7 +4,7 @@ Getting Started
 Installation
 ------------
 
-To use paxplot, first install it using pip:
+To use Paxplot, first install it using PyPI:
 
 .. code-block:: console
 
@@ -12,7 +12,7 @@ To use paxplot, first install it using pip:
 
 Basic Usage
 -----------
-We run through the basic functionality of paxplot using the following synthetic dataset. Note that paxplot requires its input be a list of lists or a similar matrix-like format. For usage with pandas see advanced usage.
+We run through the basic functionality of Paxplot using the following synthetic dataset. Note that Paxplot requires its input be in a list of lists or a similar matrix-like format. For usage with Pandas, click `here <pandas_usage.html>`_.
 
 .. code-block:: python
 
@@ -58,4 +58,4 @@ You can easily export your plot in many standard vector and raster formats.
 
    paxfig.savefig('my_plot.png')
 
-Paxplot has lots of additionall functionality. Continue onto the advanced usage to see additional examples.
+Paxplot has lots of additional functionality. Continue onto the next section to see additional examples.
