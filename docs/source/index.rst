@@ -16,7 +16,7 @@ Welcome to paxplot's documentation!
 
    This project is under active development.
 
-
+--------
 Contents
 --------
 
