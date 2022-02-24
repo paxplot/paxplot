@@ -77,7 +77,6 @@ class PaxFigure(Figure):
         super().__init__(*args, **kwargs)
         self._show_unsafe_warning = True
 
-
     def default_format(self):
         """
         Set the default format of a Paxplot Figure
@@ -686,8 +685,9 @@ def add_unsafe_warning(func, fig):
     def wrapper(*args, **kwargs):
         if fig._show_unsafe_warning:
             warnings.warn(
-                f'The function you have called ({func.__name__}) is not official supported by '
-                'Paxplot, but it may still work. Report issues to '
+                f'The function you have called ({func.__name__}) is not '
+                'officially supported by Paxplot, but it may still work. '
+                'Report issues to '
                 'https://github.com/kravitsjacob/paxplot/issues',
                 Warning
             )
@@ -697,7 +697,8 @@ def add_unsafe_warning(func, fig):
 
 def disable_unsafe_warnings(func, fig):
     """
-    Temporarily disables safety warnings for the duration of the function execution.
+    Temporarily disables safety warnings for the duration of the function
+    execution.
 
     This allows a known safe function needs to make safe calls to otherwise
     unsafe functions without throwing a warning.
