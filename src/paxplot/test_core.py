@@ -3,6 +3,8 @@
 import os
 import unittest
 import core
+import warnings
+import matplotlib.pyplot as plt
 
 
 class PaxplotLib(unittest.TestCase):
@@ -604,6 +606,32 @@ class PaxplotLib(unittest.TestCase):
 
         # Cleanup
         os.remove('test.png')
+
+    def test_parallel_not_supported(self):
+        """
+        Testing if unsupported
+        """
+        # Run
+        paxfig = core.pax_parallel(n_axes=2)
+
+        # Test
+        with self.assertWarns(Warning):
+            paxfig.suptitle('Test')
+
+    def test_parallel_supported_top_level(self):
+        """
+        Testing if top_level functions raise warnings
+        """
+        # Setup
+        paxfig = core.pax_parallel(n_axes=2)
+
+        with warnings.catch_warnings(record=True) as w:
+            # Run
+            plt.show(block=False)
+
+            # Test
+            self.assertEqual(len(w), 0)
+
 
 class PaxplotException(unittest.TestCase):
     def test_paxfig_creation(self):
