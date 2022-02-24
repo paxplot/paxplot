@@ -5,7 +5,7 @@ Paxplot is a Python visualization library for parallel coordinate plots based on
 
 .. image:: _static/pandas.svg
 
-Want to make to see how this plot is made? Check out the `Usage with Pandas <pandas_usage.html>`_ tutorial.
+Want to see how this plot is made? Check out the `Usage with Pandas <pandas_usage.html>`_ tutorial.
 
 To install:
 

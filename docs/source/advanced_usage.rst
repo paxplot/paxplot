@@ -69,7 +69,7 @@ By default, Paxplot chooses the axis limits as bounds of the plotted data. You c
 
 Axis Inversion
 --------------
-Sometimes it's helpful to invert (flip) an axis. This is particularly helpful when looking high-dimensional `Pareto fronts <https://arxiv.org/pdf/1705.00368.pdf>`_.
+Sometimes it's helpful to invert (flip) an axis. This is particularly helpful when looking at high-dimensional `Pareto fronts <https://arxiv.org/pdf/1705.00368.pdf>`_.
 
 .. code-block:: python
 
@@ -117,7 +117,7 @@ If you have many observations, it is helpful to use a colorbar to distinguish ea
 
 Accessing Matplotlib Objects
 ----------------------------
-Paxplot is an extension of Matplotlib's `subplots <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html>`_ wrapper. Paxplot gives you the ability to access the individual Matplotlib axes as well as all the associated functionality using :code:`.axes`. To demonstrate this, imagine you want to annotate your Paxplot with a label and arrow. That functionality has not been explicitly added to Paxplot, however it does exit for Matplotlib `axes <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.arrow.html>`_. Paxplot still allows us to access that functionality!
+Paxplot is an extension of Matplotlib's `subplots <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html>`_ wrapper. Paxplot gives you the ability to access the individual Matplotlib axes as well as all the associated functionality using :code:`.axes`. To demonstrate this, imagine you want to annotate your Paxplot with a label and arrow. That functionality has not been explicitly added to Paxplot, however it does exist for Matplotlib `axes <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.arrow.html>`_. Paxplot still allows us to access that functionality!
 
 .. code-block:: python
 

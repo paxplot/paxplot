@@ -24,7 +24,7 @@ We run through the basic functionality of Paxplot using the following synthetic 
 
 Creating a Simple Plot
 ^^^^^^^^^^^^^^^^^^^^^^
-First, we will create a simple plot of our :code:`data`
+First, we will create a simple plot of our :code:`data`.
 
 .. code-block:: python
 
@@ -39,7 +39,7 @@ First, we will create a simple plot of our :code:`data`
 
 Adding Labels
 ^^^^^^^^^^^^^
-Let's say these columns in :code:`data` correspond to some the labels A, B, and C. We can add those labels!
+Let's say these columns in :code:`data` correspond to the labels A, B, and C. We can add those labels!
 
 .. code-block:: python
 
