@@ -22,7 +22,7 @@ copyright = '2022, Jacob Kravits'
 author = 'Jacob Kravits'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.1.1-beta'
+release = 'beta'
 
 
 # -- General configuration ---------------------------------------------------
