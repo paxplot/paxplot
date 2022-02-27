@@ -67,7 +67,8 @@ class PaxFigure(Figure):
     _safe_inherited_functions = [
         'savefig',
         'set_size_inches',
-        'draw'
+        'draw',
+        'show'
     ]
 
     def __init__(self, *args, data=[], **kwargs):
