@@ -632,6 +632,20 @@ class PaxplotLib(unittest.TestCase):
             # Test
             self.assertEqual(len(w), 0)
 
+    def test_parallel_figshow(self):
+        """
+        Testing if .show raises warnings
+        """
+        # Setup
+        paxfig = core.pax_parallel(n_axes=2)
+
+        with warnings.catch_warnings(record=True) as w:
+            # Run
+            paxfig.show()
+
+            # Test
+            self.assertEqual(len(w), 0)
+
 
 class PaxplotException(unittest.TestCase):
     def test_paxfig_creation(self):
