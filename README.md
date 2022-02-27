@@ -23,7 +23,7 @@ Please report all bugs using [issues](https://github.com/kravitsjacob/paxplot/is
 Paxplot welcomes contributions! Users familiar with matplotlib should have no problem using/contributing to this project.
 
 1. We recommend conda to manage environments and ensure consistent results. Download [miniconda](https://docs.conda.io/en/latest/miniconda.html) and ensure you can activate it from your terminal by running `$ conda activate` 
-    * Depending on system configuration, this can be an involved process [here](https://discuss.codecademy.com/t/setting-up-conda-in-git-bash/534473) is a recommended thread.
+    * Depending on system configuration, this can be an involved process. [Here](https://discuss.codecademy.com/t/setting-up-conda-in-git-bash/534473) is a recommended thread.
 3. Clone the repository using `$ git clone https://github.com/kravitsjacob/paxplot.git` 
 4. Change to the current working directory using `$ cd paxplot`
 5. Install the development environment `$ conda env create -f environment.yml`
