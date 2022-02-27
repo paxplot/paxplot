@@ -22,4 +22,4 @@ paxfig.add_colorbar(
     colorbar_kwargs={'label': cols[color_col]}
 )
 
-plt.show()
+plt.show(block=False)

@@ -19,7 +19,7 @@ paxfig.set_even_ticks(
     n_ticks=16,
     precision=3
 )
-plt.show()
+plt.show(block=False)
 
 # Custom ticks
 paxfig = paxplot.pax_parallel(n_axes=4)
@@ -33,27 +33,27 @@ paxfig.set_ticks(
     ax_idx=2,
     ticks=[0.0, 1.0, 1.5, 2.0],
 )
-plt.show()
+plt.show(block=False)
 
 # Limits
 paxfig = paxplot.pax_parallel(n_axes=4)
 paxfig.plot(data)
 paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
 paxfig.set_lim(ax_idx=2, bottom=1.0, top=3.0)
-plt.show()
+plt.show(block=False)
 
 # Invert
 paxfig = paxplot.pax_parallel(n_axes=4)
 paxfig.plot(data)
 paxfig.invert_axis(ax_idx=0)
 paxfig.invert_axis(ax_idx=1)
-plt.show()
+plt.show(block=False)
 
 # Add legend
 paxfig = paxplot.pax_parallel(n_axes=4)
 paxfig.plot(data)
 paxfig.add_legend(labels=['A', 'B', 'C'])
-plt.show()
+plt.show(block=False)
 
 # Add colorbar
 paxfig = paxplot.pax_parallel(n_axes=4)
@@ -67,7 +67,7 @@ paxfig.add_colorbar(
     cmap='viridis',
     colorbar_kwargs={'label': 'Column A'}
 )
-plt.show()
+plt.show(block=False)
 
 # Accessing matplotlib objects
 paxfig = paxplot.pax_parallel(n_axes=4)
@@ -81,4 +81,4 @@ paxfig.axes[0].arrow(
     head_width=0.03,
     head_length=0.02
 )
-plt.show()
+plt.show(block=False)

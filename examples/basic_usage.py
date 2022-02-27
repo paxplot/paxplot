@@ -10,13 +10,13 @@ data = [
 # Basic plot
 paxfig = paxplot.pax_parallel(n_axes=4)
 paxfig.plot(data)
-plt.show()
+plt.show(block=False)
 
 # Adding labels
 paxfig = paxplot.pax_parallel(n_axes=4)
 paxfig.plot(data)
 paxfig.set_labels(['A', 'B', 'C', 'D'])
-plt.show()
+plt.show(block=False)
 
 # Exporting
 paxfig.savefig('my_plot.png')
