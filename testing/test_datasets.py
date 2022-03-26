@@ -2,7 +2,7 @@
 
 import io
 import unittest
-import datasets
+import src as paxplot
 
 
 class PaxplotDatasets(unittest.TestCase):
@@ -10,7 +10,7 @@ class PaxplotDatasets(unittest.TestCase):
         """
         Test for tradeoff dataset
         """
-        stream = datasets.tradeoff()
+        stream = paxplot.tradeoff()
         self.assertIsInstance(
             stream,
             io.BufferedReader
