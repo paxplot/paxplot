@@ -77,18 +77,24 @@ class PaxFigure(Figure):
         # Setup
         super().__init__(*args, **kwargs)
         self._show_unsafe_warning = True
-        
+
         # Paxplot attributes
         self._pax_data = []
         self._pax_data_scale = []
         self._pax_lims = []
         self._pax_tick = []
-
+        self._pax_tick_labels = []
 
     def default_format(self):
         """
         Set the default format of a Paxplot Figure
         """
+        # Set paxplot attributes
+        def_vals = [[0, 1]]*len(self.axes)
+        self._pax_lims = def_vals
+        self._pax_tick = def_vals
+        self._pax_tick_labels = def_vals
+
         # Remove space between plots
         subplots_adjust_args = {
             'wspace': 0.0,
@@ -109,6 +115,9 @@ class PaxFigure(Figure):
             # Set x ticks
             ax.set_xticks([0], [' '])
             ax.tick_params(axis='x', length=0.0, pad=10)
+
+            # Set y ticks
+            ax.set_yticks([0, 1])
 
         # Adjust ticks on last axis
         self.axes[-1].yaxis.tick_right()
