@@ -130,86 +130,6 @@ class PaxFigure(Figure):
         # Adjust ticks on last axis
         self.axes[-1].yaxis.tick_right()
 
-    def set_even_ticks(
-        self,
-        ax_idx: int,
-        n_ticks=6,
-        minimum=None,
-        maximum=None,
-        precision=2
-    ):
-        """
-        Set evenly spaced axis ticks between minimum and maximum value. If
-        no minimum and maximum values are specified, the limits of the
-        underlying plotted data are assumed.
-
-        Parameters
-        ----------
-        ax_idx : int
-            Index of matplotlib axes
-        n_ticks : int
-            Number of ticks
-        minimum : numeric
-            minimum value for ticks
-        maximum : numeric
-            maximum value for ticks
-        precision : int
-            number of decimal points for tick labels
-        """
-        # Set automatic min and maximum
-        if minimum is None and maximum is None:
-            minimum = self.line_data[:, ax_idx].min()
-            maximum = self.line_data[:, ax_idx].max()
-
-        # Minimum/maximum check
-        if minimum > maximum:
-            raise ValueError(
-                f'Value for `minimum` cannot be greater than `maximum`'
-            )
-
-        # Retrieve matplotlib axes
-        try:
-            ax = self.axes[ax_idx]
-        except IndexError:
-            raise IndexError(
-                f'You are trying to set the limits of axis with index '
-                f'{ax_idx}. However, axis index only goes up to '
-                f'{len(self.axes)-1}.'
-            )
-        except TypeError:
-            raise TypeError(
-                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
-            )
-
-        # Set ticks
-        try:
-            even_ticks = np.linspace(
-                minimum,
-                maximum,
-                num=n_ticks + 1
-            )
-        except TypeError:
-            raise TypeError(
-                f'Type of `n_ticks` must be integer not {type(n_ticks)}'
-            )
-        self._pax_ticks[ax_idx] = even_ticks
-
-        # Set tick labels
-        self._pax_ticks_labels[ax_idx] = even_ticks.round(precision)
-
-        # Scale ticks
-        ticks = self._pax_ticks[ax_idx]
-        bottom = self._pax_lims[ax_idx][0]
-        top = self._pax_lims[ax_idx][1]
-        ticks_scale = (ticks - bottom) / (top - bottom)
-        self._pax_ticks_scale[ax_idx] = ticks_scale
-
-        # Update ticks
-        self.axes[ax_idx].set_yticks(ticks=ticks_scale)
-        self.axes[ax_idx].set_yticklabels(
-            labels=self._pax_ticks_labels[ax_idx]
-        )
-
     def plot(self, data: list):
         """
         Plot the supplied data
@@ -462,6 +382,86 @@ class PaxFigure(Figure):
                 raise ValueError(
                     f'Length of `labels` must be same as length of `ticks`'
                 )
+
+    def set_even_ticks(
+        self,
+        ax_idx: int,
+        n_ticks=6,
+        minimum=None,
+        maximum=None,
+        precision=2
+    ):
+        """
+        Set evenly spaced axis ticks between minimum and maximum value. If
+        no minimum and maximum values are specified, the limits of the
+        underlying plotted data are assumed.
+
+        Parameters
+        ----------
+        ax_idx : int
+            Index of matplotlib axes
+        n_ticks : int
+            Number of ticks
+        minimum : numeric
+            minimum value for ticks
+        maximum : numeric
+            maximum value for ticks
+        precision : int
+            number of decimal points for tick labels
+        """
+        # Set automatic min and maximum
+        if minimum is None and maximum is None:
+            minimum = self.line_data[:, ax_idx].min()
+            maximum = self.line_data[:, ax_idx].max()
+
+        # Minimum/maximum check
+        if minimum > maximum:
+            raise ValueError(
+                f'Value for `minimum` cannot be greater than `maximum`'
+            )
+
+        # Retrieve matplotlib axes
+        try:
+            ax = self.axes[ax_idx]
+        except IndexError:
+            raise IndexError(
+                f'You are trying to set the limits of axis with index '
+                f'{ax_idx}. However, axis index only goes up to '
+                f'{len(self.axes)-1}.'
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            )
+
+        # Set ticks
+        try:
+            even_ticks = np.linspace(
+                minimum,
+                maximum,
+                num=n_ticks + 1
+            )
+        except TypeError:
+            raise TypeError(
+                f'Type of `n_ticks` must be integer not {type(n_ticks)}'
+            )
+        self._pax_ticks[ax_idx] = even_ticks
+
+        # Set tick labels
+        self._pax_ticks_labels[ax_idx] = even_ticks.round(precision)
+
+        # Scale ticks
+        ticks = self._pax_ticks[ax_idx]
+        bottom = self._pax_lims[ax_idx][0]
+        top = self._pax_lims[ax_idx][1]
+        ticks_scale = (ticks - bottom) / (top - bottom)
+        self._pax_ticks_scale[ax_idx] = ticks_scale
+
+        # Update ticks
+        self.axes[ax_idx].set_yticks(ticks=ticks_scale)
+        self.axes[ax_idx].set_yticklabels(
+            labels=self._pax_ticks_labels[ax_idx]
+        )
 
     def set_label(self, ax_idx: int, label: str):
         """Set the label for the axis
