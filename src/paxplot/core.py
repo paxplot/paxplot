@@ -266,13 +266,30 @@ class PaxFigure(Figure):
                 top=self._pax_lims[ax_idx][1]
             )
 
-        # Generate uniform ticks
-        
+        # Generate ticks
+        n_ticks = 6
+        precision = 2
+        for ax_idx in range(len(self._pax_ticks)):
+            bottom = self._pax_lims[ax_idx][0]
+            top = self._pax_lims[ax_idx][1]
+            uniform_ticks = np.linspace(
+                bottom,
+                top,
+                num=n_ticks + 1
+            )
+            self._pax_ticks[ax_idx] = uniform_ticks
+            self._pax_ticks_labels[ax_idx] = uniform_ticks.round(precision)
 
-        # Set ticks
+            # Scale ticks
+            ticks = self._pax_ticks[ax_idx]
+            ticks_scale = (ticks - bottom) / (top - bottom)
+            self._pax_ticks_scale[ax_idx] = ticks_scale
 
-
-        
+            # Update ticks
+            self.axes[ax_idx].set_yticks(ticks=ticks_scale)
+            self.axes[ax_idx].set_yticklabels(
+                labels=self._pax_ticks_labels[ax_idx]
+            )
 
     def set_lim(self, ax_idx: int, bottom: float, top: float):
         """Set custom limits on axis
