@@ -1,6 +1,5 @@
 """Core paxplot functions"""
 
-from faulthandler import disable
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.figure import Figure
@@ -75,8 +74,16 @@ class PaxFigure(Figure):
         """
         Paxplot extension of Matplot Figure
         """
+        # Setup
         super().__init__(*args, **kwargs)
         self._show_unsafe_warning = True
+        
+        # Paxplot attributes
+        self._pax_data = []
+        self._pax_data_scale = []
+        self._pax_lims = []
+        self._pax_tick = []
+
 
     def default_format(self):
         """
