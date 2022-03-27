@@ -82,8 +82,9 @@ class PaxFigure(Figure):
         self._pax_data = []
         self._pax_data_scale = []
         self._pax_lims = []
-        self._pax_tick = []
-        self._pax_tick_labels = []
+        self._pax_ticks = []
+        self._pax_ticks_scale = []
+        self._pax_ticks_labels = []
 
     def default_format(self):
         """
@@ -205,15 +206,22 @@ class PaxFigure(Figure):
             )
 
         # Convert to Numpy
-        data = np.array(data)
+        data_input = np.array(data)
+
+        # Pull attributes
+        data = self._pax_data
+        data_scale = self._pax_data_scale
+        lims = self._pax_lims
+        ticks = self._pax_ticks
+        ticks_scales = self._pax_ticks_scale
+        ticks_labels = self._pax_ticks_labels
 
         # Set paxplot data attributes
-        if not self._pax_data:
-            self._pax_data = data
+        if not data:
+            data = data_input
         else:
-            self._pax_data.append(data)
-        data = self._pax_data
-        self._pax_data_scale = data
+            data.append(data_input)
+        data_scale = data
 
         # Get data stats
         try:
@@ -225,8 +233,6 @@ class PaxFigure(Figure):
                 'Often this is caused by supplying non-numeric entries in '
                 '`data`'
             )
-        n_rows = data.shape[0]
-        n_cols = data.shape[1]
 
         # Checking for singleton case
         for i in range(len(data_maxs)):
@@ -234,34 +240,27 @@ class PaxFigure(Figure):
                 data_mins[i] = data_mins[i]-1.0
                 data_maxs[i] = data_maxs[i]+1.0
 
-        # Set paxplot limits attributes
-        self._pax_lims = list(map(list, zip(data_mins, data_maxs)))
-
         # Scale data
         for col_idx, col in enumerate(data.T):
             col = (col - np.min(col)) / (np.max(col) - np.min(col))
-            self._pax_data_scale[:, col_idx] = col
+            data_scale[:, col_idx] = col
 
         # Plotting scaled data (assume each axes has a x axis limits between
         # 0 and 1)
         for ax_idx, ax in enumerate(self.axes[:-1]):
-            ax.plot(self._pax_data_scale[:, ax_idx:ax_idx+2].T)
+            ax.plot(data_scale[:, ax_idx:ax_idx+2].T)
 
-        # Set ticks TODO
-            # Set attribute data
-            self.axes[col_idx].__setattr__(
-                'paxfig_lim',
-                (data_mins[col_idx], data_maxs[col_idx])
+        # Set limits
+        if not lims:
+            lims = list(map(list, zip(data_mins, data_maxs)))
+        for ax_idx in range(len(self.axes)):
+            self.set_lim(
+                ax_idx=ax_idx,
+                bottom=lims[ax_idx][0],
+                top=lims[ax_idx][1]
             )
 
-            # Defaults ticks
-            self.set_even_ticks(
-                    ax_idx=col_idx,
-                    n_ticks=6,
-                    minimum=data_mins[col_idx],
-                    maximum=data_maxs[col_idx],
-                    precision=2
-                )
+        # Set ticks TODO
 
     def set_lim(self, ax_idx: int, bottom: float, top: float):
         """Set custom limits on axis
