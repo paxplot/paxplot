@@ -90,6 +90,13 @@ class PaxFigure(Figure):
         """
         Set the default format of a Paxplot Figure
         """
+        # Set attributes
+        def_vals = [[0, 1]]*len(self.axes)
+        self._pax_lims = def_vals.copy()
+        self._pax_ticks = def_vals.copy()
+        self._pax_ticks_scale = def_vals.copy()
+        self._pax_ticks_labels = def_vals.copy()
+
         # Remove space between plots
         subplots_adjust_args = {
             'wspace': 0.0,
@@ -251,8 +258,7 @@ class PaxFigure(Figure):
             ax.plot(self._pax_data_scale[:, ax_idx:ax_idx+2].T)
 
         # Set limits
-        if not self._pax_lims:
-            self._pax_lims = list(map(list, zip(data_mins, data_maxs)))
+        self._pax_lims = list(map(list, zip(data_mins, data_maxs)))
         for ax_idx in range(len(self.axes)):
             self.set_lim(
                 ax_idx=ax_idx,
@@ -260,7 +266,13 @@ class PaxFigure(Figure):
                 top=self._pax_lims[ax_idx][1]
             )
 
-        # Set ticks TODO
+        # Generate uniform ticks
+        
+
+        # Set ticks
+
+
+        
 
     def set_lim(self, ax_idx: int, bottom: float, top: float):
         """Set custom limits on axis
@@ -331,6 +343,17 @@ class PaxFigure(Figure):
                 # Replace right y value
                 y_r_scaled = self._pax_data_scale[i, ax_idx]
                 line.set_ydata([line.get_ydata()[0], y_r_scaled])
+
+        # Scale ticks
+        ticks = self._pax_ticks[ax_idx]
+        ticks_scale = (ticks - bottom) / (top - bottom)
+        self._pax_ticks_scale[ax_idx] = ticks_scale
+
+        # Update ticks
+        self.axes[ax_idx].set_yticks(ticks=ticks_scale)
+        self.axes[ax_idx].set_yticklabels(
+            labels=self._pax_ticks_labels[ax_idx]
+        )
 
     def set_ticks(self, ax_idx: int, ticks: list, labels=None):
         """Set the axis tick locations and optionally labels.
