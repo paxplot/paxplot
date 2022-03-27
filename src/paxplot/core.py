@@ -208,25 +208,25 @@ class PaxFigure(Figure):
         # Convert to Numpy
         data_input = np.array(data)
 
-        # Pull attributes
-        data = self._pax_data
-        data_scale = self._pax_data_scale
-        lims = self._pax_lims
-        ticks = self._pax_ticks
-        ticks_scales = self._pax_ticks_scale
-        ticks_labels = self._pax_ticks_labels
+        # # Pull attributes
+        # data = self._pax_data
+        # data_scale = self._pax_data_scale
+        # lims = self._pax_lims
+        # ticks = self._pax_ticks
+        # ticks_scales = self._pax_ticks_scale
+        # ticks_labels = self._pax_ticks_labels
 
         # Set paxplot data attributes
-        if not data:
-            data = data_input
+        if not self._pax_data:
+            self._pax_data = data_input
         else:
-            data.append(data_input)
-        data_scale = data
+            self._pax_data.append(data_input)
+        self._pax_data_scale = self._pax_data.copy()
 
         # Get data stats
         try:
-            data_mins = data.min(axis=0)
-            data_maxs = data.max(axis=0)
+            data_mins = self._pax_data.min(axis=0)
+            data_maxs = self._pax_data.max(axis=0)
         except np.core._exceptions._UFuncNoLoopError:
             raise TypeError(
                 'Non-plottable data has been supplied to argument `data`. '
@@ -241,23 +241,23 @@ class PaxFigure(Figure):
                 data_maxs[i] = data_maxs[i]+1.0
 
         # Scale data
-        for col_idx, col in enumerate(data.T):
+        for col_idx, col in enumerate(self._pax_data.T):
             col = (col - np.min(col)) / (np.max(col) - np.min(col))
-            data_scale[:, col_idx] = col
+            self._pax_data_scale[:, col_idx] = col
 
         # Plotting scaled data (assume each axes has a x axis limits between
         # 0 and 1)
         for ax_idx, ax in enumerate(self.axes[:-1]):
-            ax.plot(data_scale[:, ax_idx:ax_idx+2].T)
+            ax.plot(self._pax_data_scale[:, ax_idx:ax_idx+2].T)
 
         # Set limits
-        if not lims:
-            lims = list(map(list, zip(data_mins, data_maxs)))
+        if not self._pax_lims:
+            self._pax_lims = list(map(list, zip(data_mins, data_maxs)))
         for ax_idx in range(len(self.axes)):
             self.set_lim(
                 ax_idx=ax_idx,
-                bottom=lims[ax_idx][0],
-                top=lims[ax_idx][1]
+                bottom=self._pax_lims[ax_idx][0],
+                top=self._pax_lims[ax_idx][1]
             )
 
         # Set ticks TODO
@@ -302,89 +302,35 @@ class PaxFigure(Figure):
                 f'Type of `ax_idx` must be integer not {type(ax_idx)}'
             )
 
-        self.axes[ax_idx].__setattr__('paxfig_lim', (bottom, top))
+        # Scale data
+        col = self._pax_data[:, ax_idx]
+        col = (col - bottom) / (top - bottom)
+        self._pax_data_scale[:, ax_idx] = col
 
-        if ax_idx == 0:
+        # Update plot of scaled data
+        if ax_idx == 0:  # First axis
             for i, line in enumerate(self.axes[ax_idx].lines):
-                # Get y values
-                y_data = self.line_data[i][[ax_idx, ax_idx+1]]
-
-                # Scale the first y value
-                y_0_scaled = scale_val(
-                    val=y_data[0],
-                    minimum=bottom,
-                    maximum=top
+                # Replace left y value
+                y_l_scaled = self._pax_data_scale[i, ax_idx]
+                line.set_ydata(
+                    [y_l_scaled, line.get_ydata()[1]]
                 )
-
-                # Replace y first value (keep the existing second)
-                line.set_ydata([y_0_scaled, line.get_ydata()[1]])
-
-            # Defaults ticks
-            self.set_even_ticks(
-                ax_idx=ax_idx,
-                n_ticks=6,
-                minimum=bottom,
-                maximum=top,
-                precision=2
-            )
-        elif ax_idx < len(self.axes)-1:
-            # Replace y first value
-            for i, line in enumerate(self.axes[ax_idx].lines):
-                y_data = self.line_data[i][[ax_idx, ax_idx+1]]
-                y_0_scaled = scale_val(
-                    val=y_data[0],
-                    minimum=bottom,
-                    maximum=top
-                )
-                line.set_ydata([y_0_scaled, line.get_ydata()[1]])
-
-            # Replace the second y value
+        elif ax_idx == self._pax_data.shape[1]-1:  # Last axis
             for i, line in enumerate(self.axes[ax_idx-1].lines):
-                y_data = self.line_data[i][[ax_idx-1, ax_idx]]
-                y_1_scaled = scale_val(
-                    val=y_data[1],
-                    minimum=bottom,
-                    maximum=top
+                # Replace right y value
+                y_r_scaled = self._pax_data_scale[i, ax_idx]
+                line.set_ydata([line.get_ydata()[0], y_r_scaled])
+        else:  # Middle axes
+            for i, line in enumerate(self.axes[ax_idx].lines):
+                # Replace left y value
+                y_l_scaled = self._pax_data_scale[i, ax_idx]
+                line.set_ydata(
+                    [y_l_scaled, line.get_ydata()[1]]
                 )
-                line.set_ydata([line.get_ydata()[0], y_1_scaled])
-
-            # Defaults ticks
-            self.set_even_ticks(
-                ax_idx=ax_idx,
-                n_ticks=6,
-                minimum=bottom,
-                maximum=top,
-                precision=2
-            )
-
-        elif ax_idx == len(self.axes)-1:
-            # Work with second to last axis
-            ax = self.axes[-2]
-            ax_idx = len(self.axes)-2
-
-            # Set the end of the line
-            for i, line in enumerate(ax.lines):
-                # Get y values
-                y_data = self.line_data[i][[ax_idx, ax_idx+1]]
-
-                # Scale the second y value
-                y_1_scaled = scale_val(
-                    val=y_data[1],
-                    minimum=bottom,
-                    maximum=top
-                )
-
-                # Replace the second y value
-                line.set_ydata([line.get_ydata()[0], y_1_scaled])
-
-            # Defaults ticks
-            self.set_even_ticks(
-                ax_idx=-1,
-                n_ticks=6,
-                minimum=bottom,
-                maximum=top,
-                precision=2
-            )
+            for i, line in enumerate(self.axes[ax_idx-1].lines):
+                # Replace right y value
+                y_r_scaled = self._pax_data_scale[i, ax_idx]
+                line.set_ydata([line.get_ydata()[0], y_r_scaled])
 
     def set_ticks(self, ax_idx: int, ticks: list, labels=None):
         """Set the axis tick locations and optionally labels.
