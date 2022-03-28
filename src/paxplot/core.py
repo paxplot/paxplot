@@ -365,6 +365,7 @@ class PaxFigure(Figure):
         # Scale tick based on current limits
         minimum = self._pax_lims[ax_idx][0]
         maximum = self._pax_lims[ax_idx][1]
+        ticks = np.array(ticks)
         ticks_scale = (ticks - minimum) / (maximum - minimum)
         self._pax_ticks_scale[ax_idx] = ticks_scale
 
@@ -373,7 +374,8 @@ class PaxFigure(Figure):
         self._pax_ticks[ax_idx] = ticks
 
         # Update tick labels
-        labels = ticks.copy()
+        if labels is None:
+            labels = ticks.copy()
         self.axes[ax_idx].set_yticklabels(
             labels=labels
         )
@@ -391,8 +393,8 @@ class PaxFigure(Figure):
         self._pax_custom_ticks[ax_idx] = True
 
         # Set lims to tick or lims extrema
-        bottom = min(ticks+[minimum])
-        top = max(ticks+[maximum])
+        bottom = min(np.append(ticks, minimum))
+        top = max(np.append(ticks, maximum))
         self.set_lim(
                 ax_idx=ax_idx,
                 bottom=bottom,
@@ -546,7 +548,7 @@ class PaxFigure(Figure):
 
         # Checking if data is plotted
         try:
-            self.line_data
+            self._pax_data
         except AttributeError:
             raise AttributeError(
                 'Paxplot does not support invert_axis if no data has been'
@@ -683,8 +685,8 @@ class PaxFigure(Figure):
         # Create colorbar
         sm = plt.cm.ScalarMappable(
             norm=plt.Normalize(
-                vmin=self.axes[ax_idx].paxfig_lim[0],
-                vmax=self.axes[ax_idx].paxfig_lim[1]
+                vmin=self._pax_lims[ax_idx][0],
+                vmax=self._pax_lims[ax_idx][1]
             ),
             cmap=cmap
         )
