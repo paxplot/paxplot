@@ -427,8 +427,8 @@ class PaxFigure(Figure):
         """
         # Set automatic min and maximum
         if minimum is None and maximum is None:
-            minimum = self.line_data[:, ax_idx].min()
-            maximum = self.line_data[:, ax_idx].max()
+            minimum = self._pax_data[:, ax_idx].min()
+            maximum = self._pax_data[:, ax_idx].max()
 
         # Minimum/maximum check
         if minimum > maximum:
