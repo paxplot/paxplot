@@ -292,15 +292,21 @@ class PaxFigure(Figure):
                 line.set_ydata([line.get_ydata()[0], y_r_scaled])
 
         # Scale ticks
-        ticks = self._pax_ticks[ax_idx]
-        ticks_scale = (ticks - bottom) / (top - bottom)
-        self._pax_ticks_scale[ax_idx] = ticks_scale
-
-        # Update ticks
-        self.axes[ax_idx].set_yticks(ticks=ticks_scale)
-        self.axes[ax_idx].set_yticklabels(
-            labels=self._pax_ticks_labels[ax_idx]
-        )
+        if self._pax_custom_ticks[ax_idx]:  # Preserve custom ticks
+            ticks = self._pax_ticks[ax_idx]
+            ticks_scale = (ticks - bottom) / (top - bottom)
+            self._pax_ticks_scale[ax_idx] = ticks_scale
+            self.axes[ax_idx].set_yticks(ticks=ticks_scale)
+            self.axes[ax_idx].set_yticklabels(
+                labels=self._pax_ticks_labels[ax_idx]
+            )
+        else:  # Default ticks
+            self.set_even_ticks(
+                ax_idx=ax_idx,
+                minimum=bottom,
+                maximum=top,
+                precision=2
+            )
 
     def set_ticks(self, ax_idx: int, ticks: list, labels=None):
         """Set the axis tick locations and optionally labels.
@@ -422,7 +428,7 @@ class PaxFigure(Figure):
 
         # Retrieve matplotlib axes
         try:
-            ax = self.axes[ax_idx]
+            self.axes[ax_idx]
         except IndexError:
             raise IndexError(
                 f'You are trying to set the limits of axis with index '
@@ -452,9 +458,7 @@ class PaxFigure(Figure):
 
         # Scale ticks
         ticks = self._pax_ticks[ax_idx]
-        bottom = self._pax_lims[ax_idx][0]
-        top = self._pax_lims[ax_idx][1]
-        ticks_scale = (ticks - bottom) / (top - bottom)
+        ticks_scale = (ticks - minimum) / (maximum - minimum)
         self._pax_ticks_scale[ax_idx] = ticks_scale
 
         # Update ticks
