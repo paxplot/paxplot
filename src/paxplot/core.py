@@ -201,8 +201,8 @@ class PaxFigure(Figure):
             todo = True
         else:  # Default limits of data
             for ax_idx in range(self._pax_data.shape[1]):
-                self._pax_lims[ax_idx][0] = self._pax_data[:, col_idx].min()
-                self._pax_lims[ax_idx][1] = self._pax_data[:, col_idx].max()
+                self._pax_lims[ax_idx][0] = self._pax_data[:, ax_idx].min()
+                self._pax_lims[ax_idx][1] = self._pax_data[:, ax_idx].max()
                 self.set_lim(
                     ax_idx=ax_idx,
                     bottom=self._pax_lims[ax_idx][0],
@@ -261,6 +261,9 @@ class PaxFigure(Figure):
                 f'Type of `ax_idx` must be integer not {type(ax_idx)}'
             )
 
+        # Set attribute data
+        self._pax_lims[ax_idx] = [bottom, top]
+
         # Scale data
         col = self._pax_data[:, ax_idx]
         col = (col - bottom) / (top - bottom)
@@ -294,6 +297,7 @@ class PaxFigure(Figure):
         # Scale ticks
         if self._pax_custom_ticks[ax_idx]:  # Preserve custom ticks
             ticks = self._pax_ticks[ax_idx]
+            ticks = np.array(ticks)
             ticks_scale = (ticks - bottom) / (top - bottom)
             self._pax_ticks_scale[ax_idx] = ticks_scale
             self.axes[ax_idx].set_yticks(ticks=ticks_scale)
@@ -337,7 +341,7 @@ class PaxFigure(Figure):
 
         # Checking if data is plotted
         try:
-            self.line_data
+            self._pax_data
         except AttributeError:
             raise AttributeError(
                 'Paxplot does not support set_ticks if no data has been'
@@ -358,29 +362,22 @@ class PaxFigure(Figure):
                 f'Type of `ax_idx` must be integer not {type(ax_idx)}'
             )
 
-        # Set the limits if needed (this preserves matplotlib's
-        # mandatory expansion of the view limits)
-        try:
-            [float(tick.get_text()) for tick in ax.get_yticklabels()]
-        except ValueError:
-            pass
-        else:
-            # Expand limits
-            ticks_with_limits = list(ax.paxfig_lim)+ticks
-            self.set_lim(
-                    ax_idx=ax_idx,
-                    bottom=min(ticks_with_limits),
-                    top=max(ticks_with_limits)
-                )
+        # Scale tick based on current limits
+        minimum = self._pax_lims[ax_idx][0]
+        maximum = self._pax_lims[ax_idx][1]
+        ticks_scale = (ticks - minimum) / (maximum - minimum)
+        self._pax_ticks_scale[ax_idx] = ticks_scale
 
-            # Scale the ticks
-            minimum = min(ticks_with_limits)
-            maximum = max(ticks_with_limits)
-            tick_scaled = [scale_val(i, minimum, maximum) for i in ticks]
+        # Update tick locations
+        self.axes[ax_idx].set_yticks(ticks=ticks_scale)
+        self._pax_ticks[ax_idx] = ticks
 
-        # Set the ticks
-        ax.set_yticks(ticks=tick_scaled)
-        ax.set_yticklabels(labels=ticks)
+        # Update tick labels
+        labels = ticks.copy()
+        self.axes[ax_idx].set_yticklabels(
+            labels=labels
+        )
+        self._pax_ticks_labels[ax_idx] = labels
         if labels is not None:
             try:
                 ax.set_yticklabels(labels=labels)
@@ -388,6 +385,19 @@ class PaxFigure(Figure):
                 raise ValueError(
                     f'Length of `labels` must be same as length of `ticks`'
                 )
+        self.axes[ax_idx].set_ylim([0.0, 1.0])
+
+        # Set custom tick flag
+        self._pax_custom_ticks[ax_idx] = True
+
+        # Set lims to tick or lims extrema
+        bottom = min(ticks+[minimum])
+        top = max(ticks+[maximum])
+        self.set_lim(
+                ax_idx=ax_idx,
+                bottom=bottom,
+                top=top
+            )
 
     def set_even_ticks(
         self,
