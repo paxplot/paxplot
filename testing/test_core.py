@@ -930,8 +930,9 @@ class PaxplotException(unittest.TestCase):
         # Setup
         paxfig = paxplot.pax_parallel(n_axes=3)
 
-        # Setting limits supported
-        paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
+        # Setting limits not supported
+        with self.assertRaises(AttributeError):
+            paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
 
         # Setting ticks
         with self.assertRaises(AttributeError):
