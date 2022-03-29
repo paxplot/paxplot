@@ -400,7 +400,11 @@ class PaxFigure(Figure):
 
         # Ticks
         if self._pax_custom_ticks[ax_idx]:  # Preserve custom ticks
-            todo = True
+            self._set_ticks(
+                ax_idx=ax_idx,
+                ticks=self._pax_ticks[ax_idx],
+                labels=self._pax_ticks_labels[ax_idx]
+            )
         else:  # Default ticks
             self._default_ticks(
                 ax_idx=ax_idx
@@ -411,7 +415,11 @@ class PaxFigure(Figure):
         self._pax_custom_ticks[ax_idx] = True
 
         # Set ticks
-        self._set_ticks()
+        self._set_ticks(
+            ax_idx=ax_idx,
+            ticks=ticks,
+            labels=labels
+        )
 
     def _set_ticks(self, ax_idx: int, ticks: list, labels=None):
         """
@@ -464,13 +472,16 @@ class PaxFigure(Figure):
                 f'Type of `ax_idx` must be integer not {type(ax_idx)}'
             )
 
+        # Set tick attibutes
+        self._pax_ticks[ax_idx] = ticks
+
         # Scale tick based on current limits
-        minimum = self._pax_lims[ax_idx][0]
-        maximum = self._pax_lims[ax_idx][1]
+        lim_min = self._pax_lims[ax_idx][0]
+        lim_max = self._pax_lims[ax_idx][1]
         self._pax_ticks_scale[ax_idx] = self._scale_vals(
             ticks,
-            minimum=minimum,
-            maximum=maximum
+            minimum=lim_min,
+            maximum=lim_max
         )
 
         # Tick labels
@@ -482,14 +493,14 @@ class PaxFigure(Figure):
         self._update_plot_ticks(ax_idx)
 
         # Check if limits need updating
-        # # Set lims to tick or lims extrema
-        # bottom = min(np.append(ticks, minimum))
-        # top = max(np.append(ticks, maximum))
-        # self.set_lim(
-        #         ax_idx=ax_idx,
-        #         bottom=bottom,
-        #         top=top
-        #     )
+        if min(ticks) < lim_min or max(ticks) > lim_max:
+            bottom = min(np.append(ticks, lim_min))
+            top = max(np.append(ticks, lim_max))
+            self._set_lim(
+                    ax_idx=ax_idx,
+                    bottom=bottom,
+                    top=top
+                )
 
     def set_even_ticks(
         self,
