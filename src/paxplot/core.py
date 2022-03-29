@@ -374,19 +374,13 @@ class PaxFigure(Figure):
                 f'{type(top)}'
             )
 
-        # Set default limits
+        # Checking if data is plotted
         try:
-            # self.axes[ax_idx].set_ylim([0.0, 1.0])
-            a = 1
-        except IndexError:
-            raise IndexError(
-                f'You are trying to set the limits of axis with index '
-                f'{ax_idx}. However, axis index only goes up to '
-                f'{len(self.axes)-1}.'
-            )
+            self._pax_data[:, ax_idx]
         except TypeError:
-            raise TypeError(
-                f'Type of `ax_idx` must be integer not {type(ax_idx)}'
+            raise AttributeError(
+                'Paxplot does not support set_ticks if no data has been'
+                'plotted'
             )
 
         # Set attribute data
@@ -456,8 +450,8 @@ class PaxFigure(Figure):
 
         # Checking if data is plotted
         try:
-            self._pax_data
-        except AttributeError:
+            self._pax_data[:, ax_idx]
+        except TypeError:
             raise AttributeError(
                 'Paxplot does not support set_ticks if no data has been'
                 'plotted'
@@ -650,10 +644,10 @@ class PaxFigure(Figure):
 
         # Checking if data is plotted
         try:
-            self._pax_data
-        except AttributeError:
+            self._pax_data[:, ax_idx]
+        except TypeError:
             raise AttributeError(
-                'Paxplot does not support invert_axis if no data has been'
+                'Paxplot does not support set_ticks if no data has been'
                 'plotted'
             )
 
