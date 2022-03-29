@@ -331,6 +331,8 @@ class PaxFigure(Figure):
                     ax_idx=ax_idx
                 )
 
+        # Respect custom ticks
+
     def set_lim(self, ax_idx: int, bottom: float, top: float):
         # Set attibutes
         self._pax_custom_lims[ax_idx] = True
@@ -362,6 +364,9 @@ class PaxFigure(Figure):
                     'Value for `bottom` cannot be greater than `top`. To '
                     'invert axis use the `invert_axis` function.'
                 )
+            elif bottom == top:
+                bottom = bottom - 1.0
+                top = top + 1.0
         except TypeError:
             raise TypeError(
                 f'Both `bottom` and `top` must be numeric values. Currently '
