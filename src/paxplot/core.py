@@ -331,8 +331,20 @@ class PaxFigure(Figure):
                     ax_idx=ax_idx
                 )
 
+    def set_lim(self, ax_idx: int, bottom: float, top: float):
+        # Set attibutes
+        self._pax_custom_lims[ax_idx] = True
+
+        # Set ticks
+        self._set_lim(
+            ax_idx=ax_idx,
+            bottom=bottom,
+            top=top
+        )
+
     def _set_lim(self, ax_idx: int, bottom: float, top: float):
-        """Set custom limits on axis
+        """
+        Private function to set custom limits on axis
 
         Parameters
         ----------
@@ -359,7 +371,8 @@ class PaxFigure(Figure):
 
         # Set default limits
         try:
-            self.axes[ax_idx].set_ylim([0.0, 1.0])
+            # self.axes[ax_idx].set_ylim([0.0, 1.0])
+            a = 1
         except IndexError:
             raise IndexError(
                 f'You are trying to set the limits of axis with index '
@@ -376,7 +389,11 @@ class PaxFigure(Figure):
 
         # Scale data
         col = self._pax_data[:, ax_idx]
-        self._pax_data_scale[:, ax_idx] = self._scale_vals(col)
+        self._pax_data_scale[:, ax_idx] = self._scale_vals(
+            col,
+            minimum=bottom,
+            maximum=top
+        )
 
         # Update plot of scaled data
         self._update_plot_lines(ax_idx)
@@ -389,8 +406,16 @@ class PaxFigure(Figure):
                 ax_idx=ax_idx
             )
 
+    def set_ticks(self, ax_idx: int, ticks: list, labels=None):
+        # Set attibutes
+        self._pax_custom_ticks[ax_idx] = True
+
+        # Set ticks
+        self._set_ticks()
+
     def _set_ticks(self, ax_idx: int, ticks: list, labels=None):
-        """Set the axis tick locations and optionally labels.
+        """
+        Private function to set the axis tick locations and optionally labels.
 
         Parameters
         ----------
