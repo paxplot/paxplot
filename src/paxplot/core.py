@@ -528,6 +528,9 @@ class PaxFigure(Figure):
         precision : int
             number of decimal points for tick labels
         """
+        # Set custom tick attributes
+        self._pax_custom_ticks[ax_idx] = True
+
         # Set automatic min and maximum
         if minimum is None and maximum is None:
             minimum = self._pax_data[:, ax_idx].min()
@@ -553,9 +556,9 @@ class PaxFigure(Figure):
                 f'Type of `ax_idx` must be integer not {type(ax_idx)}'
             )
 
-        # Set ticks
+        # Generate ticks
         try:
-            even_ticks = np.linspace(
+            ticks = np.linspace(
                 minimum,
                 maximum,
                 num=n_ticks + 1
@@ -564,20 +567,13 @@ class PaxFigure(Figure):
             raise TypeError(
                 f'Type of `n_ticks` must be integer not {type(n_ticks)}'
             )
-        self._pax_ticks[ax_idx] = even_ticks
+        labels = ticks.round(precision)
 
-        # Set tick labels
-        self._pax_ticks_labels[ax_idx] = even_ticks.round(precision)
-
-        # Scale ticks
-        ticks = self._pax_ticks[ax_idx]
-        ticks_scale = (ticks - minimum) / (maximum - minimum)
-        self._pax_ticks_scale[ax_idx] = ticks_scale
-
-        # Update ticks
-        self.axes[ax_idx].set_yticks(ticks=ticks_scale)
-        self.axes[ax_idx].set_yticklabels(
-            labels=self._pax_ticks_labels[ax_idx]
+        # Set ticks
+        self._set_ticks(
+            ax_idx=ax_idx,
+            ticks=ticks,
+            labels=labels
         )
 
     def set_label(self, ax_idx: int, label: str):
