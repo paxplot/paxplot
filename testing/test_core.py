@@ -359,25 +359,25 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(paxfig.axes[1].lines[2].get_ydata()[1], 0.0)
 
         # Test ticks
-        self.assertEqual(paxfig.axes[0].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(paxfig.axes[0].get_yticklabels()[0].get_text(), '2.0')
         self.assertEqual(
-            paxfig.axes[0].get_yticklabels()[-1].get_text(), '2.0'
+            paxfig.axes[0].get_yticklabels()[-1].get_text(), '0.0'
         )
-        self.assertEqual(paxfig.axes[2].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(paxfig.axes[2].get_yticklabels()[0].get_text(), '2.0')
         self.assertEqual(
-            paxfig.axes[2].get_yticklabels()[-1].get_text(), '2.0'
-        )
-        self.assertEqual(
-            paxfig.axes[0].get_yticklabels()[0].get_position()[1], 1.0
+            paxfig.axes[2].get_yticklabels()[-1].get_text(), '0.0'
         )
         self.assertEqual(
-            paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 0.0
+            paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
         )
         self.assertEqual(
-            paxfig.axes[2].get_yticklabels()[0].get_position()[1], 1.0
+            paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 1.0
         )
         self.assertEqual(
-            paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 0.0
+            paxfig.axes[2].get_yticklabels()[0].get_position()[1], 0.0
+        )
+        self.assertEqual(
+            paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
         )
 
     def test_parallel_invert_middle(self):
@@ -407,9 +407,9 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[-1].get_text(), '3.0'
         )
-        self.assertEqual(paxfig.axes[1].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(paxfig.axes[1].get_yticklabels()[0].get_text(), '2.0')
         self.assertEqual(
-            paxfig.axes[1].get_yticklabels()[-1].get_text(), '2.0'
+            paxfig.axes[1].get_yticklabels()[-1].get_text(), '0.0'
         )
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
