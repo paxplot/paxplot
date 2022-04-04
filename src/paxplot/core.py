@@ -193,6 +193,7 @@ class PaxFigure(Figure):
         self._pax_ticks_labels = copy.deepcopy(def_vals)
         self._pax_custom_lims = copy.deepcopy(def_bools)
         self._pax_custom_ticks = copy.deepcopy(def_bools)
+        self._pax_invert = copy.deepcopy(def_bools)
 
         # Remove space between plots
         subplots_adjust_args = {
@@ -360,10 +361,11 @@ class PaxFigure(Figure):
         # Check bottom top values
         try:
             if bottom > top:
-                raise ValueError(
-                    'Value for `bottom` cannot be greater than `top`. To '
-                    'invert axis use the `invert_axis` function.'
-                )
+                # raise ValueError(
+                #     'Value for `bottom` cannot be greater than `top`. To '
+                #     'invert axis use the `invert_axis` function.'
+                # )
+                a = 1
             elif bottom == top:
                 bottom = bottom - 1.0
                 top = top + 1.0
@@ -492,7 +494,7 @@ class PaxFigure(Figure):
         self._update_plot_ticks(ax_idx)
 
         # Check if limits need updating
-        if min(ticks) < lim_min or max(ticks) > lim_max:
+        if ticks[0] < lim_min or ticks[-1] > lim_max:
             bottom = min(np.append(ticks, lim_min))
             top = max(np.append(ticks, lim_max))
             self._set_lim(
@@ -651,36 +653,13 @@ class PaxFigure(Figure):
                 'plotted'
             )
 
-        if ax_idx == 0:
-            for line in ax.lines:
-                # Flip y value about 0.5
-                y_0_scaled = 1.0 - line.get_ydata()[0]
-
-                # Replace the second y value
-                line.set_ydata([y_0_scaled, line.get_ydata()[1]])
-        elif ax_idx < len(self.axes)-1:
-            # Flip left value
-            for line in ax.lines:
-                y_0_scaled = 1.0 - line.get_ydata()[0]
-                line.set_ydata([y_0_scaled, line.get_ydata()[1]])
-            # Flip right value
-            for line in self.axes[ax_idx-1].lines:
-                y_1_scaled = 1.0 - line.get_ydata()[1]
-                line.set_ydata([line.get_ydata()[0], y_1_scaled])
-        elif ax_idx == len(self.axes)-1:
-            for line in self.axes[-2].lines:
-                # Flip y value about 0.5
-                y_1_scaled = 1.0 - line.get_ydata()[1]
-
-                # Replace the second y value
-                line.set_ydata([line.get_ydata()[0], y_1_scaled])
-
-        # Invert ticks
-        ticks = ax.get_yticks()
-        ticks_scaled = 1.0 - ticks
-        labels = [i.get_text() for i in ax.get_yticklabels()]
-        ax.set_yticks(ticks=ticks_scaled)
-        ax.set_yticklabels(labels=labels)
+        # Set attribute
+        self._pax_invert[ax_idx] = True
+        self._set_lim(
+            ax_idx=ax_idx,
+            bottom=self._pax_lims[ax_idx][1],
+            top=self._pax_lims[ax_idx][0]
+        )
 
     def add_legend(self, labels: list):
         """Create a legend for a specified figure
