@@ -494,6 +494,8 @@ class PaxFigure(Figure):
         self._update_plot_ticks(ax_idx)
 
         # Check if limits need updating
+        lim_min = min(self._pax_lims[ax_idx])
+        lim_max = max(self._pax_lims[ax_idx])
         if ticks[0] < lim_min or ticks[-1] > lim_max:
             bottom = min(np.append(ticks, lim_min))
             top = max(np.append(ticks, lim_max))
