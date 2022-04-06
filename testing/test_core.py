@@ -709,10 +709,6 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(IndexError):
             paxfig.set_lim(ax_idx=4, bottom=-1.0, top=3)
 
-        # Bottom larger than top
-        with self.assertRaises(ValueError):
-            paxfig.set_lim(ax_idx=0, bottom=3, top=1)
-
         # Non integer value for ax_idx
         with self.assertRaises(TypeError):
             paxfig.set_lim(ax_idx='foo', bottom=0, top=1)
