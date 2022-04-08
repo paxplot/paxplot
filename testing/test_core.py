@@ -4,6 +4,7 @@ import os
 import unittest
 import warnings
 import matplotlib.pyplot as plt
+import numpy as np
 import src.paxplot as paxplot
 
 
@@ -655,7 +656,7 @@ class PaxplotLib(unittest.TestCase):
                 [1.0, 1.0, 1.0],
                 [2.0, 2.0, 2.0]
             ]
-            )
+        )
         paxfig.plot(
             [
                 [3.0, 3.0, 3.0],
@@ -666,21 +667,68 @@ class PaxplotLib(unittest.TestCase):
         # Test Attributes
         self.assertEqual(
             [
-                [0.0, 0.0, 0.0],
                 [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0],
                 [3.0, 3.0, 3.0],
                 [4.0, 4.0, 4.0]
             ],
             paxfig._pax_data.tolist()
         )
-        self.assertEqual(
+        np.testing.assert_almost_equal(
             [
                 [0.0, 0.0, 0.0],
-                [0.25, 0.25, 0.25],
-                [0.75, 0.75, 0.75],
+                [0.33, 0.33, 0.33],
+                [0.66, 0.66, 0.66],
                 [1.0, 1.0, 1.0]
             ],
-            paxfig._pax_data_scale.tolist()
+            paxfig._pax_data_scale.tolist(),
+            decimal=1
+        )
+
+    def test_custom_multi_plot(self):
+        """
+        Multiple calls to plot with custom ticks and limits
+        """
+        # Run
+        paxfig = paxplot.pax_parallel(n_axes=3)
+        paxfig.plot(
+            [
+                [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0]
+            ]
+        )
+        paxfig.set_lim(ax_idx=0, bottom=0.0, top=5.0)
+        paxfig.set_ticks(ax_idx=1, ticks=[0.0, 1.0, 2.0])
+        paxfig.plot(
+            [
+                [3.0, 3.0, 3.0],
+                [4.0, 4.0, 4.0],
+            ]
+        )
+
+        # Test Attributes
+        self.assertEqual(
+            [
+                [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0],
+                [3.0, 3.0, 3.0],
+                [4.0, 4.0, 4.0]
+            ],
+            paxfig._pax_data.tolist()
+        )
+        np.testing.assert_almost_equal(
+            [
+                [0.2, 0.25, 0.0],
+                [0.4, 0.5, 0.33],
+                [0.6, 0.75, 0.66],
+                [0.8, 1.0, 1.0]
+            ],
+            paxfig._pax_data_scale.tolist(),
+            decimal=1
+        )
+        self.assertEqual(
+            paxfig._pax_ticks[1],
+            [0.0, 1.0, 2.0]
         )
 
 
