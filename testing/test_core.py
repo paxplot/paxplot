@@ -644,6 +644,45 @@ class PaxplotLib(unittest.TestCase):
             # Test
             self.assertEqual(len(w), 0)
 
+    def test_multi_plot(self):
+        """
+        Calling plot multiple times
+        """
+        # Run
+        paxfig = paxplot.pax_parallel(n_axes=3)
+        paxfig.plot(
+            [
+                [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0]
+            ]
+            )
+        paxfig.plot(
+            [
+                [3.0, 3.0, 3.0],
+                [4.0, 4.0, 4.0],
+            ]
+        )
+
+        # Test Attributes
+        self.assertEqual(
+            [
+                [0.0, 0.0, 0.0],
+                [1.0, 1.0, 1.0],
+                [3.0, 3.0, 3.0],
+                [4.0, 4.0, 4.0]
+            ],
+            paxfig._pax_data.tolist()
+        )
+        self.assertEqual(
+            [
+                [0.0, 0.0, 0.0],
+                [0.25, 0.25, 0.25],
+                [0.75, 0.75, 0.75],
+                [1.0, 1.0, 1.0]
+            ],
+            paxfig._pax_data_scale.tolist()
+        )
+
 
 class PaxplotException(unittest.TestCase):
     def test_paxfig_creation(self):
