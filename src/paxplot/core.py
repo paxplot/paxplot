@@ -307,13 +307,17 @@ class PaxFigure(Figure):
             self._pax_data = data_input
         else:
             self._pax_data = np.vstack(
-                [self._pax_data_scale, data_input]
+                [self._pax_data, data_input]
             )
 
         # Scale input data based on current limits
         data_input_scale = data_input.copy()
         for col_idx, col in enumerate(data_input.T):
-            data_input_scale[:, col_idx] = self._scale_vals(col)
+            data_input_scale[:, col_idx] = self._scale_vals(
+                data=col,
+                minimum=self._pax_lims[col_idx][0],
+                maximum=self._pax_lims[col_idx][1]
+            )
 
         # Update scaled data attributes
         if len(self._pax_data_scale) == 0:
@@ -329,14 +333,25 @@ class PaxFigure(Figure):
 
         # Limits
         for ax_idx in range(self._pax_data.shape[1]):
-            if not self._pax_custom_lims:  # Respect custom limits
-                todo = True
+            if self._pax_custom_lims[ax_idx]:  # Respect custom limits
+                self._set_lim(
+                    ax_idx=ax_idx,
+                    bottom=self._pax_lims[ax_idx][0],
+                    top=self._pax_lims[ax_idx][1]
+                )
             else:  # Default limits of data
                 self._default_lim(
                     ax_idx=ax_idx
                 )
 
         # Respect custom ticks
+        for ax_idx in range(self._pax_data.shape[1]):
+            if self._pax_custom_ticks[ax_idx]:  # Respect custom ticks
+                self._set_ticks(
+                    ax_idx=ax_idx,
+                    ticks=self._pax_ticks[ax_idx],
+                    labels=self._pax_ticks_labels[ax_idx]
+                )
 
     def set_lim(self, ax_idx: int, bottom: float, top: float):
         # Set attibutes
