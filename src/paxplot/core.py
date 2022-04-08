@@ -303,10 +303,12 @@ class PaxFigure(Figure):
         data_input = np.array(data)
 
         # Update data attributes
-        if not self._pax_data:
+        if len(self._pax_data) == 0:
             self._pax_data = data_input
         else:
-            self._pax_data.append(data_input)
+            self._pax_data = np.vstack(
+                [self._pax_data_scale, data_input]
+            )
 
         # Scale input data based on current limits
         data_input_scale = data_input.copy()
@@ -314,10 +316,12 @@ class PaxFigure(Figure):
             data_input_scale[:, col_idx] = self._scale_vals(col)
 
         # Update scaled data attributes
-        if not self._pax_data_scale:
+        if len(self._pax_data_scale) == 0:
             self._pax_data_scale = data_input_scale
         else:
-            self._pax_data_scale.append(data_input_scale)
+            self._pax_data_scale = np.vstack(
+                [self._pax_data_scale, data_input_scale]
+            )
 
         # Add scaled input data to plot
         for ax_idx, ax in enumerate(self.axes[:-1]):
