@@ -277,7 +277,7 @@ class PaxFigure(Figure):
             labels=labels
         )
 
-    def plot(self, data: list):
+    def plot(self, data: list, line_kwargs={}):
         """
         Plot the supplied data
 
@@ -285,6 +285,9 @@ class PaxFigure(Figure):
         ----------
         data : array-like
             Data to be plotted
+
+        line_kwargs: dict
+            Keyword arguments for lines corresponding to data
         """
         # Initial Checking
         if len(data[0]) < len(self.axes):
@@ -329,7 +332,7 @@ class PaxFigure(Figure):
 
         # Add scaled input data to plot
         for ax_idx, ax in enumerate(self.axes[:-1]):
-            ax.plot(data_input_scale[:, ax_idx:ax_idx+2].T)
+            ax.plot(data_input_scale[:, ax_idx:ax_idx+2].T, **line_kwargs)
 
         # Limits
         for ax_idx in range(self._pax_data.shape[1]):
@@ -682,7 +685,7 @@ class PaxFigure(Figure):
             top=self._pax_lims[ax_idx][0]
         )
 
-    def add_legend(self, labels: list):
+    def add_legend(self, labels=[]):
         """Create a legend for a specified figure
 
         Parameters
@@ -697,16 +700,16 @@ class PaxFigure(Figure):
                 Warning
             )
 
-        # Set line labels
-        try:
-            for ax in self.axes:
-                for i, line in enumerate(ax.lines):
-                    line.set_label(labels[i])
-        except IndexError:
-            raise IndexError(
-                f'Incorrect number of labels specified. You have supplied '
-                f'{len(labels)} labels, but {len(ax.lines)} were expected'
-            )
+        if len(labels) > 0:
+            try:
+                for ax in self.axes:
+                    for i, line in enumerate(ax.lines):
+                        line.set_label(labels[i])
+            except IndexError:
+                raise IndexError(
+                    f'Incorrect number of labels specified. You have supplied '
+                    f'{len(labels)} labels, but {len(ax.lines)} were expected'
+                )
 
         # Create blank axis for legend
         n_axes = len(self.axes)
