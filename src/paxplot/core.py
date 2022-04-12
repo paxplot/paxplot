@@ -11,57 +11,6 @@ import functools
 import copy
 
 
-def scale_val(val, minimum, maximum):
-    """
-    Scale a value linearly between a minimum and maximum value
-
-    Parameters
-    ----------
-    val : numeric
-        Numeric value to be scaled
-    minimum : numeric
-        Minimum value to linearly scale between
-    maximum : numeric
-        Maximum value to lineraly scale between
-
-    Returns
-    -------
-    val_scaled : numeric
-        Scaled `val`
-    """
-    try:
-        val_scaled = (val-minimum)/(maximum-minimum)
-    except ZeroDivisionError:
-        val_scaled = 0.5
-    return val_scaled
-
-
-def get_color_gradient(val, minimum, maximum, colormap):
-    """
-    Get color gradient values for the `val`
-
-    Parameters
-    ----------
-    val : float
-        value to get color for scaling
-    minimum : float
-        Minimum value
-    maximum : float
-        Minimum value for scaling
-    colormap : str
-        Matplotlib colormap to use for coloring
-
-    Returns
-    -------
-    color: str
-        string color code
-    """
-    color = mpl.colors.rgb2hex(
-        cm.get_cmap(colormap)(scale_val(val, minimum, maximum))
-    )
-    return color
-
-
 class PaxFigure(Figure):
 
     _safe_inherited_functions = [
@@ -118,6 +67,31 @@ class PaxFigure(Figure):
         data_scale = (data - minimum) / (maximum - minimum)
 
         return data_scale
+
+    def _get_color_gradient(self, val, minimum, maximum, colormap):
+        """
+        Get color gradient values for the `val`
+
+        Parameters
+        ----------
+        val : float
+            value to get color for scaling
+        minimum : float
+            Minimum value
+        maximum : float
+            Minimum value for scaling
+        colormap : str
+            Matplotlib colormap to use for coloring
+
+        Returns
+        -------
+        color: str
+            string color code
+        """
+        color = mpl.colors.rgb2hex(
+            cm.get_cmap(colormap)(self._scale_vals(val, minimum, maximum))
+        )
+        return color
 
     def _update_plot_lines(self, ax_idx):
         """
@@ -769,7 +743,7 @@ class PaxFigure(Figure):
             else:
                 scale_val = self.axes[ax_idx-1].lines[i].get_ydata()[1]
             # Get color
-            color = get_color_gradient(scale_val, 0, 1, cmap)
+            color = self._get_color_gradient(scale_val, 0, 1, cmap)
             # Assign color to line
             for j in self.axes[:-1]:
                 j.lines[i].set_color(color)
