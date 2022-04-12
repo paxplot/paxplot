@@ -781,7 +781,7 @@ class PaxplotException(unittest.TestCase):
         """
         Various ways PaxFigure.plot can fail
         """
-        # Too few axes
+        # Too little data supplied
         with self.assertWarns(Warning):
             paxfig = paxplot.pax_parallel(n_axes=4)
             paxfig.plot(
@@ -791,7 +791,7 @@ class PaxplotException(unittest.TestCase):
                 ]
             )
 
-        # Too many axes
+        # Too much data supplied
         with self.assertRaises(ValueError):
             paxfig = paxplot.pax_parallel(n_axes=2)
             paxfig.plot(
