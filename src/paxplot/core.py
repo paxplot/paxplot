@@ -298,7 +298,7 @@ class PaxFigure(Figure):
             )
         elif len(data[0]) > len(self.axes):
             raise ValueError(
-                'Supplied data has fewer columns than figure. Please recreate '
+                'Supplied data has more columns than figure. Please recreate '
                 'paxfigure with appropriate n_axes'
             )
 
