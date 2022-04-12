@@ -731,6 +731,38 @@ class PaxplotLib(unittest.TestCase):
             [0.0, 1.0, 2.0]
         )
 
+    def test_attributes_plot(self):
+        """
+        Calling plot with attrubutes
+        """
+        # Run
+        paxfig = paxplot.pax_parallel(n_axes=3)
+        paxfig.plot(
+            data=[
+                [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0]
+            ],
+            line_kwargs={
+                'label': ['A', 'B'],
+                'alpha': 0.5
+            }
+        )
+        paxfig.add_legend()
+
+        # Test
+        self.assertEqual(
+            paxfig.axes[0].lines[0].get_alpha(),
+            0.5
+        )
+        self.assertEqual(
+            paxfig.axes[0].lines[0].get_label(),
+            'A'
+        )
+        self.assertEqual(
+            paxfig.axes[0].lines[1].get_label(),
+            'B'
+        )
+
 
 class PaxplotException(unittest.TestCase):
     def test_paxfig_creation(self):
