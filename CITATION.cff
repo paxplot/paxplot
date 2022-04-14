@@ -11,7 +11,6 @@ authors:
   - given-names: Jacob Kravits
     email: kravitsjacob@gmail.com
     orcid: 'https://orcid.org/0000-0002-9170-0496'
-  - given-names: Jason Valladares
 identifiers:
   - type: doi
     value: 10.1008/paxplot.v0.1.1.beta
