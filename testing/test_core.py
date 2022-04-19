@@ -778,6 +778,16 @@ class PaxplotLib(unittest.TestCase):
         paxfig = paxplot.pax_parallel(n_axes=2)
         paxfig.plot(data=data)
 
+        # Testing
+        self.assertEqual(
+            [0, 1],
+            paxfig._pax_ticks[0]
+        )
+        self.assertEqual(
+            {'B', 'A'},
+            paxfig._pax_ticks_labels[0]
+        )
+
 
 class PaxplotException(unittest.TestCase):
     def test_paxfig_creation(self):
@@ -1054,7 +1064,7 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(AttributeError):
             paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
 
-        # Setting ticks
+        # Setting ticks (raises set_lim error)
         with self.assertRaises(AttributeError):
             paxfig.set_ticks(ax_idx=0, ticks=[0.0, 1.0, 2.0])
 
