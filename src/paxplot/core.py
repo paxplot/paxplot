@@ -251,6 +251,47 @@ class PaxFigure(Figure):
             labels=labels
         )
 
+    def _convert_string_data(self, data: list):
+        """
+        Convert string input data to numerical data
+
+        Parameters
+        ----------
+        data : list
+            Data to be plotted from `plot`
+
+        Returns
+        -------
+        data : list
+            Converted `data`
+        """
+        for col_i in range(len(data[0])):
+            # Extract column
+            column = [row[col_i] for row in data]
+
+            if type(column[0]) is str:
+                # Unique values
+                strings = list(dict.fromkeys(column))  # Preserves order
+                numbers = list(range(len(strings)))
+                strings.reverse()
+
+                # Translation of strings to numbers for tick position
+                translate_dict = dict(zip(strings, numbers))
+                column_translated = [
+                    translate_dict.get(item, item) for item in column
+                ]
+                for row_idx, row in enumerate(data):
+                    row[col_i] = column_translated[row_idx]
+
+                # Set ticks
+                self.set_ticks(
+                    ax_idx=col_i,
+                    ticks=numbers,
+                    labels=strings
+                )
+
+        return np.array(data)
+
     def plot(self, data: list, line_kwargs={}):
         """
         Plot the supplied data
@@ -281,32 +322,7 @@ class PaxFigure(Figure):
 
         # Check if string datatypes
         if data_input.dtype.type is np.str_:
-
-            for col_i in range(len(data[0])):
-                # Extract data
-                column = [row[col_i] for row in data]
-
-                if type(column[0]) is str:
-                    # Unique values
-                    values = set(column)
-
-                    # Translate
-                    translate_dict = dict(zip(values, range(len(values))))
-
-                    # Subtitute values
-                    column_translated = [translate_dict.get(item, item) for item in column]
-                    for row_idx, row in enumerate(data):
-                        row[col_i] = column_translated[row_idx]
-
-                    # Set ticks
-                    self.set_ticks(
-                        ax_idx=col_i,
-                        ticks=list(range(len(values))),
-                        labels=values
-                    )
-
-            # Convert to numpy
-            data_input = np.array(data)
+            data_input = self._convert_string_data(data)
 
         # Update data attributes
         if len(self._pax_data) == 0:
