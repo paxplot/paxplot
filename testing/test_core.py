@@ -763,6 +763,21 @@ class PaxplotLib(unittest.TestCase):
             'B'
         )
 
+    def test_string_plot(self):
+        """
+        Calling plot with string inputs
+        """
+        # Run
+        data = [
+            ['A', 1],
+            ['A', 2],
+            ['B', 3],
+            ['B', 4],
+            ['B', 5],
+        ]
+        paxfig = paxplot.pax_parallel(n_axes=2)
+        paxfig.plot(data=data)
+
 
 class PaxplotException(unittest.TestCase):
     def test_paxfig_creation(self):
@@ -798,16 +813,6 @@ class PaxplotException(unittest.TestCase):
                 [
                     [0.0, 0.0, 2.0],
                     [1.0, 1.0, 1.0],
-                ]
-            )
-
-        # Non-plottable data
-        with self.assertRaises(TypeError):
-            paxfig = paxplot.pax_parallel(n_axes=3)
-            paxfig.plot(
-                [
-                    ['foo', 0.0, 2.0],
-                    ['bar', 1.0, 1.0],
                 ]
             )
 
