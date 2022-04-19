@@ -298,8 +298,15 @@ class PaxFigure(Figure):
                     for row_idx, row in enumerate(data):
                         row[col_i] = column_translated[row_idx]
 
+                    # Set ticks
+                    self.set_ticks(
+                        ax_idx=col_i,
+                        ticks=list(range(len(values))),
+                        labels=values
+                    )
+
             # Convert to numpy
-            data_input = np.array(data)
+            data_input = np.array(data).astype(np.single)
 
         # Update data attributes
         if len(self._pax_data) == 0:
@@ -399,7 +406,7 @@ class PaxFigure(Figure):
             self._pax_data[:, ax_idx]
         except TypeError:
             raise AttributeError(
-                'Paxplot does not support set_ticks if no data has been'
+                'Paxplot does not support set_lim if no data has been'
                 'plotted'
             )
 
@@ -468,14 +475,14 @@ class PaxFigure(Figure):
                 f' use the `labels` argument'
             )
 
-        # Checking if data is plotted
-        try:
-            self._pax_data[:, ax_idx]
-        except TypeError:
-            raise AttributeError(
-                'Paxplot does not support set_ticks if no data has been'
-                'plotted'
-            )
+        # # Checking if data is plotted
+        # try:
+        #     self._pax_data[:, ax_idx]
+        # except TypeError:
+        #     raise AttributeError(
+        #         'Paxplot does not support set_ticks if no data has been'
+        #         'plotted'
+        #     )
 
         # Retrieve matplotlib axes
         try:
@@ -669,7 +676,7 @@ class PaxFigure(Figure):
             self._pax_data[:, ax_idx]
         except TypeError:
             raise AttributeError(
-                'Paxplot does not support set_ticks if no data has been'
+                'Paxplot does not support invert_axis if no data has been'
                 'plotted'
             )
 
