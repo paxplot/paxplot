@@ -279,12 +279,34 @@ class PaxFigure(Figure):
         # Convert input data to numpy
         data_input = np.array(data)
 
+        # Check if string datatypes
+        if data_input.dtype.type is np.str_:
+
+            for col_i in range(len(data[0])):
+                # Extract data
+                column = [row[col_i] for row in data]
+
+                if type(column[0]) is str:
+                    # Unique values
+                    values = set(column)
+
+                    # Translate
+                    translate_dict = dict(zip(values, range(len(values))))
+
+                    # Subtitute values
+                    column_translated = [translate_dict.get(item, item) for item in column]
+                    for row_idx, row in enumerate(data):
+                        row[col_i] = column_translated[row_idx]
+
+            # Convert to numpy
+            data_input = np.array(data)
+
         # Update data attributes
         if len(self._pax_data) == 0:
-            self._pax_data = data_input
+            self._pax_data = data_input.astype(np.single)
         else:
             self._pax_data = np.vstack(
-                [self._pax_data, data_input]
+                [self._pax_data, data_input.astype(np.single)]
             )
 
         # Scale input data based on current limits
@@ -390,7 +412,7 @@ class PaxFigure(Figure):
             col,
             minimum=bottom,
             maximum=top
-        )
+        ).astype(np.single)
 
         # Update plot of scaled data
         self._update_plot_lines(ax_idx)
