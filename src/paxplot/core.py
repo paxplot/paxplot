@@ -306,18 +306,18 @@ class PaxFigure(Figure):
                     )
 
             # Convert to numpy
-            data_input = np.array(data).astype(np.single)
+            data_input = np.array(data)
 
         # Update data attributes
         if len(self._pax_data) == 0:
-            self._pax_data = data_input.astype(np.single)
+            self._pax_data = data_input
         else:
             self._pax_data = np.vstack(
-                [self._pax_data, data_input.astype(np.single)]
+                [self._pax_data, data_input]
             )
 
         # Scale input data based on current limits
-        data_input_scale = data_input.copy()
+        data_input_scale = data_input.copy().astype(np.single)
         for col_idx, col in enumerate(data_input.T):
             data_input_scale[:, col_idx] = self._scale_vals(
                 data=col,
