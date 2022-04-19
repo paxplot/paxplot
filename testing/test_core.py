@@ -784,7 +784,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig._pax_ticks[0]
         )
         self.assertEqual(
-            {'B', 'A'},
+            ['B', 'A'],
             paxfig._pax_ticks_labels[0]
         )
 
