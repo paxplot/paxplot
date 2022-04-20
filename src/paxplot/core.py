@@ -38,18 +38,18 @@ class PaxFigure(Figure):
         self._pax_custom_lims = []
         self._pax_custom_ticks = []
 
-    def _scale_vals(self, data, minimum=None, maximum=None):
+    def _scale_vals(self, data, lower=None, upper=None):
         """
-        Scale `data` between minimum and maximum
+        Scale `data` between lower and upper
 
         Parameters
         ----------
         data : array-like
             Data to be scalled
-        minimum : numeric, optional
-            Minimum value for scaling, by default None
-        maximum : numeric, optional
-            Minimum value for scaling, by default None
+        lower : numeric, optional
+            Lower value for scaling, by default None
+        upper : numeric, optional
+            Upper value for scaling, by default None
 
         Returns
         -------
@@ -59,16 +59,16 @@ class PaxFigure(Figure):
         # Convert to numpy
         data = np.array(data)
 
-        if minimum is None and maximum is None:
-            minimum = data.min()
-            maximum = data.max()
+        if lower is None and upper is None:
+            lower = data.min()
+            upper = data.max()
 
         # Scale data
-        data_scale = (data - minimum) / (maximum - minimum)
+        data_scale = (data - lower) / (upper - lower)
 
         return data_scale
 
-    def _get_color_gradient(self, val, minimum, maximum, colormap):
+    def _get_color_gradient(self, val, lower, upper, colormap):
         """
         Get color gradient values for the `val`
 
@@ -76,10 +76,10 @@ class PaxFigure(Figure):
         ----------
         val : float
             value to get color for scaling
-        minimum : float
-            Minimum value
-        maximum : float
-            Minimum value for scaling
+        lower : float
+            Lower value
+        upper : float
+            Upper value for scaling
         colormap : str
             Matplotlib colormap to use for coloring
 
@@ -89,7 +89,7 @@ class PaxFigure(Figure):
             string color code
         """
         color = mpl.colors.rgb2hex(
-            cm.get_cmap(colormap)(self._scale_vals(val, minimum, maximum))
+            cm.get_cmap(colormap)(self._scale_vals(val, lower, upper))
         )
         return color
 
@@ -237,11 +237,11 @@ class PaxFigure(Figure):
         # Set limits
         n_ticks = 6
         precision = 2
-        minimum = self._pax_lims[ax_idx][0]
-        maximum = self._pax_lims[ax_idx][1]
+        bottom = self._pax_lims[ax_idx][0]
+        top = self._pax_lims[ax_idx][1]
         ticks = np.linspace(
-                minimum,
-                maximum,
+                bottom,
+                top,
                 num=n_ticks + 1
             )
         labels = ticks.round(precision)
@@ -337,8 +337,8 @@ class PaxFigure(Figure):
         for col_idx, col in enumerate(data_input.T):
             data_input_scale[:, col_idx] = self._scale_vals(
                 data=col,
-                minimum=self._pax_lims[col_idx][0],
-                maximum=self._pax_lims[col_idx][1]
+                lower=self._pax_lims[col_idx][0],
+                upper=self._pax_lims[col_idx][1]
             )
 
         # Update scaled data attributes
@@ -401,13 +401,7 @@ class PaxFigure(Figure):
         """
         # Check bottom top values
         try:
-            if bottom > top:
-                # raise ValueError(
-                #     'Value for `bottom` cannot be greater than `top`. To '
-                #     'invert axis use the `invert_axis` function.'
-                # )
-                a = 1
-            elif bottom == top:
+            if bottom == top:
                 bottom = bottom - 1.0
                 top = top + 1.0
         except TypeError:
@@ -433,8 +427,8 @@ class PaxFigure(Figure):
         col = self._pax_data[:, ax_idx]
         self._pax_data_scale[:, ax_idx] = self._scale_vals(
             col,
-            minimum=bottom,
-            maximum=top
+            lower=bottom,
+            upper=top
         ).astype(np.single)
 
         # Update plot of scaled data
@@ -491,15 +485,6 @@ class PaxFigure(Figure):
                 f' use the `labels` argument'
             )
 
-        # # Checking if data is plotted
-        # try:
-        #     self._pax_data[:, ax_idx]
-        # except TypeError:
-        #     raise AttributeError(
-        #         'Paxplot does not support set_ticks if no data has been'
-        #         'plotted'
-        #     )
-
         # Retrieve matplotlib axes
         try:
             ax = self.axes[ax_idx]
@@ -518,12 +503,12 @@ class PaxFigure(Figure):
         self._pax_ticks[ax_idx] = ticks
 
         # Scale tick based on current limits
-        lim_min = self._pax_lims[ax_idx][0]
-        lim_max = self._pax_lims[ax_idx][1]
+        lim_bottom = self._pax_lims[ax_idx][0]
+        lim_top = self._pax_lims[ax_idx][1]
         self._pax_ticks_scale[ax_idx] = self._scale_vals(
             ticks,
-            minimum=lim_min,
-            maximum=lim_max
+            lower=lim_bottom,
+            upper=lim_top
         )
 
         # Tick labels
