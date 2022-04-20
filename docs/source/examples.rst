@@ -1,5 +1,8 @@
+Examples
+========
+
 Usage with Pandas
-=================
+-----------------
 
 The `Pandas <https://pandas.pydata.org/>`_ library offers many tools for importing and processing data. Here is an example of using Paxplot to plot data in a Pandas `DataFrame <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html>`_. We will use the :code:`tradeoff` dataset included in Paxplot, but the workflow is fairly generic.
 
@@ -33,3 +36,8 @@ The `Pandas <https://pandas.pydata.org/>`_ library offers many tools for importi
 
 
 .. image:: _static/pandas.svg
+
+Highlight Solutions
+-------------------
+
+test
