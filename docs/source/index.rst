@@ -21,7 +21,7 @@ Contents
 
    getting_started
    advanced_usage
-   pandas_usage
+   examples
    api
 
 .. note::
