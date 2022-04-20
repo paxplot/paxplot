@@ -23,6 +23,7 @@ Contents
    advanced_usage
    examples
    api
+   release
 
 .. note::
 
