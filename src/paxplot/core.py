@@ -641,7 +641,7 @@ class PaxFigure(Figure):
             Labels for each axis. Must be same length as number of axes.
         """
         # Checking length
-        if len(self.axes) != len(labels):
+        if len(self._pax_data[0]) != len(labels):
             raise IndexError(
                 'Length of `labels` must equal number of axes'
             )
