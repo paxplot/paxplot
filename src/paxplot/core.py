@@ -320,8 +320,8 @@ class PaxFigure(Figure):
         # Convert input data to numpy
         data_input = np.array(data)
 
-        # Check if string datatypes
-        if data_input.dtype.type is np.str_:
+        # Check if conversion needed
+        if not np.issubdtype(data_input.dtype.type, np.number):
             data_input = self._convert_string_data(data)
 
         # Update data attributes
