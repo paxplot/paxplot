@@ -1,6 +1,8 @@
 Examples
 ========
 
+.. _pandas:
+
 Usage with Pandas
 -----------------
 
@@ -36,6 +38,8 @@ The `Pandas <https://pandas.pydata.org/>`_ library offers many tools for importi
 
 
 .. image:: _static/pandas.svg
+
+.. _highlight-solutions:
 
 Highlight Solutions
 -------------------
