@@ -95,8 +95,8 @@ It can be nice to plot a legend to identify each line. This works well if you ha
 .. image:: _static/legend.svg
 
 Adding a Colorbar
----------------
-If you have many observations, it is helpful to use a colorbar to distinguish each line. You should also reference the Pandas integration `example <pandas_usage.html>`_ for another usage of the colorbar.
+-----------------
+If you have many observations, it is helpful to use a colorbar to distinguish each line. You should also reference the Pandas integration `example <examples.html#pandas>`__ for another usage of the colorbar.
 
 .. code-block:: python
 

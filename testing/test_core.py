@@ -1,10 +1,11 @@
-"""Tests for core paxplot functions"""
+"""Tests for paxplot paxplot functions"""
 
 import os
 import unittest
-import core
 import warnings
 import matplotlib.pyplot as plt
+import numpy as np
+import src.paxplot as paxplot
 
 
 class PaxplotLib(unittest.TestCase):
@@ -13,7 +14,7 @@ class PaxplotLib(unittest.TestCase):
         Test of blank figure
         """
         # Run
-        paxfig = core.pax_parallel(n_axes=4)
+        paxfig = paxplot.pax_parallel(n_axes=4)
 
         # Test
         self.assertEqual(paxfig.axes.__len__(), 4)
@@ -63,26 +64,24 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
         # Test attribute data
         self.assertEqual(
-            paxfig.axes[0].paxfig_lim, (0.0, 2.0)
-        )
-        self.assertEqual(
-            paxfig.axes[1].paxfig_lim, (0.0, 2.0)
+            paxfig._pax_lims,
+            [[0.0, 2.0], [0.0, 2.0]]
         )
 
         # Test plotted data
         self.assertTrue(
-            (paxfig.axes[0].lines[0].get_ydata() == [0.0, 0.0]).all()
+            paxfig.axes[0].lines[0].get_ydata() == [0.0, 0.0]
         )
         self.assertTrue(
-            (paxfig.axes[0].lines[1].get_ydata() == [0.5, 0.5]).all()
+            paxfig.axes[0].lines[1].get_ydata() == [0.5, 0.5]
         )
         self.assertTrue(
-            (paxfig.axes[0].lines[2].get_ydata() == [1.0, 1.0]).all()
+            paxfig.axes[0].lines[2].get_ydata() == [1.0, 1.0]
         )
 
         # Test ticks
@@ -109,7 +108,7 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3)
         paxfig.set_lim(ax_idx=1, bottom=-1.0, top=3)
@@ -177,7 +176,7 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         tick_lists = [
             [0.0, 1.0, 3.0],
@@ -226,7 +225,7 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.set_even_ticks(
             ax_idx=0,
@@ -260,7 +259,7 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.set_ticks(
             ax_idx=0,
@@ -294,7 +293,7 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.set_label(
             ax_idx=0,
@@ -325,7 +324,7 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.set_labels(labels=['A', 'B'])
 
@@ -349,7 +348,7 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.invert_axis(ax_idx=0)
         paxfig.invert_axis(ax_idx=2)
@@ -361,25 +360,25 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(paxfig.axes[1].lines[2].get_ydata()[1], 0.0)
 
         # Test ticks
-        self.assertEqual(paxfig.axes[0].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(paxfig.axes[0].get_yticklabels()[0].get_text(), '2.0')
         self.assertEqual(
-            paxfig.axes[0].get_yticklabels()[-1].get_text(), '2.0'
+            paxfig.axes[0].get_yticklabels()[-1].get_text(), '0.0'
         )
-        self.assertEqual(paxfig.axes[2].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(paxfig.axes[2].get_yticklabels()[0].get_text(), '2.0')
         self.assertEqual(
-            paxfig.axes[2].get_yticklabels()[-1].get_text(), '2.0'
-        )
-        self.assertEqual(
-            paxfig.axes[0].get_yticklabels()[0].get_position()[1], 1.0
+            paxfig.axes[2].get_yticklabels()[-1].get_text(), '0.0'
         )
         self.assertEqual(
-            paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 0.0
+            paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
         )
         self.assertEqual(
-            paxfig.axes[2].get_yticklabels()[0].get_position()[1], 1.0
+            paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 1.0
         )
         self.assertEqual(
-            paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 0.0
+            paxfig.axes[2].get_yticklabels()[0].get_position()[1], 0.0
+        )
+        self.assertEqual(
+            paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
         )
 
     def test_parallel_invert_middle(self):
@@ -394,7 +393,7 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.invert_axis(1)
 
@@ -409,9 +408,9 @@ class PaxplotLib(unittest.TestCase):
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[-1].get_text(), '3.0'
         )
-        self.assertEqual(paxfig.axes[1].get_yticklabels()[0].get_text(), '0.0')
+        self.assertEqual(paxfig.axes[1].get_yticklabels()[0].get_text(), '2.0')
         self.assertEqual(
-            paxfig.axes[1].get_yticklabels()[-1].get_text(), '2.0'
+            paxfig.axes[1].get_yticklabels()[-1].get_text(), '0.0'
         )
         self.assertEqual(
             paxfig.axes[0].get_yticklabels()[0].get_position()[1], 0.0
@@ -438,7 +437,7 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.add_legend(labels=['A', 'B', 'C'])
 
@@ -466,7 +465,7 @@ class PaxplotLib(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.add_colorbar(
             ax_idx=2,
@@ -517,7 +516,7 @@ class PaxplotLib(unittest.TestCase):
             [3.0, 2.0, 0.0],
         ]
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
         paxfig.set_lim(0, bottom=0, top=4)
         paxfig.set_lim(1, bottom=0, top=4)
@@ -579,7 +578,7 @@ class PaxplotLib(unittest.TestCase):
             [2.0, 1.0, 0.0],
         ]
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
         # Y data tests
@@ -598,7 +597,7 @@ class PaxplotLib(unittest.TestCase):
         Testing if possible to save figure
         """
         # Run
-        paxfig = core.pax_parallel(n_axes=2)
+        paxfig = paxplot.pax_parallel(n_axes=2)
         paxfig.savefig('test.png')
 
         # Test if file generated
@@ -612,7 +611,7 @@ class PaxplotLib(unittest.TestCase):
         Testing if unsupported
         """
         # Run
-        paxfig = core.pax_parallel(n_axes=2)
+        paxfig = paxplot.pax_parallel(n_axes=2)
 
         # Test
         with self.assertWarns(Warning):
@@ -623,7 +622,7 @@ class PaxplotLib(unittest.TestCase):
         Testing if top_level functions raise warnings
         """
         # Setup
-        paxfig = core.pax_parallel(n_axes=2)
+        paxfig = paxplot.pax_parallel(n_axes=2)
 
         with warnings.catch_warnings(record=True) as w:
             # Run
@@ -637,7 +636,7 @@ class PaxplotLib(unittest.TestCase):
         Testing if .show raises warnings
         """
         # Setup
-        paxfig = core.pax_parallel(n_axes=2)
+        paxfig = paxplot.pax_parallel(n_axes=2)
 
         with warnings.catch_warnings(record=True) as w:
             # Run
@@ -645,6 +644,149 @@ class PaxplotLib(unittest.TestCase):
 
             # Test
             self.assertEqual(len(w), 0)
+
+    def test_multi_plot(self):
+        """
+        Calling plot multiple times
+        """
+        # Run
+        paxfig = paxplot.pax_parallel(n_axes=3)
+        paxfig.plot(
+            [
+                [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0]
+            ]
+        )
+        paxfig.plot(
+            [
+                [3.0, 3.0, 3.0],
+                [4.0, 4.0, 4.0],
+            ]
+        )
+
+        # Test Attributes
+        self.assertEqual(
+            [
+                [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0],
+                [3.0, 3.0, 3.0],
+                [4.0, 4.0, 4.0]
+            ],
+            paxfig._pax_data.tolist()
+        )
+        np.testing.assert_almost_equal(
+            [
+                [0.0, 0.0, 0.0],
+                [0.33, 0.33, 0.33],
+                [0.66, 0.66, 0.66],
+                [1.0, 1.0, 1.0]
+            ],
+            paxfig._pax_data_scale.tolist(),
+            decimal=1
+        )
+
+    def test_custom_multi_plot(self):
+        """
+        Multiple calls to plot with custom ticks and limits
+        """
+        # Run
+        paxfig = paxplot.pax_parallel(n_axes=3)
+        paxfig.plot(
+            [
+                [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0]
+            ]
+        )
+        paxfig.set_lim(ax_idx=0, bottom=0.0, top=5.0)
+        paxfig.set_ticks(ax_idx=1, ticks=[0.0, 1.0, 2.0])
+        paxfig.plot(
+            [
+                [3.0, 3.0, 3.0],
+                [4.0, 4.0, 4.0],
+            ]
+        )
+
+        # Test Attributes
+        self.assertEqual(
+            [
+                [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0],
+                [3.0, 3.0, 3.0],
+                [4.0, 4.0, 4.0]
+            ],
+            paxfig._pax_data.tolist()
+        )
+        np.testing.assert_almost_equal(
+            [
+                [0.2, 0.25, 0.0],
+                [0.4, 0.5, 0.33],
+                [0.6, 0.75, 0.66],
+                [0.8, 1.0, 1.0]
+            ],
+            paxfig._pax_data_scale.tolist(),
+            decimal=1
+        )
+        self.assertEqual(
+            paxfig._pax_ticks[1],
+            [0.0, 1.0, 2.0]
+        )
+
+    def test_attributes_plot(self):
+        """
+        Calling plot with attrubutes
+        """
+        # Run
+        paxfig = paxplot.pax_parallel(n_axes=3)
+        paxfig.plot(
+            data=[
+                [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0]
+            ],
+            line_kwargs={
+                'label': ['A', 'B'],
+                'alpha': 0.5
+            }
+        )
+        paxfig.add_legend()
+
+        # Test
+        self.assertEqual(
+            paxfig.axes[0].lines[0].get_alpha(),
+            0.5
+        )
+        self.assertEqual(
+            paxfig.axes[0].lines[0].get_label(),
+            'A'
+        )
+        self.assertEqual(
+            paxfig.axes[0].lines[1].get_label(),
+            'B'
+        )
+
+    def test_string_plot(self):
+        """
+        Calling plot with string inputs
+        """
+        # Run
+        data = [
+            ['A', 1],
+            ['A', 2],
+            ['B', 3],
+            ['B', 4],
+            ['B', 5],
+        ]
+        paxfig = paxplot.pax_parallel(n_axes=2)
+        paxfig.plot(data=data)
+
+        # Testing
+        self.assertEqual(
+            [0, 1],
+            paxfig._pax_ticks[0]
+        )
+        self.assertEqual(
+            ['B', 'A'],
+            paxfig._pax_ticks_labels[0]
+        )
 
 
 class PaxplotException(unittest.TestCase):
@@ -654,19 +796,19 @@ class PaxplotException(unittest.TestCase):
         """
         # Nothing supplied
         with self.assertRaises(TypeError):
-            core.pax_parallel()
+            paxplot.pax_parallel()
 
         # Non-int n_axes
         with self.assertRaises(TypeError):
-            core.pax_parallel(n_axes=0.1)
+            paxplot.pax_parallel(n_axes=0.1)
 
     def test_plot(self):
         """
         Various ways PaxFigure.plot can fail
         """
-        # Too few axes
+        # Too little data supplied
         with self.assertWarns(Warning):
-            paxfig = core.pax_parallel(n_axes=4)
+            paxfig = paxplot.pax_parallel(n_axes=4)
             paxfig.plot(
                 [
                     [0.0, 0.0, 2.0],
@@ -674,23 +816,13 @@ class PaxplotException(unittest.TestCase):
                 ]
             )
 
-        # Too many axes
+        # Too much data supplied
         with self.assertRaises(ValueError):
-            paxfig = core.pax_parallel(n_axes=2)
+            paxfig = paxplot.pax_parallel(n_axes=2)
             paxfig.plot(
                 [
                     [0.0, 0.0, 2.0],
                     [1.0, 1.0, 1.0],
-                ]
-            )
-
-        # Non-plottable data
-        with self.assertRaises(TypeError):
-            paxfig = core.pax_parallel(n_axes=3)
-            paxfig.plot(
-                [
-                    ['foo', 0.0, 2.0],
-                    ['bar', 1.0, 1.0],
                 ]
             )
 
@@ -704,16 +836,12 @@ class PaxplotException(unittest.TestCase):
             [1.0, 1.0, 1.0],
             [2.0, 2.0, 2.0]
         ]
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
         # Requesting axis that doesn't exist
         with self.assertRaises(IndexError):
             paxfig.set_lim(ax_idx=4, bottom=-1.0, top=3)
-
-        # Bottom larger than top
-        with self.assertRaises(ValueError):
-            paxfig.set_lim(ax_idx=0, bottom=3, top=1)
 
         # Non integer value for ax_idx
         with self.assertRaises(TypeError):
@@ -737,7 +865,7 @@ class PaxplotException(unittest.TestCase):
             [1.0, 1.0, 1.0, 1.0],
             [3.0, 2.0, 0.0, 3.0],
         ]
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
         # Requesting axis that doesn't exist
@@ -772,7 +900,7 @@ class PaxplotException(unittest.TestCase):
         ]
 
         # Run
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
         # Requesting axis that doesn't exist
@@ -821,7 +949,7 @@ class PaxplotException(unittest.TestCase):
             [1.0, 1.0],
             [2.0, 2.0]
         ]
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
         # Requesting axis that doesn't exist
@@ -842,7 +970,7 @@ class PaxplotException(unittest.TestCase):
             [1.0, 1.0],
             [2.0, 2.0]
         ]
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
         # Requesting too many labels
@@ -859,7 +987,7 @@ class PaxplotException(unittest.TestCase):
             [1.0, 1.0, 1.0],
             [2.0, 2.0, 2.0]
         ]
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
         # Requesting axis that doesn't exist
@@ -880,7 +1008,7 @@ class PaxplotException(unittest.TestCase):
             [1.0, 1.0, 1.0],
             [2.0, 2.0, 0.0],
         ]
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
         # Not enough labels provided
@@ -901,7 +1029,7 @@ class PaxplotException(unittest.TestCase):
             [1.0, 1.0, 1.0],
             [3.0, 2.0, 0.0],
         ]
-        paxfig = core.pax_parallel(n_axes=len(data[0]))
+        paxfig = paxplot.pax_parallel(n_axes=len(data[0]))
         paxfig.plot(data)
 
         # Requesting axis that doesn't exist
@@ -930,12 +1058,13 @@ class PaxplotException(unittest.TestCase):
         Various ways PaxFigure can fail if no data is plotted
         """
         # Setup
-        paxfig = core.pax_parallel(n_axes=3)
+        paxfig = paxplot.pax_parallel(n_axes=3)
 
-        # Setting limits supported
-        paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
+        # Setting limits not supported
+        with self.assertRaises(AttributeError):
+            paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
 
-        # Setting ticks
+        # Setting ticks (raises set_lim error)
         with self.assertRaises(AttributeError):
             paxfig.set_ticks(ax_idx=0, ticks=[0.0, 1.0, 2.0])
 
