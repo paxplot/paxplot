@@ -81,6 +81,6 @@ Another common workflow with parallel plots is to add a colorbar to a subset of 
     # Add labels
     paxfig.set_labels(cols)
 
-    plt.show(block=False)
+    plt.show()
 
 .. image:: _static/highlight.svg

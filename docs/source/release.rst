@@ -8,7 +8,7 @@ Version 0.1.2 (beta)
 Multiple Plotting Calls
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Paxplot can now call multiple calls to plot. This allows users to plot individual lines or sets of lines opening up the ability to combine functionality. See `here <examples.html#highlight-solutions>`__ for an example of combining the ability to plot one set of data with a colorbar and another set in a neutral grey color. 
+Paxplot can now call multiple calls to :code:`plot()`. This allows users to plot individual lines or sets of lines, opening up the ability to combine functionality. See `here <examples.html#highlight-solutions>`__ for an example of combining the ability to plot one set of data with a colorbar and another set in a neutral grey color. 
 
 .. code-block:: python
 

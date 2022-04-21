@@ -12,7 +12,7 @@ To use Paxplot, first install it using PyPI:
 
 Basic Usage
 -----------
-We run through the basic functionality of Paxplot using the following synthetic dataset. Note that Paxplot requires its input be in a list of lists or a similar matrix-like format. For usage with Pandas, click `here <pandas_usage.html>`_.
+We run through the basic functionality of Paxplot using the following synthetic dataset. Note that Paxplot requires its input be in a list of lists or a similar matrix-like format. For usage with Pandas, click `here <examples.html#pandas>`__.
 
 .. code-block:: python
 
