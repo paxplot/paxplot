@@ -25,5 +25,10 @@ jobs:
       - name: Run examples
         run: |
           cd examples
-          python basic_usage.py
           python advanced_usage.py
+          python basic_usage.py
+          python categorical.py
+          python highlight.py
+          python line_kwargs.py
+          python multi_call.py
+          python pandas_usage.py
