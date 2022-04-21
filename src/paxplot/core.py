@@ -37,6 +37,7 @@ class PaxFigure(Figure):
         self._pax_ticks_labels = []
         self._pax_custom_lims = []
         self._pax_custom_ticks = []
+        self._pax_colorbar = False
 
     def _scale_vals(self, data, lower=None, upper=None):
         """
@@ -305,7 +306,7 @@ class PaxFigure(Figure):
             Keyword arguments for lines corresponding to data
         """
         # Initial Checking
-        if len(data[0]) < len(self.axes):
+        if len(data[0]) < len(self.axes) and not self._pax_colorbar:
             warnings.warn(
                 'Supplied data has fewer columns than figure. Figure created '
                 'with empty column(s)',
@@ -747,6 +748,9 @@ class PaxFigure(Figure):
         colorbar_kwargs : dict
             Matplotlib colorbar keyword arguments
         """
+        # Attribute
+        self._pax_colorbar = True
+
         # Local vars
         n_lines = len(self.axes[0].lines)
         n_axes = len(self.axes)
