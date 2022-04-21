@@ -24,7 +24,10 @@ paxfig.add_colorbar(
 )
 
 # Add grey data
-paxfig.plot(df_grey.to_numpy(), line_kwargs={'alpha': 0.5, 'color': 'grey'})
+paxfig.plot(
+    df_grey.to_numpy(),
+    line_kwargs={'alpha': 0.5, 'color': 'grey', 'zorder': 0}
+)
 
 # Add labels
 paxfig.set_labels(cols)
