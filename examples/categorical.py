@@ -15,4 +15,4 @@ cols = df.columns
 paxfig = paxplot.pax_parallel(n_axes=len(cols))
 paxfig.plot(df.to_numpy())
 
-plt.show()
+plt.show(block=False)
