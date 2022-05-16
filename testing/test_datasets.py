@@ -2,7 +2,7 @@
 
 import io
 import unittest
-import src.paxplot as paxplot
+import paxplot
 
 
 class PaxplotDatasets(unittest.TestCase):
