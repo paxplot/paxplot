@@ -18,6 +18,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Display Python version
         run: python --version
+      - name: Install Paxplot with No Dependencies
+        run: pip install -e . --no-dependencies
       - name: Install Dependencies
         run: pip install ${{ matrix.matplotlib-version }}
       - name: Test with unittest
