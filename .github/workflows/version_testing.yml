@@ -16,12 +16,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Display Python version
-        run: python --version
       - name: Install Paxplot with No Dependencies
         run: pip install -e . --no-dependencies
       - name: Install Dependencies
         run: pip install ${{ matrix.matplotlib-version }}
+      - name: Display Python version
+        run: python --version
+      - name: Display Matplot Version
+        run: pip show matplotlib
       - name: Test with unittest
         run: |
           cd testing
