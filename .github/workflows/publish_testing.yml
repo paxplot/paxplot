@@ -31,7 +31,6 @@ jobs:
           python multi_call.py
       - name: Run Unit Tests
         run: |
-          cd ..
           cd testing
           python test_core.py
           python test_datasets.
