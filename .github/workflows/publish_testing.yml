@@ -1,4 +1,4 @@
-name: Package Test
+name: Published Package Test
 
 on: [push]
 
@@ -22,10 +22,16 @@ jobs:
         run: pip install paxplot
       - name: Display Paxplot version
         run: pip show paxplot
-      - name: Run examples
+      - name: Run examples from website
         run: |
           cd examples
           python advanced_usage.py
           python basic_usage.py
           python line_kwargs.py
           python multi_call.py
+      - name: Run Unit Tests
+        run: |
+          cd ..
+          cd testing
+          python test_core.py
+          python test_datasets.

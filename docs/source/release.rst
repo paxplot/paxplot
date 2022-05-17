@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.1.3 (beta)
+--------------------
+
+Paxplot's testing now follows more standard procedures in that it uses an install of paxplot rather than relative imports. Contributors should now use :code:`pip install --editable .` to ensure they are referencing their development installs rather than a previously downloaded install. See the Paxplot's `actions page <https://github.com/kravitsjacob/paxplot/actions>`_ for the continous integration tests. 
+
 Version 0.1.2 (beta)
 --------------------
 

@@ -5,7 +5,7 @@ import unittest
 import warnings
 import matplotlib.pyplot as plt
 import numpy as np
-import src.paxplot as paxplot
+import paxplot
 
 
 class PaxplotLib(unittest.TestCase):
