@@ -33,4 +33,4 @@ jobs:
         run: |
           cd testing
           python test_core.py
-          python test_datasets.
+          python test_datasets.py
