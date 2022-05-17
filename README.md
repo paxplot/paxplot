@@ -27,4 +27,6 @@ Paxplot welcomes contributions! Users familiar with matplotlib should have no pr
 3. Clone the repository using `$ git clone https://github.com/kravitsjacob/paxplot.git` 
 4. Change to the current working directory using `$ cd paxplot`
 5. Install the development environment `$ conda env create -f environment.yml`
-6. Activate the environmet and you are ready to contribute!
+6. Activate the environmnet `$ conda activate paxplot`
+7. Install an editable version of paxplot `$ pip install --editable .`
+8. Paxplot uses test-driven development. All changes to Paxplot must pass the tests in the `testing` folder. All new features should have associated tests.
