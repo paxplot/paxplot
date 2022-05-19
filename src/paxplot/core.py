@@ -377,6 +377,18 @@ class PaxFigure(Figure):
                 )
 
     def set_lim(self, ax_idx: int, bottom: float, top: float):
+        """
+        Set custom limits on axis
+
+        Parameters
+        ----------
+        ax_idx : int
+            Index of matplotlib axes
+        bottom : numeric
+            Lower limit
+        top : numeric
+            Upper limit
+        """
         # Set attibutes
         self._pax_custom_lims[ax_idx] = True
 
@@ -448,6 +460,18 @@ class PaxFigure(Figure):
             )
 
     def set_ticks(self, ax_idx: int, ticks: list, labels=None):
+        """
+        Set the axis tick locations and optionally labels.
+
+        Parameters
+        ----------
+        ax_idx : int
+            Index of matplotlib axes
+        ticks : list of floats
+            List of tick locations.
+        labels : list of str, optional
+            List of tick labels. If not set, the labels show the data value.
+        """
         # Set attibutes
         self._pax_custom_ticks[ax_idx] = True
 
