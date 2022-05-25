@@ -5,9 +5,9 @@ using the common use case of multiobjective model evaluation.
 import matplotlib.pyplot as plt
 import pandas as pd
 import paxplot
-from paxplot.datasets import modelevaluation
+from paxplot.datasets import hydroclimate_model_evaluation
 
-df = pd.read_csv(modelevaluation())
+df = pd.read_csv(hydroclimate_model_evaluation())
 
 # map the values from categorical column "data" to linetypes:
 period2linestyle = {"cal": "-",
