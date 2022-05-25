@@ -27,5 +27,5 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.7",
     include_package_data=True,
-    package_data={'': ['data/tradeoff.csv']},
+    package_data={'': ['data/tradeoff.csv', 'data/hydroclimate_model_evaluation.csv.csv']},
 )
