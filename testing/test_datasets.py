@@ -17,6 +17,17 @@ class PaxplotDatasets(unittest.TestCase):
         )
         stream.close()
 
+    def test_model_evaluation(self):
+        """
+        Test for model_evaluation dataset
+        """
+        stream = paxplot.hydroclimate_model_evaluation()
+        self.assertIsInstance(
+            stream,
+            io.BufferedReader
+        )
+        stream.close()
+
 
 if __name__ == '__main__':
     unittest.main()

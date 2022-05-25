@@ -14,7 +14,7 @@ authors:
     family-names: Kravits
 identifiers:
   - type: doi
-    value: 10.1008/paxplot.v0.1.2-beta
+    value: 10.1008/paxplot.v0.1.4-beta
 repository-code: 'https://github.com/kravitsjacob/paxplot'
 url: 'https://kravitsjacob.github.io/paxplot/'
 keywords:
@@ -23,5 +23,5 @@ keywords:
   - multi-objective
   - parallel-coordinates-plot
 license: MIT
-version: v0.1.2-beta
+version: v0.1.4-beta
 date-released: '2022-04-20'

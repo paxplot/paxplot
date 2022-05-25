@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.1.4 (beta)
+--------------------
+Paxplot now includes another testing dataset from contributor `Nele Reyniers <https://github.com/nelerey>`_. Here is how to access it as a Pandas DataFrame:
+
+.. code-block:: python
+
+    import paxplot
+    import pandas as pd
+    df = pd.read_csv(paxplot.hydroclimate_model_evaluation())
+
 Version 0.1.3 (beta)
 --------------------
 
