@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="paxplot",
-    version="0.1.3b0",
+    version="0.1.4b0",
     author="Jacob Kravits",
     author_email="kravitsjacob@gmail.com",
     description="Paxplot is a Python visualization library for parallel coordinate plots based on Matplotlib.",
