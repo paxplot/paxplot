@@ -5,7 +5,7 @@ using the common use case of multiobjective model evaluation.
 import matplotlib.pyplot as plt
 import pandas as pd
 import paxplot
-from paxplot.datasets import hydroclimate_model_evaluation
+from paxplot import hydroclimate_model_evaluation
 
 df = pd.read_csv(hydroclimate_model_evaluation())
 
