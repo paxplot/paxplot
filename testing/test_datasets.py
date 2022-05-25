@@ -21,7 +21,7 @@ class PaxplotDatasets(unittest.TestCase):
         """
         Test for model_evaluation dataset
         """
-        stream = paxplot.model_evaluation()
+        stream = paxplot.hydroclimate_model_evaluation()
         self.assertIsInstance(
             stream,
             io.BufferedReader
