@@ -16,7 +16,7 @@ def tradeoff():
     return stream
 
 
-def model_evaluation():
+def hydroclimate_model_evaluation():
     """
     Hydroclimate model evaluation dataset from Nele Reyniers
 
@@ -27,6 +27,6 @@ def model_evaluation():
     """
     stream = pkg_resources.resource_stream(
         __name__,
-        'data/model_evaluation.csv'
+        'data/hydroclimate_model_evaluation.csv'
     )
     return stream
