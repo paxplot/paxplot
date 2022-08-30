@@ -274,6 +274,9 @@ class PaxFigure(Figure):
                 # Unique values
                 strings = list(dict.fromkeys(column))  # Preserves order
                 numbers = list(range(len(strings)))
+                numbers = self._scale_vals(
+                    numbers,
+                )
                 strings.reverse()
 
                 # Translation of strings to numbers for tick position
