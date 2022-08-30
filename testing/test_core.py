@@ -780,11 +780,44 @@ class PaxplotLib(unittest.TestCase):
 
         # Testing
         self.assertEqual(
-            [0, 1],
-            paxfig._pax_ticks[0]
+            0.0,
+            paxfig._pax_ticks[0][0]
+        )
+        self.assertEqual(
+            1.0,
+            paxfig._pax_ticks[0][1]
         )
         self.assertEqual(
             ['B', 'A'],
+            paxfig._pax_ticks_labels[0]
+        )
+
+    def test_string_plot_multi(self):
+        """
+        Calling plot with string inputs with multiple input
+        """
+        # Run
+        data = [
+            ['A', 1],
+            ['B', 2],
+            ['C', 3],
+            ['D', 4],
+            ['E', 5],
+        ]
+        paxfig = paxplot.pax_parallel(n_axes=2)
+        paxfig.plot(data=data)
+
+        # Testing
+        self.assertEqual(
+            0.0,
+            paxfig._pax_ticks[0][0]
+        )
+        self.assertEqual(
+            0.5,
+            paxfig._pax_ticks[0][2]
+        )
+        self.assertEqual(
+            ['E', 'D', 'C', 'B', 'A'],
             paxfig._pax_ticks_labels[0]
         )
 
