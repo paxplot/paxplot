@@ -824,7 +824,7 @@ class PaxFigure(Figure):
             ),
             cmap=cmap
         )
-        self.colorbar(sm, orientation='vertical', **colorbar_kwargs)
+        self.colorbar(sm, orientation='vertical', ax=ax_colorbar, **colorbar_kwargs)
 
         # Figure formatting
         for i in range(n_axes):
