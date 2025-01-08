@@ -1,5 +1,9 @@
 """Class for NormalizedDataManager"""
 
+import uuid
+import pandas as pd
+
+
 
 class NormalizedDataManager():
     """
@@ -7,15 +11,24 @@ class NormalizedDataManager():
     """
 
     def __init__(self):
-        self.true_data = []
-        self.normalized_data = []
+        self.true_data = pd.DataFrame()
+        self.normalized_data = pd.DataFrame()
 
 
-    def append(self, data=list):
+    def append(self, data: list):
         """Append data to manager. Updates both the true and normalized data.
 
         Args:
-            data (_type_, optional): _description_. Defaults to list.
+            data (list): list of list (must rectangular) to append to data
         """
-        self.true_data = data
-        self.normalized_data = data
+        # Generate unique row indices
+        uuid_row = [str(uuid.uuid4()) for _ in data]
+
+        # Generate unique column indices
+        uuid_column = [str(uuid.uuid4()) for _ in data[0]]
+
+        # Create a DataFrame from the new data
+        df_true = pd.DataFrame(data=data, columns=uuid_column, index=uuid_row)
+
+        # Append new data to the true data
+        self.true_data = pd.concat([self.true_data, df_true])

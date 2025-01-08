@@ -11,7 +11,7 @@ class NormalizedDataManagerTests(unittest.TestCase):
         unittest (_type_): _description_
     """
 
-    def test_append_success(self):
+    def test_append_true_data_appended(self):
         """
         Basic appending data
         """
@@ -27,4 +27,9 @@ class NormalizedDataManagerTests(unittest.TestCase):
         paxdataset.append(data)
 
         # Assert
-        self.assertEqual(paxdataset.true_data[0][0], 0.0)
+        self.assertEqual(paxdataset.true_data.iloc[0][0], 0.0)
+        self.assertEqual(paxdataset.true_data.iloc[0][1], 0.0)
+        self.assertEqual(paxdataset.true_data.iloc[1][0], 1.0)
+        self.assertEqual(paxdataset.true_data.iloc[1][1], 1.0)
+        self.assertEqual(paxdataset.true_data.iloc[2][0], 2.0)
+        self.assertEqual(paxdataset.true_data.iloc[2][1], 2.0)
