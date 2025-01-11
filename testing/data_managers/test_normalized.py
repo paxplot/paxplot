@@ -33,6 +33,14 @@ class NormalizedDataManagerTests(unittest.TestCase):
         self.assertEqual(paxdataset.true_data.iloc[1][1], 1.0)
         self.assertEqual(paxdataset.true_data.iloc[2][0], 2.0)
         self.assertEqual(paxdataset.true_data.iloc[2][1], 2.0)
+        self.assertEqual(paxdataset.empty, False)
+        self.assertEqual(paxdataset.column_datatypes[0], float)
+        self.assertEqual(paxdataset.column_datatypes[1], float)
+        self.assertEqual(paxdataset.row_uuids.shape[0], 3)
+        self.assertEqual(paxdataset.row_uuids.shape[1], 2)
+        self.assertEqual(paxdataset.column_uuids.shape[0], 2)
+        self.assertEqual(paxdataset.column_uuids.shape[1], 2)
+
 
     def test_append_named_data(self):
         """

@@ -2,8 +2,7 @@
 
 import uuid
 import pandas as pd
-
-
+import paxplot
 
 class NormalizedDataManager():
     """
@@ -18,6 +17,9 @@ class NormalizedDataManager():
         self.row_name = "row"
         self.column_uuids = pd.DataFrame(columns=[self.uuid_name, self.column_name])
         self.row_uuids = pd.DataFrame(columns=[self.uuid_name, self.row_name])
+        self.column_datatypes = []
+        self._data_validator = paxplot.data_managers.DataValidator()
+        self.empty = True
 
 
     def append(self, data: list, column_names: list=None, row_names: list=None):
@@ -28,6 +30,11 @@ class NormalizedDataManager():
             column_names (list, optional): Column names. Defaults to None.
             row_names (list, optional): Row names. Defaults to None.
         """
+        # Check data validity
+        self._data_validator.self_validate(data)
+        if self.empty is False:
+            self._data_validator.can_append(data, self.column_datatypes)
+
         # Generate UUIDs
         n_rows = len(data)
         n_cols = len(data[0])
@@ -41,10 +48,14 @@ class NormalizedDataManager():
             index=df_row_uuids[self.uuid_name]
         )
 
-        # Append new data to the true data
+        # Store new data
+        self.empty = False
         self.true_data = pd.concat([self.true_data, df_true])
 
-        # Update UUID information
+        # Store column data types
+        self.column_datatypes = [type(i) for i in data[0]]
+
+        # Store UUID information
         self.row_uuids = pd.concat([self.row_uuids, df_row_uuids])
         self.column_uuids = pd.concat([self.column_uuids, df_column_uuids])
 
