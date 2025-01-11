@@ -17,7 +17,7 @@ setuptools.setup(
     },
     install_requires=[
         'matplotlib>=3.10',
-        'pandas>=3.10'
+        'pandas>=2.2.3'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
