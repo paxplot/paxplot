@@ -16,7 +16,8 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/kravitsjacob/paxplot/issues",
     },
     install_requires=[
-        'matplotlib>=3.5',
+        'matplotlib>=3.10',
+        'pandas>=3.10'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -25,7 +26,7 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
-    python_requires=">=3.7",
+    python_requires=">=3.11",
     include_package_data=True,
     package_data={'': ['data/tradeoff.csv', 'data/hydroclimate_model_evaluation.csv']},
 )
