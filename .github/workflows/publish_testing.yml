@@ -1,6 +1,9 @@
 name: Published Package Test
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
