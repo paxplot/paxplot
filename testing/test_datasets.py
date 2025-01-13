@@ -6,6 +6,11 @@ import paxplot
 
 
 class PaxplotDatasets(unittest.TestCase):
+    """_summary_
+
+    Args:
+        unittest (_type_): _description_
+    """
     def test_tradeoff(self):
         """
         Test for tradeoff dataset

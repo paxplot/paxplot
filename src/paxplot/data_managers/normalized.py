@@ -15,8 +15,8 @@ class NormalizedDataManager():
         self.uuid_name = "uuid"
         self.column_name = "column"
         self.row_name = "row"
-        self.column_uuids = pd.DataFrame(columns=[self.uuid_name, self.column_name])
-        self.row_uuids = pd.DataFrame(columns=[self.uuid_name, self.row_name])
+        self.column_uuids = pd.Series(name=self.column_name)
+        self.row_uuids = pd.Series(name=self.row_name)
         self.column_datatypes = []
         self._data_validator = paxplot.data_managers.DataValidator()
         self.empty = True
@@ -38,14 +38,14 @@ class NormalizedDataManager():
         # Generate UUIDs
         n_rows = len(data)
         n_cols = len(data[0])
-        df_row_uuids = self._generate_uuid_df(n_rows, self.row_name, row_names)
-        df_column_uuids = self._generate_uuid_df(n_cols, self.column_name, column_names)
+        series_row_uuids = self._generate_uuid_series(n_rows, self.row_name, row_names)
+        series_column_uuids = self._generate_uuid_series(n_cols, self.column_name, column_names)
 
         # Create a DataFrame from the new data
         df_true = pd.DataFrame(
             data=data,
-            columns=df_column_uuids[self.uuid_name],
-            index=df_row_uuids[self.uuid_name]
+            columns=series_column_uuids.index,
+            index=series_row_uuids.index
         )
 
         # Store new data
@@ -56,11 +56,11 @@ class NormalizedDataManager():
         self.column_datatypes = [type(i) for i in data[0]]
 
         # Store UUID information
-        self.row_uuids = pd.concat([self.row_uuids, df_row_uuids])
-        self.column_uuids = pd.concat([self.column_uuids, df_column_uuids])
+        self.row_uuids = pd.concat([self.row_uuids, series_row_uuids])
+        self.column_uuids = pd.concat([self.column_uuids, series_column_uuids])
 
-    def _generate_uuid_df(self, n_objects: int, object_name: str, names: list=None):
-        """Generate dataframe of UUID objects (and names, if supplied)
+    def _generate_uuid_series(self, n_objects: int, object_name: str, names: list=None):
+        """Generate series of UUID objects (and names, if supplied)
 
         Args:
             n_objects (int): Number of objects with UUID to generate
@@ -68,7 +68,7 @@ class NormalizedDataManager():
             names (list, optional): Names of objects. Defaults to None.
 
         Returns:
-            pandas.DataFrame: UUID dataframe
+            pandas.Series: UUID series
         """
         # Generate UUIDs
         uuids = [str(uuid.uuid4()) for _ in range(n_objects)]
@@ -76,12 +76,65 @@ class NormalizedDataManager():
         if names is None:
             names = uuids
 
-        # Create dataframe
-        df_uuid = pd.DataFrame(
-            {
-                self.uuid_name: uuids,
-                object_name: names
-            }
+        # Create series
+        series_uuid = pd.Series(
+            names,
+            name=object_name,
+            index=uuids
         )
 
-        return df_uuid
+        return series_uuid
+
+    def get_row_uuids(self, row_names: list[str]) -> list:
+        """
+        Retrieve the UUIDs corresponding to the provided row names.
+
+        This method checks the `row_uuids` DataFrame and returns a list of UUIDs 
+        that correspond to the given list of `row_names`.
+
+        Args:
+            row_names (list[str]): A list of row names for which UUIDs are to be retrieved.
+
+        Returns:
+            list: A list of UUIDs corresponding to the provided row names.
+            If no matching row names are found, an empty list will be returned.
+        """
+        # Filter the row_uuids DataFrame to include only the rows with matching row names
+        # and return the index (UUIDs) as a list.
+        return self.row_uuids[self.row_uuids.isin(row_names)].index.tolist()
+
+    def drop_rows_by_uuid(self, uuids: list[str]) -> None:
+        """
+        Drop rows from both the true_data and row_uuids DataFrames based on the provided UUIDs.
+
+        This method checks if the UUIDs exist in the `row_uuids` DataFrame. If any 
+        UUIDs do not exist, a KeyError is raised. After validation, it drops the 
+        corresponding rows from both `true_data` and `row_uuids`.
+
+        Args:
+            uuids (list[str]): A list of UUIDs to be dropped from both DataFrames.
+
+        Raises:
+            KeyError: If any of the provided UUIDs do not exist in the `row_uuids` DataFrame.
+        """
+        # Check if all provided UUIDs exist in the row_uuids DataFrame
+        missing_uuids = set(uuids) - set(self.row_uuids.index)
+
+        if missing_uuids:
+            # If any UUIDs are missing, raise a KeyError with a descriptive message
+            raise KeyError(f"The following UUIDs do not exist in row_uuids: {missing_uuids}")
+
+        # Drop the rows from true_data and row_uuids DataFrames using the provided UUIDs
+        # The inplace=True ensures the changes are applied directly to the DataFrames
+        self.true_data.drop(index=uuids, inplace=True)
+        self.row_uuids.drop(index=uuids, inplace=True)
+
+    def drop_rows_by_names(self, row_names: list[str]) -> None:
+        """
+        Drop rows from both the true_data and row_uuids DataFrames based on the provided row names.
+
+        Args:
+            row_names (list[str]): A list of row names to be dropped from both DataFrames.
+        """
+        row_uuids = self.get_row_uuids(row_names)
+        self.drop_rows_by_uuid(row_uuids)

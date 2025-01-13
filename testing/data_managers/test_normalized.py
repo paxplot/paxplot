@@ -37,9 +37,7 @@ class NormalizedDataManagerTests(unittest.TestCase):
         self.assertEqual(paxdataset.column_datatypes[0], float)
         self.assertEqual(paxdataset.column_datatypes[1], float)
         self.assertEqual(paxdataset.row_uuids.shape[0], 3)
-        self.assertEqual(paxdataset.row_uuids.shape[1], 2)
         self.assertEqual(paxdataset.column_uuids.shape[0], 2)
-        self.assertEqual(paxdataset.column_uuids.shape[1], 2)
 
 
     def test_append_named_data(self):
@@ -60,8 +58,57 @@ class NormalizedDataManagerTests(unittest.TestCase):
         paxdataset.append(data, column_names, row_names)
 
         # Assert
-        self.assertEqual(paxdataset.column_uuids[paxdataset.column_name][0], "col_a")
-        self.assertEqual(paxdataset.column_uuids[paxdataset.column_name][1], "col_b")
-        self.assertEqual(paxdataset.row_uuids[paxdataset.row_name][0], "row_a")
-        self.assertEqual(paxdataset.row_uuids[paxdataset.row_name][1], "row_b")
-        self.assertEqual(paxdataset.row_uuids[paxdataset.row_name][2], "row_c")
+        self.assertEqual(paxdataset.column_uuids[0], "col_a")
+        self.assertEqual(paxdataset.column_uuids[1], "col_b")
+        self.assertEqual(paxdataset.row_uuids[0], "row_a")
+        self.assertEqual(paxdataset.row_uuids[1], "row_b")
+        self.assertEqual(paxdataset.row_uuids[2], "row_c")
+
+    def test_drop_rows_by_uuid_success(self):
+        """
+        Basic dropping of row data by uuids
+        """
+        # Arrange
+        data = [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
+        ]
+        row_names = ["row_a", "row_b", "row_c"]
+        column_names = ["col_a", "col_b"]
+        paxdataset = paxplot.data_managers.NormalizedDataManager()
+        paxdataset.append(data, column_names, row_names)
+        data_to_drop = paxdataset.get_row_uuids(["row_b"])
+
+        # Act
+        paxdataset.drop_rows_by_uuid(data_to_drop)
+
+        # Assert
+        self.assertEqual(paxdataset.true_data.iloc[0][0], 0.0)
+        self.assertEqual(paxdataset.true_data.iloc[0][1], 0.0)
+        self.assertEqual(paxdataset.true_data.iloc[1][0], 2.0)
+        self.assertEqual(paxdataset.true_data.iloc[1][1], 2.0)
+        self.assertEqual(paxdataset.row_uuids.shape[0], 2)
+
+    def test_drop_rows_by_row_names_success(self):
+        """
+        Basic dropping of by row names
+        """
+        # Arrange
+        data = [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0]
+        ]
+        row_names = ["row_a", "row_b", "row_c"]
+        column_names = ["col_a", "col_b"]
+        paxdataset = paxplot.data_managers.NormalizedDataManager()
+        paxdataset.append(data, column_names, row_names)
+
+        # Act
+        paxdataset.drop_rows_by_names(["row_a", "row_b"])
+
+        # Assert
+        self.assertEqual(paxdataset.true_data.iloc[0][0], 2.0)
+        self.assertEqual(paxdataset.true_data.iloc[0][1], 2.0)
+        self.assertEqual(paxdataset.row_uuids.shape[0], 1)
