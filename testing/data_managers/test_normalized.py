@@ -27,12 +27,12 @@ class NormalizedDataManagerTests(unittest.TestCase):
         paxdataset.append(data)
 
         # Assert
-        self.assertEqual(paxdataset.true_data.iloc[0][0], 0.0)
-        self.assertEqual(paxdataset.true_data.iloc[0][1], 0.0)
-        self.assertEqual(paxdataset.true_data.iloc[1][0], 1.0)
-        self.assertEqual(paxdataset.true_data.iloc[1][1], 1.0)
-        self.assertEqual(paxdataset.true_data.iloc[2][0], 2.0)
-        self.assertEqual(paxdataset.true_data.iloc[2][1], 2.0)
+        self.assertEqual(paxdataset.true_data.iloc[0, 0], 0.0)
+        self.assertEqual(paxdataset.true_data.iloc[0, 1], 0.0)
+        self.assertEqual(paxdataset.true_data.iloc[1, 0], 1.0)
+        self.assertEqual(paxdataset.true_data.iloc[1, 1], 1.0)
+        self.assertEqual(paxdataset.true_data.iloc[2, 0], 2.0)
+        self.assertEqual(paxdataset.true_data.iloc[2, 1], 2.0)
         self.assertEqual(paxdataset.empty, False)
         self.assertEqual(paxdataset.column_datatypes[0], float)
         self.assertEqual(paxdataset.column_datatypes[1], float)
@@ -58,11 +58,11 @@ class NormalizedDataManagerTests(unittest.TestCase):
         paxdataset.append(data, column_names, row_names)
 
         # Assert
-        self.assertEqual(paxdataset.column_uuids[0], "col_a")
-        self.assertEqual(paxdataset.column_uuids[1], "col_b")
-        self.assertEqual(paxdataset.row_uuids[0], "row_a")
-        self.assertEqual(paxdataset.row_uuids[1], "row_b")
-        self.assertEqual(paxdataset.row_uuids[2], "row_c")
+        self.assertEqual(paxdataset.column_uuids.iloc[0], "col_a")
+        self.assertEqual(paxdataset.column_uuids.iloc[1], "col_b")
+        self.assertEqual(paxdataset.row_uuids.iloc[0], "row_a")
+        self.assertEqual(paxdataset.row_uuids.iloc[1], "row_b")
+        self.assertEqual(paxdataset.row_uuids.iloc[2], "row_c")
 
     def test_drop_rows_by_uuid_success(self):
         """
@@ -84,10 +84,10 @@ class NormalizedDataManagerTests(unittest.TestCase):
         paxdataset.drop_rows_by_uuid(data_to_drop)
 
         # Assert
-        self.assertEqual(paxdataset.true_data.iloc[0][0], 0.0)
-        self.assertEqual(paxdataset.true_data.iloc[0][1], 0.0)
-        self.assertEqual(paxdataset.true_data.iloc[1][0], 2.0)
-        self.assertEqual(paxdataset.true_data.iloc[1][1], 2.0)
+        self.assertEqual(paxdataset.true_data.iloc[0, 0], 0.0)
+        self.assertEqual(paxdataset.true_data.iloc[0, 1], 0.0)
+        self.assertEqual(paxdataset.true_data.iloc[1, 0], 2.0)
+        self.assertEqual(paxdataset.true_data.iloc[1, 1], 2.0)
         self.assertEqual(paxdataset.row_uuids.shape[0], 2)
 
     def test_drop_rows_by_row_names_success(self):
@@ -109,6 +109,6 @@ class NormalizedDataManagerTests(unittest.TestCase):
         paxdataset.drop_rows_by_names(["row_a", "row_b"])
 
         # Assert
-        self.assertEqual(paxdataset.true_data.iloc[0][0], 2.0)
-        self.assertEqual(paxdataset.true_data.iloc[0][1], 2.0)
+        self.assertEqual(paxdataset.true_data.iloc[0, 0], 2.0)
+        self.assertEqual(paxdataset.true_data.iloc[0, 1], 2.0)
         self.assertEqual(paxdataset.row_uuids.shape[0], 1)
