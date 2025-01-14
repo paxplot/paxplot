@@ -41,16 +41,20 @@ class NormalizedDataManager():
         series_row_uuids = self._generate_uuid_series(n_rows, self.row_name, row_names)
         series_column_uuids = self._generate_uuid_series(n_cols, self.column_name, column_names)
 
-        # Create a DataFrame from the new data
+        # Create a true DataFrame from the new data
         df_true = pd.DataFrame(
             data=data,
             columns=series_column_uuids.index,
             index=series_row_uuids.index
         )
 
+        # Create a normalized DataFrame from the new data
+        df_normalized = self._normalize_dataframe(df_true)
+
         # Store new data
         self.empty = False
         self.true_data = pd.concat([self.true_data, df_true])
+        self.normalized_data = pd.concat([self.normalized_data, df_normalized])
 
         # Store column data types
         self.column_datatypes = [type(i) for i in data[0]]
@@ -84,6 +88,25 @@ class NormalizedDataManager():
         )
 
         return series_uuid
+
+    def _normalize_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Normalize all columns to be between 0 and 1
+
+        Args:
+            df (pd.DataFrame): DataFrame to normalize
+
+        Returns:
+            pd.DataFrame: Normalized DataFrame
+        """
+        # Compute the minimum and maximum for all columns at once
+        min_vals = df.min()
+        max_vals = df.max()
+        # Compute the range, avoiding division by zero
+        ranges = max_vals - min_vals
+        ranges[ranges == 0] = 1  # Prevent division by zero for constant columns
+        # Normalize using vectorized operations
+        df_normalize = (df - min_vals) / ranges
+        return df_normalize
 
     def get_row_uuids(self, row_names: list[str]) -> list:
         """
@@ -127,6 +150,7 @@ class NormalizedDataManager():
         # Drop the rows from true_data and row_uuids DataFrames using the provided UUIDs
         # The inplace=True ensures the changes are applied directly to the DataFrames
         self.true_data.drop(index=uuids, inplace=True)
+        self.normalized_data.drop(index=uuids, inplace=True)
         self.row_uuids.drop(index=uuids, inplace=True)
 
     def drop_rows_by_names(self, row_names: list[str]) -> None:
