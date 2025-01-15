@@ -7,7 +7,10 @@ class DataFrameNormalizer:
     """
     A class to normalize the columns of a DataFrame and dynamically update normalization 
     when appending new data.
+
     """
+
+    # TODO update implementation to allow for blank dataframe at begining and use append
     def __init__(self, reference_df):
         """
         Initialize the DataFrameNormalizer with a reference DataFrame.
