@@ -1,4 +1,4 @@
 """Data managers for paxplot"""
-from .normalized import *
+from .normalized_manager import *
 from .validator import *
 from .normalizer import *
