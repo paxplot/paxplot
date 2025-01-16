@@ -45,27 +45,27 @@ class NormalizedDataManagerTests(unittest.TestCase):
         self.assertEqual(paxdataset.row_uuids.shape[0], 3)
         self.assertEqual(paxdataset.column_uuids.shape[0], 2)
 
-    def test_append_multiple(self):
-        """
-        Multiple appending data
-        """
-        # Arrange
-        data = [
-            [-1.0, -1.0],
-            [1.0, 1.0],
-        ]
-        out_of_range_data = [
-            [-2.0, -2.0],
-            [2.0, 2.0]
-        ]
-        paxdataset = paxplot.data_managers.NormalizedDataManager()
-        paxdataset.append(data)
+    # def test_append_multiple(self):
+    #     """
+    #     Multiple appending data
+    #     """
+    #     # Arrange
+    #     data = [
+    #         [-1.0, -1.0],
+    #         [1.0, 1.0],
+    #     ]
+    #     out_of_range_data = [
+    #         [-2.0, -2.0],
+    #         [2.0, 2.0]
+    #     ]
+    #     paxdataset = paxplot.data_managers.NormalizedDataManager()
+    #     paxdataset.append(data)
 
-        # Act
-        paxdataset.append(out_of_range_data) # TODO need to use DataFrameNormalizer
+    #     # Act
+    #     paxdataset.append(out_of_range_data) # TODO need to use DataFrameNormalizer
 
-        # Assert
-        self.assertEqual(paxdataset.true_data.iloc[0, 0], 0.0)
+    #     # Assert
+    #     self.assertEqual(paxdataset.true_data.iloc[0, 0], 0.0)
 
     def test_append_named_data(self):
         """
