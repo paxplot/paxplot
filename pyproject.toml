@@ -1,6 +1,42 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
+requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "paxplot"
+version = "0.1.4b2"
+description = "Paxplot is a Python visualization library for parallel coordinate plots based on Matplotlib."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Jacob Kravits", email = "kravitsjacob@gmail.com" }
+]
+dependencies = [
+    "matplotlib>=3.10",
+    "pandas>=2.2.3"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+[project.urls]
+Homepage = "https://github.com/kravitsjacob/paxplot"
+
+[project.optional-dependencies]
+dev = ["black>=24.0.0"]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"paxplot" = ["data/tradeoff.csv", "data/hydroclimate_model_evaluation.csv"]
+
+[tool.black]
+line-length = 79
+target-version = ["py312"]

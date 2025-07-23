@@ -22,11 +22,8 @@ Please report all bugs using [issues](https://github.com/kravitsjacob/paxplot/is
 # Contributing
 Paxplot welcomes contributions! Users familiar with matplotlib should have no problem using/contributing to this project.
 
-1. We recommend conda to manage environments and ensure consistent results. Download [miniconda](https://docs.conda.io/en/latest/miniconda.html) and ensure you can activate it from your terminal by running `$ conda activate`
-    * Depending on system configuration, this can be an involved process. [Here](https://discuss.codecademy.com/t/setting-up-conda-in-git-bash/534473) is a recommended thread.
-3. Clone the repository using `$ git clone https://github.com/kravitsjacob/paxplot.git`
-4. Change to the current working directory using `$ cd paxplot`
-5. Install the development environment `$ conda env create -f environment.yml`
-6. Activate the environmnet `$ conda activate paxplot`
-7. Install an editable version of paxplot `$ pip install --editable .`
-8. Paxplot uses test-driven development. All changes to Paxplot must pass the tests in the `testing` folder. All new features should have associated tests.
+1. Ensure that you have (python installed on your machine)[https://www.python.org/downloads/].
+2. Clone the repository using `$ git clone https://github.com/kravitsjacob/paxplot.git`
+3. Change to the current working directory using `$ cd paxplot`
+4. Install an editable version of paxplot `$ pip install -e .[dev]`
+5. Paxplot uses test-driven development. All changes to Paxplot must pass the tests in the `testing` folder. All new features should have associated tests.
