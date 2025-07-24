@@ -1,6 +1,5 @@
 """The ArrayNormalizer class"""
 
-import json
 from typing import Any, Type
 
 import numpy as np
@@ -103,20 +102,44 @@ class ArrayNormalizer(BaseModel):
         scale = 2.0 / (max_val - min_val)
         return scale * (array - min_val) - 1.0
 
-    def model_dump_json(self, **kwargs) -> str:
+    def to_dict(self, **kwargs) -> dict:
         """
-        Serializes the model to a JSON string, converting the NumPy array to a list.
+        Serializes the model to a dictionary, converting the NumPy array to a list.
 
         Parameters
         ----------
         **kwargs
-            Additional keyword arguments to pass to `model_dump()` (e.g., `exclude`, `include`).
+            Additional keyword arguments to pass to `model_dump()`.
 
         Returns
         -------
-        str
-            A JSON string representation of the model with the array converted to a list.
+        dict
+            A dictionary representation of the model with the array converted to a list.
         """
         raw = self.model_dump(**kwargs)
         raw["array"] = self.array.tolist()
-        return json.dumps(raw)
+        return raw
+
+    @classmethod
+    def from_dict(cls: Type["ArrayNormalizer"], data: dict) -> "ArrayNormalizer":
+        """
+        Creates an ArrayNormalizer instance from a dictionary, converting
+        the array list back into a NumPy array.
+
+        Parameters
+        ----------
+        data : dict
+            Dictionary representation of the serialized ArrayNormalizer model.
+
+        Returns
+        -------
+        ArrayNormalizer
+            A new instance of ArrayNormalizer with the array restored as a NumPy array.
+        """
+        arr = np.array(data["array"])
+        # Create a temporary model to trigger validation and post-init normalization
+        instance = cls(array=arr)
+        # Overwrite min and max
+        instance.min_val = data.get("min_val")
+        instance.max_val = data.get("max_val")
+        return instance

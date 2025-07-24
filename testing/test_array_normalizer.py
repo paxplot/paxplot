@@ -115,11 +115,33 @@ def test_rejects_non_numeric_dtype():
     with pytest.raises(ValidationError):
         ArrayNormalizer(array=arr)
 
-def test_json_serialization():
+def test_to_dict():
     arr = np.array([1, 2, 3])
     model = ArrayNormalizer(array=arr)
-    json_str = model.model_dump_json()
-    assert json_str == '{"array": [-1.0, 0.0, 1.0], "min_val": 1.0, "max_val": 3.0}'
+
+    # Serialize to dict
+    data = model.to_dict()
+
+    expected = {
+        "array": [-1.0, 0.0, 1.0],
+        "min_val": 1.0,
+        "max_val": 3.0,
+    }
+    assert data == expected
+
+def test_from_dict():
+    data = {
+        "array": [-1.0, 0.0, 1.0],
+        "min_val": 1.0,
+        "max_val": 3.0,
+    }
+
+    model = ArrayNormalizer.from_dict(data)
+
+    # Check the array was restored as a NumPy array
+    np.testing.assert_array_equal(model.array, np.array([-1.0, 0.0, 1.0]))
+    assert model.min_val == 1.0
+    assert model.max_val == 3.0
 
 def test_normalize_to_minus1_plus1_basic():
     array = np.array([10.0, 15.0, 20.0])
