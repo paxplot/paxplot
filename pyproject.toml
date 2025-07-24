@@ -14,7 +14,9 @@ authors = [
 ]
 dependencies = [
     "matplotlib>=3.10",
-    "pandas>=2.2.3"
+    "pandas>=2.2.3",
+    "pydantic",
+    "pytest"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
