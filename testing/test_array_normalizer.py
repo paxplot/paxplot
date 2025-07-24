@@ -1,4 +1,4 @@
-# pylint: disable=C0116
+# pylint: disable=C0116, W0212
 """Tests for the ArrayNormalizer"""
 
 import pytest
@@ -48,3 +48,30 @@ def test_json_serialization():
     model = ArrayNormalizer(array=arr)
     json_str = model.model_dump_json()
     assert json_str == '{"array": [1, 2, 3]}'
+
+def test_normalize_to_minus1_plus1_basic():
+    array = np.array([10.0, 15.0, 20.0])
+    expected = np.array([-1.0, 0.0, 1.0])
+    model = ArrayNormalizer(array=array)
+    result = model._normalize_to_minus1_plus1(array, min_val=10.0, max_val=20.0)
+    np.testing.assert_allclose(result, expected, rtol=1e-6)
+
+def test_all_same_values():
+    array = np.array([5.0, 5.0, 5.0])
+    model = ArrayNormalizer(array=array)
+    with pytest.raises(ZeroDivisionError):
+        model._normalize_to_minus1_plus1(array, min_val=5.0, max_val=5.0)
+
+def test_negative_range():
+    array = np.array([-5.0, 0.0, 5.0])
+    expected = np.array([-1.0, 0.0, 1.0])
+    model = ArrayNormalizer(array=array)
+    result = model._normalize_to_minus1_plus1(array, min_val=-5.0, max_val=5.0)
+    np.testing.assert_allclose(result, expected, rtol=1e-6)
+
+def test_out_of_bounds_values():
+    array = np.array([0.0, 10.0, 20.0, 30.0])
+    model = ArrayNormalizer(array=array)
+    result = model._normalize_to_minus1_plus1(array, min_val=10.0, max_val=20.0)
+    expected = np.array([-3.0, -1.0, 1.0, 3.0])  # Values outside the range are linearly projected
+    np.testing.assert_allclose(result, expected, rtol=1e-6)

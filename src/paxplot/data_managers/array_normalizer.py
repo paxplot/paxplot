@@ -7,14 +7,16 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, field_validator, ConfigDict
 
+
 class ArrayNormalizer(BaseModel):
     """
     Class to normalize arrays
     """
+
     array: NDArray[np.number]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    @field_validator('array', mode='before')
+    @field_validator("array", mode="before")
     @classmethod
     def validate_numpy_array(cls: Type[Any], v: Any) -> NDArray[np.number]:
         """
@@ -43,7 +45,9 @@ class ArrayNormalizer(BaseModel):
         """
 
         if not isinstance(v, np.ndarray):
-            raise ValueError(f"`array` must be a NumPy array, got {type(v).__name__}")
+            raise ValueError(
+                f"`array` must be a NumPy array, got {type(v).__name__}"
+            )
 
         shape: tuple[int, ...] = v.shape
         if len(shape) != 1:
@@ -54,6 +58,30 @@ class ArrayNormalizer(BaseModel):
             raise ValueError(f"`array` dtype must be numeric, got {dtype}")
 
         return v
+
+    @staticmethod
+    def _normalize_to_minus1_plus1(
+        array: NDArray[np.number], min_val: float, max_val: float
+    ) -> NDArray[np.number]:
+        """
+        Normalizes a NumPy array to the range [-1, 1] using the provided min and max values.
+
+        Parameters
+        ----------
+        array : NDArray[np.number]
+            Input array to normalize.
+        min_val : float
+            Minimum possible value in the original scale.
+        max_val : float
+            Maximum possible value in the original scale.
+
+        Returns
+        -------
+        NDArray[np.number]
+            Normalized array in the range [-1, 1].
+        """
+        scale = 2.0 / (max_val - min_val)
+        return scale * (array - min_val) - 1.0
 
     def model_dump_json(self, **kwargs) -> str:
         """
@@ -70,5 +98,5 @@ class ArrayNormalizer(BaseModel):
             A JSON string representation of the model with the array converted to a list.
         """
         raw = self.model_dump(**kwargs)
-        raw['array'] = self.array.tolist()
+        raw["array"] = self.array.tolist()
         return json.dumps(raw)
