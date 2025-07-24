@@ -14,6 +14,8 @@ class ArrayNormalizer(BaseModel):
     """
 
     array: NDArray[np.number]
+    min_val: float | None = None
+    max_val: float | None = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator("array", mode="before")
@@ -58,6 +60,24 @@ class ArrayNormalizer(BaseModel):
             raise ValueError(f"`array` dtype must be numeric, got {dtype}")
 
         return v
+
+    def model_post_init(self, __context: Any) -> None:  # pylint: disable=arguments-differ
+        """Called after model initialization and validation.
+        Computes min and max and normalizes the array to [-1, 1].
+
+        Parameters
+        ----------
+        __context : Any
+            Pydantic context
+        """
+        self.min_val = float(np.min(self.array))
+        self.max_val = float(np.max(self.array))
+
+        # Avoid division by zero
+        if self.max_val == self.min_val:
+            self.array = np.zeros_like(self.array)
+        else:
+            self.array = self._normalize_to_minus1_plus1(self.array, self.min_val, self.max_val)
 
     @staticmethod
     def _normalize_to_minus1_plus1(

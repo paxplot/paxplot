@@ -6,24 +6,96 @@ import numpy as np
 from pydantic import ValidationError
 from paxplot.data_managers.array_normalizer import ArrayNormalizer
 
+
 def test_accepts_numpy_array_float64():
     arr = np.array([1.0, 2.0, 3.0], dtype=np.float64)
     model = ArrayNormalizer(array=arr)
+
     assert isinstance(model.array, np.ndarray)
-    np.testing.assert_array_equal(model.array, arr)
+    assert model.min_val == 1.0
+    assert model.max_val == 3.0
+
+    expected = (2.0 / (3.0 - 1.0)) * (arr - 1.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array, expected)
+
 
 def test_accepts_numpy_array_int():
     arr = np.array([1, 2, 3], dtype=int)
     model = ArrayNormalizer(array=arr)
+
     assert isinstance(model.array, np.ndarray)
-    np.testing.assert_array_equal(model.array, arr)
+    assert model.min_val == 1.0
+    assert model.max_val == 3.0
+
+    expected = (2.0 / (3.0 - 1.0)) * (arr - 1.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array, expected)
+
 
 def test_accepts_float32_array():
     arr = np.array([1.0, 2.0, 3.0], dtype=np.float32)
     model = ArrayNormalizer(array=arr)
+
     assert isinstance(model.array, np.ndarray)
-    np.testing.assert_array_equal(model.array, arr)
-    assert model.array.dtype == np.float32
+    assert model.min_val == 1.0
+    assert model.max_val == 3.0
+    assert model.array.dtype == np.float32 or model.array.dtype == np.float64
+
+    expected = (2.0 / (3.0 - 1.0)) * (arr - 1.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array, expected.astype(model.array.dtype))
+
+def test_already_normalized_range():
+    arr = np.array([-1.0, 0.0, 1.0])
+    model = ArrayNormalizer(array=arr)
+    expected = arr  # Should be unchanged after normalization
+    np.testing.assert_array_almost_equal(model.array, expected)
+    assert model.min_val == -1.0
+    assert model.max_val == 1.0
+
+def test_all_identical_values():
+    arr = np.array([5.0, 5.0, 5.0])
+    model = ArrayNormalizer(array=arr)
+    expected = np.array([0.0, 0.0, 0.0])
+    np.testing.assert_array_almost_equal(model.array, expected)
+    assert model.min_val == 5.0
+    assert model.max_val == 5.0
+
+def test_negative_values():
+    arr = np.array([-3, -2, -1])
+    model = ArrayNormalizer(array=arr)
+    expected = np.array([-1.0, 0.0, 1.0])
+    np.testing.assert_array_almost_equal(model.array, expected)
+    assert model.min_val == -3.0
+    assert model.max_val == -1.0
+
+def test_mixed_negative_and_positive():
+    arr = np.array([-2, 0, 2])
+    model = ArrayNormalizer(array=arr)
+    expected = np.array([-1.0, 0.0, 1.0])
+    np.testing.assert_array_almost_equal(model.array, expected)
+    assert model.min_val == -2.0
+    assert model.max_val == 2.0
+
+def test_single_element():
+    arr = np.array([7.0])
+    model = ArrayNormalizer(array=arr)
+    expected = np.array([0.0])
+    np.testing.assert_array_almost_equal(model.array, expected)
+    assert model.min_val == 7.0
+    assert model.max_val == 7.0
+
+def test_large_integer_range():
+    arr = np.array([0, 2**31 - 1], dtype=np.int64)
+    model = ArrayNormalizer(array=arr)
+    expected = np.array([-1.0, 1.0])
+    np.testing.assert_array_almost_equal(model.array, expected)
+    assert model.min_val == 0.0
+    assert model.max_val == float(2**31 - 1)
+
+def test_float16_array():
+    arr = np.array([100.0, 200.0], dtype=np.float16)
+    model = ArrayNormalizer(array=arr)
+    expected = np.array([-1.0, 1.0], dtype=np.float16)
+    np.testing.assert_array_almost_equal(model.array, expected.astype(np.float16), decimal=2)
 
 def test_rejects_list_input():
     with pytest.raises(ValidationError):
@@ -47,7 +119,7 @@ def test_json_serialization():
     arr = np.array([1, 2, 3])
     model = ArrayNormalizer(array=arr)
     json_str = model.model_dump_json()
-    assert json_str == '{"array": [1, 2, 3]}'
+    assert json_str == '{"array": [-1.0, 0.0, 1.0], "min_val": 1.0, "max_val": 3.0}'
 
 def test_normalize_to_minus1_plus1_basic():
     array = np.array([10.0, 15.0, 20.0])
