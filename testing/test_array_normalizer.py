@@ -141,6 +141,14 @@ def test_to_dict():
     assert data["_schema_version"] == model._schema_version
     assert data["array"] == [1, 2, 3]
 
+def test_to_dict_includes_keys():
+    arr = np.array([1, 2, 3])
+    model = ArrayNormalizer(array=arr)
+    data = model.to_dict()
+
+    assert "array" in data
+    assert "_schema_version" in data
+    assert data["array"] == [1, 2, 3]
 
 def test_from_dict():
     # Use raw (unnormalized) values for 'array'
@@ -157,6 +165,10 @@ def test_from_dict():
     assert model.min_val == 1.0
     assert model.max_val == 3.0
 
+def test_from_dict_missing_array_key():
+    data = {"_schema_version": 1}
+    with pytest.raises(KeyError):
+        ArrayNormalizer.from_dict(data)
 
 def test_from_dict_without_schema_version():
     """Ensure backward compatibility if `_schema_version` is missing"""
@@ -194,6 +206,10 @@ def test_normalize_to_minus1_plus1_basic():
     result = model._normalize_to_minus1_plus1(array, min_val=10.0, max_val=20.0)
     np.testing.assert_allclose(result, expected, rtol=1e-6)
 
+def test_normalize_raises_when_min_equals_max():
+    arr = np.array([5.0, 5.0, 5.0])
+    with pytest.raises(ZeroDivisionError):
+        ArrayNormalizer._normalize_to_minus1_plus1(arr, min_val=5.0, max_val=5.0)
 
 def test_all_same_values():
     array = np.array([5.0, 5.0, 5.0])
@@ -216,3 +232,14 @@ def test_out_of_bounds_values():
     result = model._normalize_to_minus1_plus1(array, min_val=10.0, max_val=20.0)
     expected = np.array([-3.0, -1.0, 1.0, 3.0])  # Values outside the range are linearly projected
     np.testing.assert_allclose(result, expected, rtol=1e-6)
+
+def test_update_array_recomputes_normalization():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr)
+
+    new_arr = np.array([10.0, 20.0, 30.0])
+    model.update_array(new_arr)
+
+    assert np.allclose(model.array, new_arr)
+    expected = (2.0 / (30.0 - 10.0)) * (new_arr - 10.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected)
