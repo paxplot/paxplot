@@ -16,10 +16,10 @@ class BaseNormalizedArray(BaseModel, ABC):
         return self.raw_values[index]
 
     @property
-    def normalized_values(self) -> NDArray[np.number]:
+    def normalized_values(self) -> NDArray[np.float64]:
         if self._normalizer is None:
             self._normalizer = self._build_normalizer()
-        return self._normalizer.array
+        return self._normalizer.array_normalized
 
     @abstractmethod
     def _build_normalizer(self) -> ArrayNormalizer:

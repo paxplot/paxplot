@@ -4,7 +4,7 @@ from typing import Any, Type, ClassVar
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import BaseModel, field_validator, ConfigDict
+from pydantic import BaseModel, field_validator, model_validator, ConfigDict
 
 
 class ArrayNormalizer(BaseModel):
@@ -14,9 +14,64 @@ class ArrayNormalizer(BaseModel):
 
     _schema_version: ClassVar[int] = 1
     array: NDArray[np.number]
-    min_val: float | None = None
-    max_val: float | None = None
+    _array_normalized: NDArray[np.float64] | None = None
+    _min_val: float | None = None
+    _max_val: float | None = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    @property
+    def array_normalized(self) -> NDArray[np.float64]:
+        """
+        Returns the normalized version of the input array, scaled to the range [-1, 1].
+
+        Returns
+        -------
+        NDArray[np.number]
+            A NumPy array where the values have been normalized using min-max scaling.
+
+        Raises
+        ------
+        AssertionError
+            If normalization has not yet been computed.
+        """
+        assert self._array_normalized is not None, "array_normalized not computed yet"
+        return self._array_normalized
+
+    @property
+    def min_val(self) -> float:
+        """
+        Returns the minimum value of the input array used for normalization.
+
+        Returns
+        -------
+        float
+            Minimum value in the original array.
+
+        Raises
+        ------
+        AssertionError
+            If the minimum value has not yet been computed.
+        """
+        assert self._min_val is not None, "min_val not computed yet"
+        return self._min_val
+
+    @property
+    def max_val(self) -> float:
+        """
+        Returns the maximum value of the input array used for normalization.
+
+        Returns
+        -------
+        float
+            Maximum value in the original array.
+
+        Raises
+        ------
+        AssertionError
+            If the maximum value has not yet been computed.
+        """
+        assert self._max_val is not None, "max_val not computed yet"
+        return self._max_val
 
     @field_validator("array", mode="before")
     @classmethod
@@ -61,28 +116,42 @@ class ArrayNormalizer(BaseModel):
 
         return v
 
-    def model_post_init(self, __context: Any) -> None:  # pylint: disable=arguments-differ
-        """Called after model initialization and validation.
-        Computes min and max and normalizes the array to [-1, 1].
-
-        Parameters
-        ----------
-        __context : Any
-            Pydantic context
+    @model_validator(mode="after")
+    def normalize_after_init(self) -> "ArrayNormalizer":
         """
-        self.min_val = float(np.min(self.array))
-        self.max_val = float(np.max(self.array))
+        Recomputes the normalized array and value bounds after model initialization.
 
-        # Avoid division by zero
-        if self.max_val == self.min_val:
-            self.array = np.zeros_like(self.array)
+        Returns
+        -------
+        ArrayNormalizer
+            The updated model instance with normalization results populated.
+        """
+        self._recompute_normalization()
+        return self
+
+    def _recompute_normalization(self) -> None:
+        """
+        Computes the normalized array (`_array_normalized`) and stores the
+        min and max values used in the normalization.
+
+        If the array has constant values, sets the normalized array to zeros.
+        """
+        self._min_val = float(np.min(self.array))
+        self._max_val = float(np.max(self.array))
+
+        if self._max_val == self._min_val:
+            self._array_normalized = np.zeros_like(self.array, dtype=np.float64)
         else:
-            self.array = self._normalize_to_minus1_plus1(self.array, self.min_val, self.max_val)
+            self._array_normalized = self._normalize_to_minus1_plus1(
+                self.array,
+                self.min_val,
+                self.max_val
+            )
 
     @staticmethod
     def _normalize_to_minus1_plus1(
         array: NDArray[np.number], min_val: float, max_val: float
-    ) -> NDArray[np.number]:
+    ) -> NDArray[np.float64]:
         """
         Normalizes a NumPy array to the range [-1, 1] using the provided min and max values.
 
@@ -100,8 +169,21 @@ class ArrayNormalizer(BaseModel):
         NDArray[np.number]
             Normalized array in the range [-1, 1].
         """
+        array_float = array.astype(np.float64)
         scale = 2.0 / (max_val - min_val)
-        return scale * (array - min_val) - 1.0
+        return scale * (array_float - min_val) - 1.0
+
+    def update_array(self, new_array: NDArray[np.number]) -> None:
+        """
+        Updates the internal array with a new NumPy array and re-applies normalization.
+
+        Parameters
+        ----------
+        new_array : NDArray[np.number]
+            A 1D numeric NumPy array to replace the existing array.
+        """
+        self.array = self.validate_numpy_array(new_array)
+        self._recompute_normalization()
 
     def to_dict(self, **kwargs) -> dict:
         """
@@ -146,9 +228,4 @@ class ArrayNormalizer(BaseModel):
             )
 
         arr = np.array(data["array"])
-        # Create a temporary model to trigger validation and post-init normalization
-        instance = cls(array=arr)
-        # Overwrite min and max
-        instance.min_val = data.get("min_val")
-        instance.max_val = data.get("max_val")
-        return instance
+        return cls(array=arr)
