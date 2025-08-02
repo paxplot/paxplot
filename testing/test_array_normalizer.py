@@ -115,6 +115,7 @@ def test_rejects_non_numeric_dtype():
     with pytest.raises(ValidationError):
         ArrayNormalizer(array=arr)
 
+
 def test_to_dict():
     arr = np.array([1, 2, 3])
     model = ArrayNormalizer(array=arr)
@@ -122,26 +123,54 @@ def test_to_dict():
     # Serialize to dict
     data = model.to_dict()
 
-    expected = {
-        "array": [-1.0, 0.0, 1.0],
-        "min_val": 1.0,
-        "max_val": 3.0,
-    }
-    assert data == expected
+    expected_array = [-1.0, 0.0, 1.0]
+    assert data["array"] == expected_array
+    assert data["min_val"] == 1.0
+    assert data["max_val"] == 3.0
+    assert data["_schema_version"] == model._schema_version
+
 
 def test_from_dict():
     data = {
         "array": [-1.0, 0.0, 1.0],
         "min_val": 1.0,
         "max_val": 3.0,
+        "_schema_version": 1
     }
 
     model = ArrayNormalizer.from_dict(data)
 
-    # Check the array was restored as a NumPy array
     np.testing.assert_array_equal(model.array, np.array([-1.0, 0.0, 1.0]))
     assert model.min_val == 1.0
     assert model.max_val == 3.0
+
+
+def test_from_dict_without_schema_version():
+    """Ensure backward compatibility if `_schema_version` is missing"""
+    data = {
+        "array": [-1.0, 0.0, 1.0],
+        "min_val": 1.0,
+        "max_val": 3.0
+    }
+
+    model = ArrayNormalizer.from_dict(data)
+
+    np.testing.assert_array_equal(model.array, np.array([-1.0, 0.0, 1.0]))
+    assert model.min_val == 1.0
+    assert model.max_val == 3.0
+
+
+def test_from_dict_future_schema_version_raises():
+    """Ensure it raises for unsupported newer versions"""
+    data = {
+        "array": [-1.0, 0.0, 1.0],
+        "min_val": 1.0,
+        "max_val": 3.0,
+        "_schema_version": 999
+    }
+
+    with pytest.raises(ValueError, match="Unsupported schema version"):
+        ArrayNormalizer.from_dict(data)
 
 def test_normalize_to_minus1_plus1_basic():
     array = np.array([10.0, 15.0, 20.0])

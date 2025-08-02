@@ -1,6 +1,6 @@
 """The ArrayNormalizer class"""
 
-from typing import Any, Type
+from typing import Any, Type, ClassVar
 
 import numpy as np
 from numpy.typing import NDArray
@@ -12,6 +12,7 @@ class ArrayNormalizer(BaseModel):
     Class to normalize arrays
     """
 
+    _schema_version: ClassVar[int] = 1
     array: NDArray[np.number]
     min_val: float | None = None
     max_val: float | None = None
@@ -118,6 +119,7 @@ class ArrayNormalizer(BaseModel):
         """
         raw = self.model_dump(**kwargs)
         raw["array"] = self.array.tolist()
+        raw["_schema_version"] = self._schema_version
         return raw
 
     @classmethod
@@ -136,6 +138,13 @@ class ArrayNormalizer(BaseModel):
         ArrayNormalizer
             A new instance of ArrayNormalizer with the array restored as a NumPy array.
         """
+        version = data.get("_schema_version", 0)
+        if version > cls._schema_version:
+            raise ValueError(
+                f"Unsupported schema version: {version}. "
+                f"Current supported version is {cls._schema_version}."
+            )
+
         arr = np.array(data["array"])
         # Create a temporary model to trigger validation and post-init normalization
         instance = cls(array=arr)
