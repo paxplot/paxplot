@@ -140,17 +140,11 @@ def test_to_dict():
 
     assert data["_schema_version"] == model._schema_version
     assert data["array"] == [1, 2, 3]
+    assert data["min_val_normalization"] == 1.0
+    assert data["max_val_normalization"] == 3.0
 
-def test_to_dict_includes_keys():
-    arr = np.array([1, 2, 3])
-    model = ArrayNormalizer(array=arr)
-    data = model.to_dict()
 
-    assert "array" in data
-    assert "_schema_version" in data
-    assert data["array"] == [1, 2, 3]
-
-def test_from_dict():
+def test_from_dict(): #TODO update behavior with custom normalization bounds
     # Use raw (unnormalized) values for 'array'
     data = {
         "array": [1.0, 2.0, 3.0],  # raw input array, NOT normalized

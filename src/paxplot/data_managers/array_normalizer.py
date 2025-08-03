@@ -14,9 +14,9 @@ class ArrayNormalizer(BaseModel):
 
     _schema_version: ClassVar[int] = 1
     array: NDArray[np.float64]
+    min_val_normalization: float | None = None
+    max_val_normalization: float | None = None
     _array_normalized: NDArray[np.float64] | None = None
-    _min_val_normalization: float | None = None
-    _max_val_normalization: float | None = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @property
@@ -36,42 +36,6 @@ class ArrayNormalizer(BaseModel):
         """
         assert self._array_normalized is not None, "array_normalized not computed yet"
         return self._array_normalized
-
-    @property
-    def min_val_normalization(self) -> float:
-        """
-        Returns the minimum value of the input array used for normalization.
-
-        Returns
-        -------
-        float
-            Minimum value in the original array.
-
-        Raises
-        ------
-        AssertionError
-            If the minimum value has not yet been computed.
-        """
-        assert self._min_val_normalization is not None, "min_val_normalization not computed yet"
-        return self._min_val_normalization
-
-    @property
-    def max_val_normalization(self) -> float:
-        """
-        Returns the maximum value of the input array used for normalization.
-
-        Returns
-        -------
-        float
-            Maximum value in the original array.
-
-        Raises
-        ------
-        AssertionError
-            If the maximum value has not yet been computed.
-        """
-        assert self._max_val_normalization is not None, "max_val_normalization not computed yet"
-        return self._max_val_normalization
 
     @field_validator("array", mode="before")
     @classmethod
@@ -136,10 +100,10 @@ class ArrayNormalizer(BaseModel):
 
         If the array has constant values, sets the normalized array to zeros.
         """
-        self._min_val_normalization = float(np.min(self.array))
-        self._max_val_normalization = float(np.max(self.array))
+        self.min_val_normalization = float(np.min(self.array))
+        self.max_val_normalization = float(np.max(self.array))
 
-        if self._max_val_normalization == self._min_val_normalization:
+        if self.max_val_normalization == self.min_val_normalization:
             self._array_normalized = np.zeros_like(self.array, dtype=np.float64)
         else:
             self._array_normalized = self._normalize_to_minus1_plus1(
