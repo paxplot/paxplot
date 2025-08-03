@@ -75,3 +75,9 @@ def test_constant_array_normalization():
     obj = NumericNormalizedArray(array=[7, 7, 7])
     result = obj.array_normalized
     np.testing.assert_array_almost_equal(result, np.zeros(3))
+
+def test_set_custom_bounds():
+    arr = [1.0, 2.0, 3.0]
+    obj = NumericNormalizedArray(array=arr)
+    obj.set_custom_bounds(min_val=0.0, max_val=10.0)
+    assert np.allclose(obj.array_normalized, [-0.8, -0.6, -0.4])
