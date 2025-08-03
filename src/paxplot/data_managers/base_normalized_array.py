@@ -4,22 +4,19 @@ Base classes for normalized array types.
 
 This module defines the abstract base class `BaseNormalizedArray`, which provides
 a common interface and shared functionality for normalized array data structures.
-It manages raw data storage and lazy construction of an internal `ArrayNormalizer`
+It manages raw data storage and eager construction of an internal `ArrayNormalizer`
 for normalization operations.
-
-Subclasses like `NumericNormalizedArray` and `CategoricalNormalizedArray` are
-expected to implement specific normalization strategies and data manipulation
-methods such as appending new data and removing elements by index.
 
 The module depends on NumPy for array handling and Pydantic for data validation.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Sequence, Optional
+from typing import Any, Sequence
 import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, PrivateAttr
 from paxplot.data_managers.array_normalizer import ArrayNormalizer
+
 
 class BaseNormalizedArray(BaseModel, ABC):
     """
@@ -29,8 +26,7 @@ class BaseNormalizedArray(BaseModel, ABC):
     normalized array types, managing a sequence of raw values and an internal
     ArrayNormalizer instance to perform normalization.
 
-    Subclasses must implement methods for building the normalizer, appending data,
-    and removing elements by index.
+    Subclasses must implement methods for appending data and removing elements by index.
 
     Parameters
     ----------
@@ -39,12 +35,17 @@ class BaseNormalizedArray(BaseModel, ABC):
 
     Attributes
     ----------
-    _normalizer : Optional[ArrayNormalizer]
+    _normalizer : ArrayNormalizer
         Internal instance responsible for normalization operations.
     """
 
     array: Sequence[Any]
-    _normalizer: Optional[ArrayNormalizer] = PrivateAttr(default=None)
+    _normalizer: ArrayNormalizer = PrivateAttr()
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        arr = np.array(self.array, dtype=np.float64)
+        self._normalizer = ArrayNormalizer(array=arr)
 
     def __len__(self) -> int:
         return len(self.array)
@@ -57,20 +58,12 @@ class BaseNormalizedArray(BaseModel, ABC):
         """
         Returns the normalized NumPy array scaled to the range [-1, 1].
 
-        This property initializes the internal normalizer if not already created.
-
         Returns
         -------
         NDArray[np.float64]
             The normalized array of float64 values.
         """
-        if self._normalizer is None:
-            self._normalizer = self._build_normalizer()
         return self._normalizer.array_normalized
-
-    @abstractmethod
-    def _build_normalizer(self) -> ArrayNormalizer:
-        pass
 
     @abstractmethod
     def append_array(self, new_data: Sequence[Any]) -> None:
@@ -87,16 +80,30 @@ class BaseNormalizedArray(BaseModel, ABC):
         """
         ...
 
-    @abstractmethod
     def remove_indices(self, indices: Sequence[int]) -> None:
         """
-        Removes elements at specified indices from the array and updates normalization.
-
-        Subclasses must implement removal logic and normalization updates.
+        Removes elements at the specified indices from the raw array and updates the internal
+        normalization.
 
         Parameters
         ----------
         indices : Sequence[int]
-            Indices of elements to remove from the array.
+            A sequence of integer indices indicating which elements to remove.
+
+        Raises
+        ------
+        TypeError
+            If the input is not a sequence of integers.
+        IndexError
+            If any index is out of bounds.
         """
-        ...
+        if not isinstance(indices, Sequence):
+            raise TypeError("Indices must be a sequence of integers.")
+        index_array = np.array(indices, dtype=np.int64)
+        self._normalizer.remove_indices(index_array)
+
+        # Remove raw entries from `self.array`
+        array_np = np.array(self.array)
+        mask = np.ones(len(array_np), dtype=bool)
+        mask[index_array] = False
+        self.array = array_np[mask].tolist()
