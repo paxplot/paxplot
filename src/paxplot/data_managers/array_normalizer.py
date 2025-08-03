@@ -13,7 +13,7 @@ class ArrayNormalizer(BaseModel):
     """
 
     _schema_version: ClassVar[int] = 1
-    array: NDArray[np.number]
+    array: NDArray[np.float64]
     _array_normalized: NDArray[np.float64] | None = None
     _min_val: float | None = None
     _max_val: float | None = None
@@ -114,7 +114,7 @@ class ArrayNormalizer(BaseModel):
         if not np.issubdtype(dtype, np.number):
             raise ValueError(f"`array` dtype must be numeric, got {dtype}")
 
-        return v
+        return v.astype(np.float64)
 
     @model_validator(mode="after")
     def normalize_after_init(self) -> "ArrayNormalizer":
