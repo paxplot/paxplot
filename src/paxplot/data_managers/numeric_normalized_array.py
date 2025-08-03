@@ -18,6 +18,7 @@ from pydantic import validate_call
 import numpy as np
 
 from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
+from paxplot.data_managers.array_normalizer import ArrayNormalizer
 
 
 class NumericNormalizedArray(BaseNormalizedArray):
@@ -32,6 +33,11 @@ class NumericNormalizedArray(BaseNormalizedArray):
     array : Sequence[float | int]
         The raw sequence of numeric values.
     """
+    array: Sequence[float | int]
+
+    def _init_normalizer(self) -> ArrayNormalizer:
+        arr = np.array(self.array, dtype=np.float64)
+        return ArrayNormalizer(array=arr)
 
     @property
     def custom_min_val(self) -> float | None:

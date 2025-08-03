@@ -11,7 +11,7 @@ The module depends on NumPy for array handling and Pydantic for data validation.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Sequence, ClassVar, Union
+from typing import Any, Sequence, ClassVar
 import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, PrivateAttr, validate_call
@@ -39,14 +39,24 @@ class BaseNormalizedArray(BaseModel, ABC):
         Internal instance responsible for normalization operations.
     """
 
-    array: Sequence[Union[int, float]]
+    array: Sequence[Any]
     _normalizer: ArrayNormalizer = PrivateAttr()
     _schema_version: ClassVar[int] = 1
 
     def __init__(self, **data):
         super().__init__(**data)
-        arr = np.array(self.array, dtype=np.float64)
-        self._normalizer = ArrayNormalizer(array=arr)
+        self._normalizer = self._init_normalizer()
+
+    @abstractmethod
+    def _init_normalizer(self) -> ArrayNormalizer:
+        """Subclasses must return a proper normalizer instance.
+
+        Returns
+        -------
+        ArrayNormalizer
+            The normalizer instance for this array type.
+        """
+        ...
 
     def __len__(self) -> int:
         return len(self.array)
