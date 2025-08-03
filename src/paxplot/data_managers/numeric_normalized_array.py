@@ -14,7 +14,7 @@ NumericNormalizedArray
 
 from typing import Sequence, Union
 
-from pydantic import validate_arguments
+from pydantic import validate_call
 import numpy as np
 
 from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
@@ -35,7 +35,7 @@ class NumericNormalizedArray(BaseNormalizedArray):
 
     array: Sequence[Union[int, float]]
 
-    @validate_arguments
+    @validate_call
     def append_array(self, new_data: Sequence[float | int]) -> None:
         """
         Appends new numeric data to the raw array and updates the normalized values.
