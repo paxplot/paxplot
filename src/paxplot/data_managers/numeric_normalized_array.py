@@ -7,8 +7,15 @@ from paxplot.data_managers.array_normalizer import ArrayNormalizer
 from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
 
 class NumericNormalizedArray(BaseNormalizedArray):
-    raw_values: Sequence[float | int]
+    array: Sequence[float | int]
 
     def _build_normalizer(self) -> ArrayNormalizer:
-        arr: NDArray[np.number] = np.array(self.raw_values, dtype=float)
+        arr: NDArray[np.number] = np.array(self.array, dtype=np.float64)
         return ArrayNormalizer(array=arr)
+
+    def append_array(self, new_data: Sequence[float | int]) -> None:
+        raise NotImplementedError
+
+    def remove_indices(self, indices: Sequence[int]) -> None:
+        raise NotImplementedError
+
