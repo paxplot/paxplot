@@ -191,6 +191,23 @@ class ArrayNormalizer(BaseModel):
         self.array = self.validate_numpy_array(new_array)
         self._recompute_normalization()
 
+    def set_custom_bounds(
+        self, min_val: float | None = None, max_val: float | None = None
+    ) -> None:
+        """
+        Sets custom min and/or max values for normalization and re-applies normalization.
+
+        Parameters
+        ----------
+        min_val : float | None
+            Custom minimum value for normalization.
+        max_val : float | None
+            Custom maximum value for normalization.
+        """
+        self.custom_min_val = min_val
+        self.custom_max_val = max_val
+        self._recompute_normalization()
+
     def to_dict(self, **kwargs) -> dict:
         """
         Serializes the model to a dictionary, converting the NumPy array to a list.

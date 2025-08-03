@@ -334,3 +334,65 @@ def test_custom_min_equals_max_raises():
     with pytest.raises(ZeroDivisionError):
         # Force custom min and max equal
         ArrayNormalizer._normalize_to_minus1_plus1(arr, min_val=5.0, max_val=5.0)
+
+def test_set_custom_min_val_only():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr)
+
+    model.set_custom_bounds(min_val=0.0)
+
+    assert model.custom_min_val == 0.0
+    assert model.custom_max_val is None
+    assert model.effective_min_val == 0.0
+    assert model.effective_max_val == 3.0
+
+    expected = (2.0 / (3.0 - 0.0)) * (arr - 0.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected)
+
+
+def test_set_custom_max_val_only():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr)
+
+    model.set_custom_bounds(max_val=4.0)
+
+    assert model.custom_min_val is None
+    assert model.custom_max_val == 4.0
+    assert model.effective_min_val == 1.0
+    assert model.effective_max_val == 4.0
+
+    expected = (2.0 / (4.0 - 1.0)) * (arr - 1.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected)
+
+
+def test_set_both_custom_bounds():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr)
+
+    model.set_custom_bounds(min_val=0.0, max_val=4.0)
+
+    assert model.custom_min_val == 0.0
+    assert model.custom_max_val == 4.0
+    assert model.effective_min_val == 0.0
+    assert model.effective_max_val == 4.0
+
+    expected = (2.0 / (4.0 - 0.0)) * (arr - 0.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected)
+
+
+def test_reset_custom_bounds():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr)
+
+    model.set_custom_bounds(min_val=0.0, max_val=4.0)
+
+    # Reset to defaults
+    model.set_custom_bounds(min_val=None, max_val=None)
+
+    assert model.custom_min_val is None
+    assert model.custom_max_val is None
+    assert model.effective_min_val == 1.0
+    assert model.effective_max_val == 3.0
+
+    expected = (2.0 / (3.0 - 1.0)) * (arr - 1.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected)
