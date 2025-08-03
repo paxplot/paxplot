@@ -396,3 +396,70 @@ def test_reset_custom_bounds():
 
     expected = (2.0 / (3.0 - 1.0)) * (arr - 1.0) - 1.0
     np.testing.assert_array_almost_equal(model.array_normalized, expected)
+
+def test_append_within_bounds_appends_and_normalizes_partial():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr)
+
+    # Append data fully within current normalization bounds (1.0 to 3.0)
+    new_data = np.array([1.5, 2.5])
+    model.append_array(new_data)
+
+    # Check that the array length increased correctly
+    assert model.array.shape[0] == 5
+
+    # Check that the newly appended values are normalized correctly using existing bounds
+    expected_new_norm = (2.0 / (3.0 - 1.0)) * (new_data - 1.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized[-2:], expected_new_norm)
+
+
+def test_append_outside_bounds_triggers_renormalization():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr)
+
+    # Append data outside current normalization bounds (e.g., new min 0.0)
+    new_data = np.array([0.0, 4.0])
+    model.append_array(new_data)
+
+    # Check that array length increased
+    assert model.array.shape[0] == 5
+
+    # Check that effective min and max updated
+    assert model.effective_min_val == 0.0
+    assert model.effective_max_val == 4.0
+
+    # Check normalized array has length 5
+    assert model.array_normalized.shape[0] == 5
+
+    # Check normalization is correct on the entire array
+    expected_norm = (2.0 / (4.0 - 0.0)) * (model.array - 0.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected_norm)
+
+
+def test_append_raises_if_normalization_not_computed():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr)
+    # Manually clear normalized array to simulate uninitialized state
+    model._array_normalized = None
+
+    new_data = np.array([1.5])
+    with pytest.raises(ValueError, match="Normalization must be computed before appending"):
+        model.append_array(new_data)
+
+
+def test_append_rejects_invalid_input_type():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr)
+
+    # Passing a list instead of a NumPy array should raise ValueError
+    with pytest.raises(ValueError):
+        model.append_array([4, 5]) # type: ignore
+
+
+def test_append_rejects_multidimensional_array():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr)
+
+    multi_dim_data = np.array([[1.0, 2.0], [3.0, 4.0]])
+    with pytest.raises(ValueError):
+        model.append_array(multi_dim_data)

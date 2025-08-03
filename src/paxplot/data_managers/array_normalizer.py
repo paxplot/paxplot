@@ -191,6 +191,48 @@ class ArrayNormalizer(BaseModel):
         self.array = self.validate_numpy_array(new_array)
         self._recompute_normalization()
 
+    def append_array(self, new_data: NDArray[np.number]) -> None:
+        """
+        Appends new data to the internal array and updates the normalized array.
+
+        If the new data falls outside the current normalization bounds, the entire
+        array is re-normalized. Otherwise, only the new portion is normalized and
+        appended to the existing normalized array.
+
+        Parameters
+        ----------
+        new_data : NDArray[np.number]
+            A 1D NumPy array of numeric values to be appended.
+
+        Raises
+        ------
+        ValueError
+            If normalization has not yet been computed (i.e., _array_normalized is None).
+        ValueError
+            If the input array is invalid (non-numeric, multi-dimensional, etc.).
+        """
+        validated = self.validate_numpy_array(new_data)
+        new_min = float(np.min(validated))
+        new_max = float(np.max(validated))
+        combined = np.concatenate([self.array, validated])
+
+        if new_min < self.effective_min_val or new_max > self.effective_max_val:
+            self.array = combined
+            self._recompute_normalization()
+        else:
+            new_norm = self._normalize_to_minus1_plus1(
+                validated,
+                self.effective_min_val,
+                self.effective_max_val,
+            )
+            self.array = combined
+            if self._array_normalized is None:
+                raise ValueError("Normalization must be computed before appending")
+            self._array_normalized = np.concatenate([
+                self._array_normalized,
+                new_norm
+            ])
+
     def set_custom_bounds(
         self, min_val: float | None = None, max_val: float | None = None
     ) -> None:
