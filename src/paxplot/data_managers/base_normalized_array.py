@@ -11,7 +11,7 @@ The module depends on NumPy for array handling and Pydantic for data validation.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Sequence
+from typing import Any, Sequence, ClassVar
 import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, PrivateAttr, validate_call
@@ -41,6 +41,7 @@ class BaseNormalizedArray(BaseModel, ABC):
 
     array: Sequence[Any]
     _normalizer: ArrayNormalizer = PrivateAttr()
+    _schema_version: ClassVar[int] = 1
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -79,6 +80,36 @@ class BaseNormalizedArray(BaseModel, ABC):
             New elements to append to the array.
         """
         ...
+
+    @abstractmethod
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Converts the object to a dictionary representation.
+        Subclasses must implement this method to ensure proper serialization.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary containing the object's data.
+
+        Raises
+        ------
+        TypeError
+            If the object cannot be serialized to a dictionary.
+        """
+        ...
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "BaseNormalizedArray":
+        """
+        Creates an instance of the class from a dictionary representation.
+
+        Raises
+        ------
+        TypeError
+            If the dictionary does not contain the required keys.
+        """
+        raise NotImplementedError
 
     @validate_call
     def remove_indices(self, indices: Sequence[int]) -> None:
