@@ -11,7 +11,7 @@ The module depends on NumPy for array handling and Pydantic for data validation.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Sequence, ClassVar
+from typing import Any, Sequence, ClassVar, Union
 import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, PrivateAttr, validate_call
@@ -39,7 +39,7 @@ class BaseNormalizedArray(BaseModel, ABC):
         Internal instance responsible for normalization operations.
     """
 
-    array: Sequence[Any]
+    array: Sequence[Union[int, float]]
     _normalizer: ArrayNormalizer = PrivateAttr()
     _schema_version: ClassVar[int] = 1
 

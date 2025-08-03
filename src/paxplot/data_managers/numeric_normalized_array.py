@@ -12,7 +12,7 @@ NumericNormalizedArray
     A concrete implementation of BaseNormalizedArray for numeric (int or float) sequences.
 """
 
-from typing import Sequence, Union, Any
+from typing import Sequence, Any
 
 from pydantic import validate_call
 import numpy as np
@@ -32,8 +32,6 @@ class NumericNormalizedArray(BaseNormalizedArray):
     array : Sequence[float | int]
         The raw sequence of numeric values.
     """
-
-    array: Sequence[Union[int, float]]
 
     @property
     def custom_min_val(self) -> float | None:
