@@ -15,8 +15,8 @@ class ArrayNormalizer(BaseModel):
     _schema_version: ClassVar[int] = 1
     array: NDArray[np.float64]
     _array_normalized: NDArray[np.float64] | None = None
-    _min_val: float | None = None
-    _max_val: float | None = None
+    _min_val_normalization: float | None = None
+    _max_val_normalization: float | None = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @property
@@ -38,7 +38,7 @@ class ArrayNormalizer(BaseModel):
         return self._array_normalized
 
     @property
-    def min_val(self) -> float:
+    def min_val_normalization(self) -> float:
         """
         Returns the minimum value of the input array used for normalization.
 
@@ -52,11 +52,11 @@ class ArrayNormalizer(BaseModel):
         AssertionError
             If the minimum value has not yet been computed.
         """
-        assert self._min_val is not None, "min_val not computed yet"
-        return self._min_val
+        assert self._min_val_normalization is not None, "min_val_normalization not computed yet"
+        return self._min_val_normalization
 
     @property
-    def max_val(self) -> float:
+    def max_val_normalization(self) -> float:
         """
         Returns the maximum value of the input array used for normalization.
 
@@ -70,12 +70,12 @@ class ArrayNormalizer(BaseModel):
         AssertionError
             If the maximum value has not yet been computed.
         """
-        assert self._max_val is not None, "max_val not computed yet"
-        return self._max_val
+        assert self._max_val_normalization is not None, "max_val_normalization not computed yet"
+        return self._max_val_normalization
 
     @field_validator("array", mode="before")
     @classmethod
-    def validate_numpy_array(cls: Type[Any], v: Any) -> NDArray[np.number]:
+    def validate_numpy_array(cls: Type[Any], v: Any) -> NDArray[np.float64]:
         """
         Validates that the input is a 1D NumPy array with a numeric data type.
 
@@ -88,7 +88,7 @@ class ArrayNormalizer(BaseModel):
 
         Returns
         -------
-        NDArray[np.number]
+        NDArray[np.float64]
             The validated 1D numeric NumPy array.
 
         Raises
@@ -136,21 +136,21 @@ class ArrayNormalizer(BaseModel):
 
         If the array has constant values, sets the normalized array to zeros.
         """
-        self._min_val = float(np.min(self.array))
-        self._max_val = float(np.max(self.array))
+        self._min_val_normalization = float(np.min(self.array))
+        self._max_val_normalization = float(np.max(self.array))
 
-        if self._max_val == self._min_val:
+        if self._max_val_normalization == self._min_val_normalization:
             self._array_normalized = np.zeros_like(self.array, dtype=np.float64)
         else:
             self._array_normalized = self._normalize_to_minus1_plus1(
                 self.array,
-                self.min_val,
-                self.max_val
+                self.min_val_normalization,
+                self.max_val_normalization
             )
 
     @staticmethod
     def _normalize_to_minus1_plus1(
-        array: NDArray[np.number], min_val: float, max_val: float
+        array: NDArray[np.number], min_val_normalization: float, max_val_normalization: float
     ) -> NDArray[np.float64]:
         """
         Normalizes a NumPy array to the range [-1, 1] using the provided min and max values.
@@ -159,9 +159,9 @@ class ArrayNormalizer(BaseModel):
         ----------
         array : NDArray[np.number]
             Input array to normalize.
-        min_val : float
+        min_val_normalization : float
             Minimum possible value in the original scale.
-        max_val : float
+        max_val_normalization : float
             Maximum possible value in the original scale.
 
         Returns
@@ -170,8 +170,8 @@ class ArrayNormalizer(BaseModel):
             Normalized array in the range [-1, 1].
         """
         array_float = array.astype(np.float64)
-        scale = 2.0 / (max_val - min_val)
-        return scale * (array_float - min_val) - 1.0
+        scale = 2.0 / (max_val_normalization - min_val_normalization)
+        return scale * (array_float - min_val_normalization) - 1.0
 
     def update_array(self, new_array: NDArray[np.number]) -> None:
         """
