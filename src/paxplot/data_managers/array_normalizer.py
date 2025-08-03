@@ -233,6 +233,53 @@ class ArrayNormalizer(BaseModel):
                 new_norm
             ])
 
+    def remove_indices(self, indices: NDArray[np.integer]) -> None:
+        """
+        Removes elements at the specified indices from the internal array.
+        If any removed elements are equal to the effective min or max values,
+        the normalization is recomputed.
+
+        Parameters
+        ----------
+        indices : NDArray[np.integer]
+            1D array of integer indices indicating which elements to remove.
+
+        Raises
+        ------
+        ValueError
+            If normalization has not been computed yet.
+            If any index is out of bounds.
+        """
+        if self._array_normalized is None:
+            raise ValueError("Normalization must be computed before removing elements")
+
+        # Validate indices array type and shape
+        indices = np.asarray(indices)
+        if indices.ndim != 1 or not np.issubdtype(indices.dtype, np.integer):
+            raise ValueError("Indices must be a 1D array of integers")
+
+        if np.any(indices < 0) or np.any(indices >= self.array.shape[0]):
+            raise IndexError("One or more indices are out of bounds")
+
+        # Determine if min or max value is being removed
+        values_to_remove = self.array[indices]
+        need_renormalize = (
+            np.any(values_to_remove == self.effective_min_val) or
+            np.any(values_to_remove == self.effective_max_val)
+        )
+
+        # Create mask for elements to keep
+        mask = np.ones(self.array.shape[0], dtype=bool)
+        mask[indices] = False
+
+        # Remove elements from array and normalized array
+        self.array = self.array[mask]
+        self._array_normalized = self._array_normalized[mask]
+
+        if need_renormalize:
+            self._recompute_normalization()
+
+
     def set_custom_bounds(
         self, min_val: float | None = None, max_val: float | None = None
     ) -> None:

@@ -463,3 +463,63 @@ def test_append_rejects_multidimensional_array():
     multi_dim_data = np.array([[1.0, 2.0], [3.0, 4.0]])
     with pytest.raises(ValueError):
         model.append_array(multi_dim_data)
+
+def test_remove_indices_basic():
+    arr = np.array([1.0, 2.0, 3.0])
+    normalizer = ArrayNormalizer(array=arr)
+
+    # Remove middle element (index 1)
+    normalizer.remove_indices(np.array([1]))
+
+    np.testing.assert_array_equal(normalizer.array, np.array([1.0, 3.0]))
+    expected_norm = (2.0 / (3.0 - 1.0)) * (normalizer.array - 1.0) - 1.0
+    np.testing.assert_array_almost_equal(normalizer.array_normalized, expected_norm)
+
+def test_remove_indices_recompute_normalization():
+    arr = np.array([1.0, 2.0, 3.0])
+    normalizer = ArrayNormalizer(array=arr)
+
+    # Remove element at max value index (2)
+    normalizer.remove_indices(np.array([2]))
+
+    np.testing.assert_array_equal(normalizer.array, np.array([1.0, 2.0]))
+    expected_norm = (2.0 / (2.0 - 1.0)) * (normalizer.array - 1.0) - 1.0
+    np.testing.assert_array_almost_equal(normalizer.array_normalized, expected_norm)
+    assert normalizer.effective_max_val == 2.0
+
+def test_remove_indices_recompute_min_and_max():
+    arr = np.array([1.0, 2.0, 3.0, 0.0])
+    normalizer = ArrayNormalizer(array=arr)
+
+    # Remove elements at indices 3 and 0 (min and max)
+    normalizer.remove_indices(np.array([0, 3]))
+
+    np.testing.assert_array_equal(normalizer.array, np.array([2.0, 3.0]))
+    expected_norm = (2.0 / (3.0 - 2.0)) * (normalizer.array - 2.0) - 1.0
+    np.testing.assert_array_almost_equal(normalizer.array_normalized, expected_norm)
+    assert normalizer.effective_min_val == 2.0
+    assert normalizer.effective_max_val == 3.0
+
+def test_remove_indices_out_of_bounds():
+    arr = np.array([1.0, 2.0, 3.0])
+    normalizer = ArrayNormalizer(array=arr)
+
+    with pytest.raises(IndexError):
+        normalizer.remove_indices(np.array([5]))
+
+def test_remove_indices_without_normalization():
+    normalizer = ArrayNormalizer(array=np.array([1.0, 2.0, 3.0]))
+    # Force _array_normalized to None to simulate not normalized
+    normalizer._array_normalized = None
+
+    with pytest.raises(ValueError):
+        normalizer.remove_indices(np.array([1]))
+
+def test_remove_indices_duplicates():
+    arr = np.array([1.0, 2.0, 3.0, 4.0])
+    normalizer = ArrayNormalizer(array=arr)
+
+    # Remove indices with duplicates
+    normalizer.remove_indices(np.array([1, 1, 2]))
+
+    np.testing.assert_array_equal(normalizer.array, np.array([1.0, 4.0]))
