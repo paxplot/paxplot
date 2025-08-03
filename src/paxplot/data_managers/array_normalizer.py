@@ -14,9 +14,11 @@ class ArrayNormalizer(BaseModel):
 
     _schema_version: ClassVar[int] = 1
     array: NDArray[np.float64]
-    min_val_normalization: float | None = None
-    max_val_normalization: float | None = None
+    custom_min_val: float | None = None
+    custom_max_val: float | None = None
     _array_normalized: NDArray[np.float64] | None = None
+    _effective_min_val: float | None = None
+    _effective_max_val: float | None = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @property
@@ -34,8 +36,37 @@ class ArrayNormalizer(BaseModel):
         AssertionError
             If normalization has not yet been computed.
         """
-        assert self._array_normalized is not None, "array_normalized not computed yet"
+        if self._array_normalized is None:
+            raise ValueError("Normalization has not been computed yet")
         return self._array_normalized
+
+    @property
+    def effective_min_val(self) -> float:
+        """
+        Returns the effective minimum value used for normalization (defaults to custom).
+
+        Raises
+        ------
+        ValueError
+            If normalization has not yet been computed.
+        """
+        if self._effective_min_val is None:
+            raise ValueError("Normalization has not been computed yet")
+        return self._effective_min_val
+
+    @property
+    def effective_max_val(self) -> float:
+        """
+        Returns the effective maximum value used for normalization (defaults to custom).
+
+        Raises
+        ------
+        ValueError
+            If normalization has not yet been computed.
+        """
+        if self._effective_max_val is None:
+            raise ValueError("Normalization has not been computed yet")
+        return self._effective_max_val
 
     @field_validator("array", mode="before")
     @classmethod
@@ -100,21 +131,31 @@ class ArrayNormalizer(BaseModel):
 
         If the array has constant values, sets the normalized array to zeros.
         """
-        self.min_val_normalization = float(np.min(self.array))
-        self.max_val_normalization = float(np.max(self.array))
+        min_val = (
+            self.custom_min_val
+            if self.custom_min_val is not None
+            else float(np.min(self.array))
+        )
 
-        if self.max_val_normalization == self.min_val_normalization:
+        max_val = (
+            self.custom_max_val
+            if self.custom_max_val is not None
+            else float(np.max(self.array))
+        )
+
+        self._effective_min_val = min_val
+        self._effective_max_val = max_val
+
+        if max_val == min_val:
             self._array_normalized = np.zeros_like(self.array, dtype=np.float64)
         else:
             self._array_normalized = self._normalize_to_minus1_plus1(
-                self.array,
-                self.min_val_normalization,
-                self.max_val_normalization
+                self.array, min_val, max_val
             )
 
     @staticmethod
     def _normalize_to_minus1_plus1(
-        array: NDArray[np.number], min_val_normalization: float, max_val_normalization: float
+        array: NDArray[np.number], min_val: float, max_val: float
     ) -> NDArray[np.float64]:
         """
         Normalizes a NumPy array to the range [-1, 1] using the provided min and max values.
@@ -123,9 +164,9 @@ class ArrayNormalizer(BaseModel):
         ----------
         array : NDArray[np.number]
             Input array to normalize.
-        min_val_normalization : float
+        min_val : float
             Minimum possible value in the original scale.
-        max_val_normalization : float
+        max_val : float
             Maximum possible value in the original scale.
 
         Returns
@@ -134,8 +175,9 @@ class ArrayNormalizer(BaseModel):
             Normalized array in the range [-1, 1].
         """
         array_float = array.astype(np.float64)
-        scale = 2.0 / (max_val_normalization - min_val_normalization)
-        return scale * (array_float - min_val_normalization) - 1.0
+        scale = 2.0 / (max_val - min_val)
+        return scale * (array_float - min_val) - 1.0
+
 
     def update_array(self, new_array: NDArray[np.number]) -> None:
         """
@@ -192,4 +234,8 @@ class ArrayNormalizer(BaseModel):
             )
 
         arr = np.array(data["array"])
-        return cls(array=arr)
+        return cls(
+            array=arr,
+            custom_min_val=data.get("custom_min_val"),
+            custom_max_val=data.get("custom_max_val"),
+        )

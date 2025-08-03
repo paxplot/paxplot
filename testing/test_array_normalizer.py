@@ -12,8 +12,8 @@ def test_accepts_numpy_array_float64():
     model = ArrayNormalizer(array=arr)
 
     assert isinstance(model.array, np.ndarray)
-    assert model.min_val_normalization == 1.0
-    assert model.max_val_normalization == 3.0
+    assert model.effective_min_val == 1.0
+    assert model.effective_max_val == 3.0
 
     expected = (2.0 / (3.0 - 1.0)) * (arr - 1.0) - 1.0
     np.testing.assert_array_almost_equal(model.array_normalized, expected)
@@ -24,8 +24,8 @@ def test_accepts_numpy_array_int():
     model = ArrayNormalizer(array=arr)
 
     assert isinstance(model.array, np.ndarray)
-    assert model.min_val_normalization == 1.0
-    assert model.max_val_normalization == 3.0
+    assert model.effective_min_val == 1.0
+    assert model.effective_max_val == 3.0
 
     expected = (2.0 / (3.0 - 1.0)) * (arr - 1.0) - 1.0
     np.testing.assert_array_almost_equal(model.array_normalized, expected)
@@ -36,8 +36,8 @@ def test_accepts_float32_array():
     model = ArrayNormalizer(array=arr) # type: ignore
 
     assert isinstance(model.array, np.ndarray)
-    assert model.min_val_normalization == 1.0
-    assert model.max_val_normalization == 3.0
+    assert model.effective_min_val == 1.0
+    assert model.effective_max_val == 3.0
     assert model.array.dtype == np.float32 or model.array.dtype == np.float64
 
     expected = (2.0 / (3.0 - 1.0)) * (arr - 1.0) - 1.0
@@ -49,8 +49,8 @@ def test_already_normalized_range():
     model = ArrayNormalizer(array=arr)
     expected = arr  # Should be unchanged after normalization
     np.testing.assert_array_almost_equal(model.array_normalized, expected)
-    assert model.min_val_normalization == -1.0
-    assert model.max_val_normalization == 1.0
+    assert model.effective_min_val == -1.0
+    assert model.effective_max_val == 1.0
 
 
 def test_all_identical_values():
@@ -58,8 +58,8 @@ def test_all_identical_values():
     model = ArrayNormalizer(array=arr)
     expected = np.array([0.0, 0.0, 0.0])
     np.testing.assert_array_almost_equal(model.array_normalized, expected)
-    assert model.min_val_normalization == 5.0
-    assert model.max_val_normalization == 5.0
+    assert model.effective_min_val == 5.0
+    assert model.effective_max_val == 5.0
 
 
 def test_negative_values():
@@ -67,8 +67,8 @@ def test_negative_values():
     model = ArrayNormalizer(array=arr)
     expected = np.array([-1.0, 0.0, 1.0])
     np.testing.assert_array_almost_equal(model.array_normalized, expected)
-    assert model.min_val_normalization == -3.0
-    assert model.max_val_normalization == -1.0
+    assert model.effective_min_val == -3.0
+    assert model.effective_max_val == -1.0
 
 
 def test_mixed_negative_and_positive():
@@ -76,8 +76,8 @@ def test_mixed_negative_and_positive():
     model = ArrayNormalizer(array=arr)
     expected = np.array([-1.0, 0.0, 1.0])
     np.testing.assert_array_almost_equal(model.array_normalized, expected)
-    assert model.min_val_normalization == -2.0
-    assert model.max_val_normalization == 2.0
+    assert model.effective_min_val == -2.0
+    assert model.effective_max_val == 2.0
 
 
 def test_single_element():
@@ -85,8 +85,8 @@ def test_single_element():
     model = ArrayNormalizer(array=arr)
     expected = np.array([0.0])
     np.testing.assert_array_almost_equal(model.array_normalized, expected)
-    assert model.min_val_normalization == 7.0
-    assert model.max_val_normalization == 7.0
+    assert model.effective_min_val == 7.0
+    assert model.effective_max_val == 7.0
 
 
 def test_large_integer_range():
@@ -94,8 +94,8 @@ def test_large_integer_range():
     model = ArrayNormalizer(array=arr) # type: ignore
     expected = np.array([-1.0, 1.0])
     np.testing.assert_array_almost_equal(model.array_normalized, expected)
-    assert model.min_val_normalization == 0.0
-    assert model.max_val_normalization == float(2**31 - 1)
+    assert model.effective_min_val == 0.0
+    assert model.effective_max_val == float(2**31 - 1)
 
 
 def test_float16_array():
@@ -140,15 +140,17 @@ def test_to_dict():
 
     assert data["_schema_version"] == model._schema_version
     assert data["array"] == [1, 2, 3]
-    assert data["min_val_normalization"] == 1.0
-    assert data["max_val_normalization"] == 3.0
+    assert data["custom_min_val"] is None
+    assert data["custom_max_val"] is None
 
 
-def test_from_dict(): #TODO update behavior with custom normalization bounds
+def test_from_dict():
     # Use raw (unnormalized) values for 'array'
     data = {
         "array": [1.0, 2.0, 3.0],  # raw input array, NOT normalized
-        "_schema_version": 1
+        "_schema_version": 1,
+        "custom_min_val": None,
+        "custom_max_val": None
     }
 
     model = ArrayNormalizer.from_dict(data)
@@ -156,8 +158,25 @@ def test_from_dict(): #TODO update behavior with custom normalization bounds
     # Normalized result expected
     expected_normalized = (2.0 / (3.0 - 1.0)) * (np.array([1.0, 2.0, 3.0]) - 1.0) - 1.0
     np.testing.assert_array_almost_equal(model.array_normalized, expected_normalized)
-    assert model.min_val_normalization == 1.0
-    assert model.max_val_normalization == 3.0
+    assert model.custom_min_val is None
+    assert model.custom_max_val is None
+
+def test_from_dict_with_custom_bounds():
+    data = {
+        "array": [1.0, 2.0, 3.0],  # raw input array, NOT normalized
+        "_schema_version": 1,
+        "custom_min_val": 0.0,
+        "custom_max_val": 4.0
+    }
+
+    model = ArrayNormalizer.from_dict(data)
+
+    # Expected normalization using custom bounds (0.0 to 4.0)
+    expected_normalized = (2.0 / (4.0 - 0.0)) * (np.array([1.0, 2.0, 3.0]) - 0.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected_normalized)
+
+    assert model.custom_min_val == 0.0
+    assert model.custom_max_val == 4.0
 
 def test_from_dict_missing_array_key():
     data = {"_schema_version": 1}
@@ -168,24 +187,24 @@ def test_from_dict_without_schema_version():
     """Ensure backward compatibility if `_schema_version` is missing"""
     data = {
         "array": [1.0, 2.0, 3.0],  # raw input array, NOT normalized
-        "min_val_normalization": 1.0,
-        "max_val_normalization": 3.0
+        "custom_min_val": None,
+        "custom_max_val": None
     }
 
     model = ArrayNormalizer.from_dict(data)
 
     expected_normalized = (2.0 / (3.0 - 1.0)) * (np.array([1.0, 2.0, 3.0]) - 1.0) - 1.0
     np.testing.assert_array_almost_equal(model.array_normalized, expected_normalized)
-    assert model.min_val_normalization == 1.0
-    assert model.max_val_normalization == 3.0
+    assert model.custom_min_val is None
+    assert model.custom_max_val is None
 
 
 def test_from_dict_future_schema_version_raises():
     """Ensure it raises for unsupported newer versions"""
     data = {
         "array": [-1.0, 0.0, 1.0],
-        "min_val_normalization": 1.0,
-        "max_val_normalization": 3.0,
+        "custom_min_val": 1.0,
+        "custom_max_val": 3.0,
         "_schema_version": 999
     }
 
@@ -199,8 +218,8 @@ def test_normalize_to_minus1_plus1_basic():
     model = ArrayNormalizer(array=array)
     result = model._normalize_to_minus1_plus1(
         array,
-        min_val_normalization=10.0,
-        max_val_normalization=20.0
+        min_val=10.0,
+        max_val=20.0
     )
     np.testing.assert_allclose(result, expected, rtol=1e-6)
 
@@ -209,8 +228,8 @@ def test_normalize_raises_when_min_equals_max():
     with pytest.raises(ZeroDivisionError):
         ArrayNormalizer._normalize_to_minus1_plus1(
             arr,
-            min_val_normalization=5.0,
-            max_val_normalization=5.0
+            min_val=5.0,
+            max_val=5.0
         )
 
 def test_all_same_values():
@@ -219,8 +238,8 @@ def test_all_same_values():
     with pytest.raises(ZeroDivisionError):
         model._normalize_to_minus1_plus1(
             array,
-            min_val_normalization=5.0,
-            max_val_normalization=5.0
+            min_val=5.0,
+            max_val=5.0
         )
 
 
@@ -230,8 +249,8 @@ def test_negative_range():
     model = ArrayNormalizer(array=array)
     result = model._normalize_to_minus1_plus1(
         array,
-        min_val_normalization=-5.0,
-        max_val_normalization=5.0
+        min_val=-5.0,
+        max_val=5.0
     )
     np.testing.assert_allclose(result, expected, rtol=1e-6)
 
@@ -241,8 +260,8 @@ def test_out_of_bounds_values():
     model = ArrayNormalizer(array=array)
     result = model._normalize_to_minus1_plus1(
         array,
-        min_val_normalization=10.0,
-        max_val_normalization=20.0
+        min_val=10.0,
+        max_val=20.0
     )
     expected = np.array([-3.0, -1.0, 1.0, 3.0])  # Values outside the range are linearly projected
     np.testing.assert_allclose(result, expected, rtol=1e-6)
@@ -257,3 +276,61 @@ def test_update_array_recomputes_normalization():
     assert np.allclose(model.array, new_arr)
     expected = (2.0 / (30.0 - 10.0)) * (new_arr - 10.0) - 1.0
     np.testing.assert_array_almost_equal(model.array_normalized, expected)
+
+def test_update_array_with_custom_bounds():
+    arr = np.array([1.0, 2.0, 3.0])
+    model = ArrayNormalizer(array=arr, custom_min_val=0.0, custom_max_val=4.0)
+
+    new_arr = np.array([5.0, 6.0, 7.0])
+    model.update_array(new_arr)
+
+    # After update, custom bounds remain the same
+    assert model.custom_min_val == 0.0
+    assert model.custom_max_val == 4.0
+
+    expected = (2.0 / (4.0 - 0.0)) * (new_arr - 0.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected)
+
+def test_custom_min_val_only():
+    arr = np.array([1.0, 2.0, 3.0])
+    custom_min = 0.0
+    model = ArrayNormalizer(array=arr, custom_min_val=custom_min)
+
+    # The effective min should be the custom_min_val, max should be array max
+    assert model.effective_min_val == custom_min
+    assert model.effective_max_val == 3.0
+
+    # Expected normalization: scale using custom_min=0, max=3
+    expected = (2.0 / (3.0 - 0.0)) * (arr - 0.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected)
+
+def test_custom_max_val_only():
+    arr = np.array([1.0, 2.0, 3.0])
+    custom_max = 4.0
+    model = ArrayNormalizer(array=arr, custom_max_val=custom_max)
+
+    # The effective max should be custom_max_val, min should be array min
+    assert model.effective_max_val == custom_max
+    assert model.effective_min_val == 1.0
+
+    # Expected normalization: scale using min=1, custom_max=4
+    expected = (2.0 / (4.0 - 1.0)) * (arr - 1.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected)
+
+def test_custom_min_max_vals():
+    arr = np.array([1.0, 2.0, 3.0])
+    custom_min = 0.0
+    custom_max = 4.0
+    model = ArrayNormalizer(array=arr, custom_min_val=custom_min, custom_max_val=custom_max)
+
+    assert model.effective_min_val == custom_min
+    assert model.effective_max_val == custom_max
+
+    expected = (2.0 / (4.0 - 0.0)) * (arr - 0.0) - 1.0
+    np.testing.assert_array_almost_equal(model.array_normalized, expected)
+
+def test_custom_min_equals_max_raises():
+    arr = np.array([1.0, 2.0, 3.0])
+    with pytest.raises(ZeroDivisionError):
+        # Force custom min and max equal
+        ArrayNormalizer._normalize_to_minus1_plus1(arr, min_val=5.0, max_val=5.0)
