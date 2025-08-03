@@ -14,7 +14,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Sequence
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import BaseModel, PrivateAttr
+from pydantic import BaseModel, PrivateAttr, validate_arguments
 from paxplot.data_managers.array_normalizer import ArrayNormalizer
 
 
@@ -80,6 +80,7 @@ class BaseNormalizedArray(BaseModel, ABC):
         """
         ...
 
+    @validate_arguments
     def remove_indices(self, indices: Sequence[int]) -> None:
         """
         Removes elements at the specified indices from the raw array and updates the internal

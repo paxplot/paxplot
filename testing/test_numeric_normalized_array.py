@@ -3,6 +3,7 @@
 
 import numpy as np
 import pytest
+from pydantic import ValidationError
 from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
 
 def test_numeric_normalized_array():
@@ -48,16 +49,19 @@ def test_append_triggers_renormalization():
     expected = np.array([-1.0, -1.0+1/9*(1-(-1.0)), -1.0+2/9*(1-(-1.0)), 1.0])
     np.testing.assert_array_almost_equal(obj.array_normalized, expected)
 
+def test_array_invalid_type():
+    with pytest.raises(ValidationError):
+        NumericNormalizedArray(array="not a sequence") # type: ignore
 
 def test_append_array_invalid_type():
     obj = NumericNormalizedArray(array=[1, 2, 3])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         obj.append_array("not a sequence") # type: ignore
 
 
 def test_remove_indices_invalid_type():
     obj = NumericNormalizedArray(array=[1, 2, 3])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         obj.remove_indices("not a sequence") # type: ignore
 
 
