@@ -72,35 +72,73 @@ class CategoricalNormalizedArray(BaseNormalizedArray):
         """
         Appends new categorical data to the array and updates normalization state.
 
-        This method must extend the existing label-to-index mapping and update the
-        internal normalizer accordingly.
+        This method extends the existing label-to-index mapping, appends new
+        labels and their corresponding indices, and updates the internal normalizer.
 
         Parameters
         ----------
         new_data : Sequence[str]
             New categorical string values to append.
-
-        Raises
-        ------
-        NotImplementedError
-            This method must be implemented in the future to support dynamic updates.
         """
-        raise NotImplementedError("Appending categorical data is not yet implemented.")
+        current_index = len(self._label_to_index)
+        indices = []
+
+        for label in new_data:
+            if label not in self._label_to_index:
+                self._label_to_index[label] = current_index
+                current_index += 1
+            indices.append(self._label_to_index[label])
+
+        # Convert new labels to index array
+        new_index_array = np.array(indices, dtype=np.float64)
+
+        # Append to existing array and update normalizer
+        self.array = list(self.array) + list(new_data)
+        self._normalizer.append_array(new_index_array)
 
     def to_dict(self) -> dict[str, Any]:
         """
-        Serializes the object to a dictionary including both raw and normalized data.
-
-        This method should return all relevant information for full reconstruction.
+        Converts the object to a dictionary for serialization.
+        This method includes the raw array and custom bounds in the output.
 
         Returns
         -------
-        dict[str, Any]
-            A dictionary representation of the object.
+        dict
+            A dictionary containing the raw array and custom bounds.
+        """
+        return {
+            "array": list(self.array),
+            "_schema_version": self._schema_version
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "CategoricalNormalizedArray":
+        """
+        Creates a CategoricalNormalizedArray instance from a dictionary.
+        This method handles schema version checking and reconstructs the object
+
+        Parameters
+        ----------
+        data : dict
+            A dictionary containing the raw array and custom bounds. Must include
+            the '_schema_version' key.
+
+        Returns
+        -------
+        CategoricalNormalizedArray
+            The reconstructed CategoricalNormalizedArray instance.
 
         Raises
         ------
-        NotImplementedError
-            This method must be implemented for full serialization support.
+        ValueError
+            If the schema version in the data is not supported.
         """
-        raise NotImplementedError("Serialization is not yet implemented.")
+        version = data.get("_schema_version", 0)
+        if version > cls._schema_version:
+            raise ValueError(
+                f"Unsupported schema version: {version}. "
+                f"Current supported version is {cls._schema_version}."
+            )
+
+        instance = cls(array=data["array"])
+        return instance
