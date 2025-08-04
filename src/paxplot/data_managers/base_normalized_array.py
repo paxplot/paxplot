@@ -45,6 +45,7 @@ class BaseNormalizedArray(BaseModel, ABC):
 
     def __init__(self, **data):
         super().__init__(**data)
+        self.array = list(self.array)
         self._normalizer = self._init_normalizer()
 
     @abstractmethod
