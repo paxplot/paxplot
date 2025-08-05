@@ -1,6 +1,22 @@
+"""
+A matrix class that handles normalization of mixed numeric and categorical data.
+
+This class provides functionality to store and manage a 2D data structure where each column
+can be either numeric or categorical. Each column is independently normalized according to
+its type. Numeric columns are scaled to a [0,1] range, while categorical columns are
+encoded as normalized indicators.
+
+Notes
+-----
+- Each column must contain consistently typed data (either all numeric or all categorical)
+- Null values (None) are allowed in both numeric and categorical columns
+- Column access is zero-indexed
+"""
+
 from typing import Sequence, Union, Literal, Tuple, List
 from pydantic import BaseModel, field_validator
 import numpy as np
+from numpy.typing import NDArray
 
 from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
 from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
@@ -21,9 +37,19 @@ class NormalizedMatrix(BaseModel):
     data: Sequence[Sequence[Union[str, int, float, None]]]
     _columns: List[BaseNormalizedArray] = []
 
+    class Config:
+        """
+        Pydantic configuration for the NormalizedMatrix class.
+        """
+        arbitrary_types_allowed = True
+        extra = "forbid"
+
     @field_validator("data", mode="before")
     @classmethod
-    def validate_input(cls, v: Sequence[Sequence[Union[str, int, float, None]]]) -> Sequence[Sequence[Union[str, int, float, None]]]:
+    def validate_input(
+        cls,
+        v: Sequence[Sequence[Union[str, int, float, None]]]
+    ) -> Sequence[Sequence[Union[str, int, float, None]]]:
         """
         Validate the input data structure.
 
@@ -131,6 +157,17 @@ class NormalizedMatrix(BaseModel):
             return 0
         return len(self._columns[0].array)
 
-    class Config:
-        arbitrary_types_allowed = True
-        extra = "forbid"
+    def get_normalized_array(self, column_index: int) -> NDArray[np.float64]:
+        """Get the normalized array for a specific column.
+
+        Parameters
+        ----------
+        column_index : int
+            The index of the column to retrieve.
+
+        Returns
+        -------
+        NDArray[np.float64]
+            The normalized array for the specified column.
+        """
+        return self._columns[column_index]._normalizer.array_normalized # pylint: disable=protected-access
