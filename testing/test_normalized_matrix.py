@@ -15,12 +15,11 @@ def test_normalized_matrix_basic():
     matrix = NormalizedMatrix(data=data)
 
     # Test dimensions
-    assert matrix.num_columns() == 2
-    assert matrix.num_rows() == 3
+    assert matrix.num_columns == 2
+    assert matrix.num_rows == 3
 
     # Test column types
-    col0 = matrix.get_column(0)
-    col1 = matrix.get_column(1)
-
+    col0 = matrix._columns[0]
+    col1 = matrix._columns[1]
     assert isinstance(col0, NumericNormalizedArray)
     assert isinstance(col1, CategoricalNormalizedArray)

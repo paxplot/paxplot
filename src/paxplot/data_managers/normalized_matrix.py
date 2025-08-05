@@ -105,14 +105,28 @@ class NormalizedMatrix(BaseModel):
 
         return arr, column_types
 
-    def get_column(self, index: int) -> BaseNormalizedArray:
-        """Return the normalized array at the given column index."""
-        return self._columns[index]
-
+    @property
     def num_columns(self) -> int:
+        """
+        Returns the number of columns in the matrix.
+
+        Returns
+        -------
+        int
+            The number of columns.
+        """
         return len(self._columns)
 
+    @property
     def num_rows(self) -> int:
+        """
+        Returns the number of rows in the matrix.
+
+        Returns
+        -------
+        int
+            The number of rows.
+        """
         if not self._columns:
             return 0
         return len(self._columns[0].array)
