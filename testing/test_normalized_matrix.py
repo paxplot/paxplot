@@ -1,7 +1,9 @@
 # pylint: disable=C0116, W0212
 """Tests for the NormalizedMatrix"""
 
+import pytest
 import numpy as np
+
 from paxplot.data_managers.normalized_matrix import NormalizedMatrix, ColumnType
 from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
 from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
@@ -36,3 +38,15 @@ def test_normalized_matrix_basic():
     # Testing original arrays
     assert matrix.get_numeric_array(0) == [1.0, 2.0, 3.0]
     assert matrix.get_categorical_array(1) == ["apple", "banana", "apple"]
+
+
+def test_normalized_matrix_raises_on_none():
+    """Test that initializing with None values raises a ValueError."""
+    data_with_none = [
+        [1.0, "apple"],
+        [None, "banana"],  # Invalid None value in numeric column
+        [3.0, "apple"]
+    ]
+
+    with pytest.raises(ValueError, match="None values.*not allowed"):
+        NormalizedMatrix(data=data_with_none)

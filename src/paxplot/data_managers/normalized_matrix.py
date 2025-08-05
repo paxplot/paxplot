@@ -8,9 +8,9 @@ encoded as normalized indicators.
 
 Notes
 -----
-- Each column must contain consistently typed data (either all numeric or all categorical)
-- Null values (None) are allowed in both numeric and categorical columns
-- Column access is zero-indexed
+- Each column must contain consistently typed data (either all numeric or all categorical).
+- Null values (None) are not allowed in either numeric or categorical columns.
+- Column access is zero-indexed.
 """
 
 from typing import Sequence, Union, Tuple, List
@@ -45,9 +45,13 @@ class NormalizedMatrix(BaseModel):
 
     Each column is either numeric or categorical and stored as a normalized array.
     Columns are accessed by integer index.
+
+    Notes
+    -----
+    None values are not allowed in the matrix.
     """
 
-    data: Sequence[Sequence[Union[str, int, float, None]]]
+    data: Sequence[Sequence[Union[str, int, float]]]
     _columns: List[BaseNormalizedArray] = []
 
     class Config:
@@ -62,7 +66,7 @@ class NormalizedMatrix(BaseModel):
     def validate_input(
         cls,
         v: Sequence[Sequence[Union[str, int, float, None]]]
-    ) -> Sequence[Sequence[Union[str, int, float, None]]]:
+    ) -> Sequence[Sequence[Union[str, int, float]]]:
         """
         Validate the input data structure.
 
@@ -73,18 +77,20 @@ class NormalizedMatrix(BaseModel):
 
         Returns
         -------
-        Sequence[Sequence[Union[str, int, float, None]]]
+        Sequence[Sequence[Union[str, int, float]]]
             The validated input data.
 
         Raises
         ------
         ValueError
-            If the input is not a 2D array-like structure.
+            If the input is not a 2D array-like structure or contains None values.
         """
         arr = np.array(v, dtype=object)
         if arr.ndim != 2:
             raise ValueError("Input must be a 2D array-like structure")
-        return v
+        if np.any(arr == None):  # pylint: disable=singleton-comparison
+            raise ValueError("Input contains None values, which are not allowed")
+        return v # type: ignore
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -100,14 +106,14 @@ class NormalizedMatrix(BaseModel):
 
     @staticmethod
     def validate_and_infer_column_types(
-        rows: Sequence[Sequence[Union[str, int, float, None]]]
+        rows: Sequence[Sequence[Union[str, int, float]]]
     ) -> Tuple[np.ndarray, List[ColumnType]]:
         """
         Validates the input rows and infers column types.
 
         Parameters
         ----------
-        rows : Sequence[Sequence[Union[str, int, float, None]]]
+        rows : Sequence[Sequence[Union[str, int, float]]]
             The input tabular data in row-major form.
 
         Returns
@@ -119,19 +125,21 @@ class NormalizedMatrix(BaseModel):
         Raises
         ------
         ValueError
-            If the input is not 2D or contains unsupported/mixed column types.
+            If the input is not 2D or contains unsupported/mixed column types or None values.
         """
         arr = np.array(rows, dtype=object)
 
         if arr.ndim != 2:
             raise ValueError("Input must be a 2D array-like structure")
+        if np.any(arr == None):  # pylint: disable=singleton-comparison 
+            raise ValueError("Input contains None values, which are not allowed")
 
         n_cols = arr.shape[1]
         column_types: List[ColumnType] = []
 
         for col_index in range(n_cols):
             col_data = arr[:, col_index]
-            types = {type(x) for x in col_data if x is not None}
+            types = {type(x) for x in col_data}
 
             if types.issubset({int, float}):
                 column_types.append(ColumnType.NUMERIC)
@@ -171,7 +179,8 @@ class NormalizedMatrix(BaseModel):
         return len(self._columns[0].array)
 
     def get_normalized_array(self, column_index: int) -> NDArray[np.float64]:
-        """Get the normalized array for a specific column.
+        """
+        Get the normalized array for a specific column.
 
         Parameters
         ----------
@@ -183,10 +192,11 @@ class NormalizedMatrix(BaseModel):
         NDArray[np.float64]
             The normalized array for the specified column.
         """
-        return self._columns[column_index]._normalizer.array_normalized # pylint: disable=protected-access
+        return self._columns[column_index]._normalizer.array_normalized  # pylint: disable=protected-access
 
     def get_column_type(self, column_index: int) -> ColumnType:
-        """Retrieve the column type for a specified column index.
+        """
+        Retrieve the column type for a specified column index.
 
         Parameters
         ----------
@@ -206,7 +216,7 @@ class NormalizedMatrix(BaseModel):
         else:
             raise ValueError("Unknown column type")
 
-    def get_numeric_array(self, column_index: int) -> Sequence[Union[int, float, None]]:
+    def get_numeric_array(self, column_index: int) -> Sequence[Union[int, float]]:
         """
         Get the original numeric array (before normalization) for the specified column.
 
@@ -217,7 +227,7 @@ class NormalizedMatrix(BaseModel):
 
         Returns
         -------
-        Sequence[Union[int, float, None]]
+        Sequence[Union[int, float]]
             The original numeric values from the column.
 
         Raises
@@ -230,7 +240,7 @@ class NormalizedMatrix(BaseModel):
             raise TypeError(f"Column {column_index} is not of numeric type")
         return column_instance.array
 
-    def get_categorical_array(self, column_index: int) -> Sequence[Union[str, None]]:
+    def get_categorical_array(self, column_index: int) -> Sequence[str]:
         """
         Get the original categorical array (before normalization) for the specified column.
 
@@ -241,7 +251,7 @@ class NormalizedMatrix(BaseModel):
 
         Returns
         -------
-        Sequence[Union[str, None]]
+        Sequence[str]
             The original categorical values from the column.
 
         Raises
