@@ -13,7 +13,8 @@ Notes
 - Column access is zero-indexed
 """
 
-from typing import Sequence, Union, Literal, Tuple, List
+from typing import Sequence, Union, Tuple, List
+from enum import Enum
 from pydantic import BaseModel, field_validator
 import numpy as np
 from numpy.typing import NDArray
@@ -23,7 +24,19 @@ from paxplot.data_managers.categorical_normalized_array import CategoricalNormal
 from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
 
 
-ColumnType = Literal["numeric", "categorical"]
+class ColumnType(str, Enum):
+    """
+    Enumeration of possible column types in the NormalizedMatrix.
+
+    Attributes
+    ----------
+    NUMERIC : str
+        Indicates a column with numeric data (int or float), to be normalized using min-max scaling.
+    CATEGORICAL : str
+        Indicates a column with string (categorical) data, to be encoded as numeric indices.
+    """
+    NUMERIC = "numeric"
+    CATEGORICAL = "categorical"
 
 
 class NormalizedMatrix(BaseModel):
@@ -80,9 +93,9 @@ class NormalizedMatrix(BaseModel):
         self._columns = []
         for i, col_type in enumerate(col_types):
             col_data = arr[:, i].tolist()
-            if col_type == "numeric":
+            if col_type == ColumnType.NUMERIC:
                 self._columns.append(NumericNormalizedArray(array=col_data))
-            else:
+            elif col_type == ColumnType.CATEGORICAL:
                 self._columns.append(CategoricalNormalizedArray(array=col_data))
 
     @staticmethod
@@ -121,9 +134,9 @@ class NormalizedMatrix(BaseModel):
             types = {type(x) for x in col_data if x is not None}
 
             if types.issubset({int, float}):
-                column_types.append("numeric")
+                column_types.append(ColumnType.NUMERIC)
             elif types.issubset({str}):
-                column_types.append("categorical")
+                column_types.append(ColumnType.CATEGORICAL)
             else:
                 raise ValueError(
                     f"Column {col_index} contains mixed or unsupported types: {types}"
@@ -171,3 +184,72 @@ class NormalizedMatrix(BaseModel):
             The normalized array for the specified column.
         """
         return self._columns[column_index]._normalizer.array_normalized # pylint: disable=protected-access
+
+    def get_column_type(self, column_index: int) -> ColumnType:
+        """Retrieve the column type for a specified column index.
+
+        Parameters
+        ----------
+        column_index : int
+            The index of the column whose type is to be retrieved.
+
+        Returns
+        -------
+        ColumnType
+            The type of the specified column (numeric or categorical).
+        """
+        column_instance = self._columns[column_index]
+        if isinstance(column_instance, NumericNormalizedArray):
+            return ColumnType.NUMERIC
+        elif isinstance(column_instance, CategoricalNormalizedArray):
+            return ColumnType.CATEGORICAL
+        else:
+            raise ValueError("Unknown column type")
+
+    def get_numeric_array(self, column_index: int) -> Sequence[Union[int, float, None]]:
+        """
+        Get the original numeric array (before normalization) for the specified column.
+
+        Parameters
+        ----------
+        column_index : int
+            The index of the column to retrieve.
+
+        Returns
+        -------
+        Sequence[Union[int, float, None]]
+            The original numeric values from the column.
+
+        Raises
+        ------
+        TypeError
+            If the column is not of numeric type.
+        """
+        column_instance = self._columns[column_index]
+        if not isinstance(column_instance, NumericNormalizedArray):
+            raise TypeError(f"Column {column_index} is not of numeric type")
+        return column_instance.array
+
+    def get_categorical_array(self, column_index: int) -> Sequence[Union[str, None]]:
+        """
+        Get the original categorical array (before normalization) for the specified column.
+
+        Parameters
+        ----------
+        column_index : int
+            The index of the column to retrieve.
+
+        Returns
+        -------
+        Sequence[Union[str, None]]
+            The original categorical values from the column.
+
+        Raises
+        ------
+        TypeError
+            If the column is not of categorical type.
+        """
+        column_instance = self._columns[column_index]
+        if not isinstance(column_instance, CategoricalNormalizedArray):
+            raise TypeError(f"Column {column_index} is not of categorical type")
+        return column_instance.array

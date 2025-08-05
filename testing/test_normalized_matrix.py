@@ -2,9 +2,10 @@
 """Tests for the NormalizedMatrix"""
 
 import numpy as np
-from paxplot.data_managers.normalized_matrix import NormalizedMatrix
+from paxplot.data_managers.normalized_matrix import NormalizedMatrix, ColumnType
 from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
 from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
+
 
 
 def test_normalized_matrix_basic():
@@ -25,7 +26,13 @@ def test_normalized_matrix_basic():
     col1 = matrix._columns[1]
     assert isinstance(col0, NumericNormalizedArray)
     assert isinstance(col1, CategoricalNormalizedArray)
+    assert matrix.get_column_type(0) == ColumnType.NUMERIC
+    assert matrix.get_column_type(1) == ColumnType.CATEGORICAL
 
     # Test normalized arrays
     np.testing.assert_array_equal(matrix.get_normalized_array(0), np.array([-1.0, 0.0, 1.0]))
     np.testing.assert_array_equal(matrix.get_normalized_array(1), np.array([-1.0, 1.0, -1.0]))
+
+    # Testing original arrays
+    assert matrix.get_numeric_array(0) == [1.0, 2.0, 3.0]
+    assert matrix.get_categorical_array(1) == ["apple", "banana", "apple"]
