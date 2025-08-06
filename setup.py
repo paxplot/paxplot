@@ -11,9 +11,9 @@ setuptools.setup(
     description="Paxplot is a Python visualization library for parallel coordinate plots based on Matplotlib.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/kravitsjacob/paxplot",
+    url="https://github.com/paxplot/paxplot",
     project_urls={
-        "Bug Tracker": "https://github.com/kravitsjacob/paxplot/issues",
+        "Bug Tracker": "https://github.com/paxplot/paxplot/issues",
     },
     install_requires=[
         'matplotlib>=3.5',

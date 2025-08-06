@@ -843,7 +843,7 @@ def add_unsafe_warning(func, fig):
                 f'The function you have called ({func.__name__}) is not '
                 'officially supported by Paxplot, but it may still work. '
                 'Report issues to '
-                'https://github.com/kravitsjacob/paxplot/issues',
+                'https://github.com/paxplot/paxplot/issues',
                 Warning
             )
         return func(*args, **kwargs)

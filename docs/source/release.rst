@@ -14,7 +14,7 @@ Paxplot now includes another testing dataset from contributor `Nele Reyniers <ht
 Version 0.1.3 (beta)
 --------------------
 
-Paxplot's testing now follows more standard procedures in that it uses an install of paxplot rather than relative imports. Contributors should now use :code:`pip install --editable .` to ensure they are referencing their development installs rather than a previously downloaded install. See the Paxplot's `actions page <https://github.com/kravitsjacob/paxplot/actions>`_ for the continous integration tests. 
+Paxplot's testing now follows more standard procedures in that it uses an install of paxplot rather than relative imports. Contributors should now use :code:`pip install --editable .` to ensure they are referencing their development installs rather than a previously downloaded install. See the Paxplot's `actions page <https://github.com/paxplot/paxplot/actions>`_ for the continous integration tests. 
 
 Version 0.1.2 (beta)
 --------------------
@@ -101,10 +101,10 @@ Much of Paxplot's backend has been refactored to be both more efficient and read
 
 Citation Information
 ^^^^^^^^^^^^^^^^^^^^
-Citation information for Paxplot can now be found on the Github `page <https://github.com/kravitsjacob/paxplot>`_.
+Citation information for Paxplot can now be found on the Github `page <https://github.com/paxplot/paxplot>`_.
 
 Website Improvements
 ^^^^^^^^^^^^^^^^^^^^
 Paxplot's website has also been expanded. In this release, an “examples” tab encompasses multiple common workflows. As is probably obvious from reading this page, we are now doing release notes.
 
-Please reach out with your `issues and feature requests <https://github.com/kravitsjacob/paxplot/issues>`_. If you are interested in contributing Paxplot, please contact `Jacob Kravits <https://twitter.com/jacob_kravits>`_. 
+Please reach out with your `issues and feature requests <https://github.com/paxplot/paxplot/issues>`_. If you are interested in contributing Paxplot, please contact `Jacob Kravits <https://twitter.com/jacob_kravits>`_. 

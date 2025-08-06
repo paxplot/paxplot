@@ -59,7 +59,7 @@ html_theme = 'pydata_sphinx_theme'
 html_static_path = ['_static']
 
 # For sitemap creation
-html_baseurl = 'https://kravitsjacob.github.io/paxplot/'
+html_baseurl = 'https://paxplot.github.io/paxplot/'
 
 # Numpy Docstrings
 napoleon_numpy_docstring = True
