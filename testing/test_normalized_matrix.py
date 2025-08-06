@@ -130,3 +130,61 @@ def test_append_empty_list_does_nothing():
     matrix = NormalizedMatrix(data=data)
     matrix.append_data([])
     assert matrix.num_rows == 1
+
+def test_to_dict_and_from_dict():
+    # Sample mixed data: 2 numeric columns, 1 categorical
+    data = [
+        [1.0, 10, "cat"],
+        [2.0, 20, "dog"],
+        [3.0, 15, "mouse"],
+    ]
+    nm = NormalizedMatrix(data=data)
+
+    # Set custom bounds on first numeric column only
+    nm.set_custom_bounds(0, min_val=0.0, max_val=5.0)
+    # Second numeric column no custom bounds
+    # Third column categorical, so no custom bounds
+
+    # Serialize to dict
+    serialized = nm.to_dict()
+
+    # Check serialized keys
+    assert "data" in serialized
+    assert "column_types" in serialized
+    assert "custom_bounds" in serialized
+    assert "_schema_version" in serialized
+
+    # Check data is preserved
+    assert serialized["data"] == data
+
+    # Check column types are correct
+    assert serialized["column_types"] == ["numeric", "numeric", "categorical"]
+
+    # Check custom bounds present only for first column
+    assert 0 in serialized["custom_bounds"]
+    assert serialized["custom_bounds"][0]["custom_min_val"] == 0.0
+    assert serialized["custom_bounds"][0]["custom_max_val"] == 5.0
+    # No custom bounds for second numeric column
+    assert 1 not in serialized["custom_bounds"] or all(
+        v is None for v in serialized["custom_bounds"][1].values()
+    )
+
+    # Deserialize from dict
+    nm2 = NormalizedMatrix.from_dict(serialized)
+
+    # Data roundtrip
+    assert nm2.data == data
+
+    # Confirm types of columns
+    assert isinstance(nm2._columns[0], NumericNormalizedArray)
+    assert isinstance(nm2._columns[1], NumericNormalizedArray)
+    assert isinstance(nm2._columns[2], CategoricalNormalizedArray)
+
+    # Confirm custom bounds preserved on first numeric column
+    min_val, max_val = nm2.get_custom_bounds(0)
+    assert min_val == 0.0
+    assert max_val == 5.0
+
+    # Confirm no custom bounds on second numeric column
+    with pytest.raises(TypeError):
+        nm2.get_custom_bounds(2)
