@@ -13,7 +13,7 @@ Notes
 - Column access is zero-indexed.
 """
 
-from typing import Sequence, Union, Tuple, List
+from typing import Sequence, Union, List
 from enum import Enum
 from pydantic import BaseModel, field_validator
 import numpy as np
@@ -88,13 +88,14 @@ class NormalizedMatrix(BaseModel):
         arr = np.array(v, dtype=object)
         if arr.ndim != 2:
             raise ValueError("Input must be a 2D array-like structure")
-        if np.any(arr == None):  # pylint: disable=singleton-comparison
+        if any(x is None for row in arr for x in row):  # pylint: disable=singleton-comparison
             raise ValueError("Input contains None values, which are not allowed")
         return v # type: ignore
 
     def __init__(self, **data):
         super().__init__(**data)
-        arr, col_types = self.validate_and_infer_column_types(self.data)
+        arr = NormalizedMatrix.validate_column_shape_and_nulls(self.data)
+        col_types = NormalizedMatrix.infer_column_types(arr)
 
         self._columns = []
         for i, col_type in enumerate(col_types):
@@ -105,35 +106,49 @@ class NormalizedMatrix(BaseModel):
                 self._columns.append(CategoricalNormalizedArray(array=col_data))
 
     @staticmethod
-    def validate_and_infer_column_types(
+    def validate_column_shape_and_nulls(
         rows: Sequence[Sequence[Union[str, int, float]]]
-    ) -> Tuple[np.ndarray, List[ColumnType]]:
+    ) -> np.ndarray:
         """
-        Validates the input rows and infers column types.
-
-        Parameters
-        ----------
-        rows : Sequence[Sequence[Union[str, int, float]]]
-            The input tabular data in row-major form.
+        Validates that the input is a 2D array-like structure and contains no None values.
 
         Returns
         -------
-        tuple
-            - A NumPy ndarray (2D) with dtype=object.
-            - A list of inferred column types: 'numeric' or 'categorical'.
+        np.ndarray
+            The validated array with dtype=object.
 
         Raises
         ------
         ValueError
-            If the input is not 2D or contains unsupported/mixed column types or None values.
+            If input is not 2D or contains None values.
         """
         arr = np.array(rows, dtype=object)
-
         if arr.ndim != 2:
             raise ValueError("Input must be a 2D array-like structure")
-        if np.any(arr == None):  # pylint: disable=singleton-comparison 
+        if np.any(arr == None):  # pylint: disable=singleton-comparison
             raise ValueError("Input contains None values, which are not allowed")
+        return arr
 
+    @staticmethod
+    def infer_column_types(arr: np.ndarray) -> List[ColumnType]:
+        """
+        Infers column types from a validated 2D ndarray.
+
+        Parameters
+        ----------
+        arr : np.ndarray
+            A validated 2D NumPy array with dtype=object.
+
+        Returns
+        -------
+        List[ColumnType]
+            The inferred column types.
+
+        Raises
+        ------
+        ValueError
+            If a column contains mixed or unsupported types.
+        """
         n_cols = arr.shape[1]
         column_types: List[ColumnType] = []
 
@@ -150,7 +165,7 @@ class NormalizedMatrix(BaseModel):
                     f"Column {col_index} contains mixed or unsupported types: {types}"
                 )
 
-        return arr, column_types
+        return column_types
 
     @property
     def num_columns(self) -> int:
@@ -263,3 +278,37 @@ class NormalizedMatrix(BaseModel):
         if not isinstance(column_instance, CategoricalNormalizedArray):
             raise TypeError(f"Column {column_index} is not of categorical type")
         return column_instance.array
+
+    def append_data(self, new_rows: Sequence[Sequence[Union[str, int, float]]]) -> None:
+        """
+        Append one or more new rows to the matrix.
+
+        Raises
+        ------
+        ValueError
+            If dimensions are invalid or None values are present.
+        TypeError
+            If any value doesn't match expected column type.
+        """
+        if not new_rows:
+            return
+        arr = self.validate_column_shape_and_nulls(new_rows)
+
+        if arr.shape[1] != self.num_columns:
+            raise ValueError(
+                f"Expected {self.num_columns} columns, got {arr.shape[1]}"
+            )
+
+        for col_index, col_data in enumerate(arr.T):
+            column = self._columns[col_index]
+            if isinstance(column, NumericNormalizedArray):
+                if not all(isinstance(x, (int, float)) for x in col_data):
+                    raise TypeError(f"Column {col_index} expects numeric values")
+            elif isinstance(column, CategoricalNormalizedArray):
+                if not all(isinstance(x, str) for x in col_data):
+                    raise TypeError(f"Column {col_index} expects string values")
+            else:
+                raise TypeError(f"Unknown column type at index {col_index}")
+
+        for i, column in enumerate(self._columns):
+            column.append_array(arr[:, i].tolist())
