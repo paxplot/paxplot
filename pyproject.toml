@@ -15,8 +15,7 @@ authors = [
 dependencies = [
     "matplotlib>=3.10",
     "pandas>=2.2.3",
-    "pydantic",
-    "pytest"
+    "pydantic"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -28,7 +27,10 @@ classifiers = [
 Homepage = "https://github.com/kravitsjacob/paxplot"
 
 [project.optional-dependencies]
-dev = ["black>=24.0.0"]
+dev = [
+    "black>=24.0.0",
+    "pytest"
+]
 
 [tool.setuptools]
 package-dir = { "" = "src" }
