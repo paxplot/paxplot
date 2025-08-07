@@ -130,3 +130,53 @@ def test_append_empty_list_does_nothing():
     matrix = NormalizedMatrix(data=data)
     matrix.append_data([])
     assert matrix.num_rows == 1
+
+def test_remove_rows_success():
+    data = [
+        [10.0, "apple"],
+        [20.0, "banana"],
+        [30.0, "cherry"],
+        [40.0, "banana"]
+    ]
+    matrix = NormalizedMatrix(data=data)
+
+    # Remove second and fourth rows (index 1 and 3)
+    matrix.remove_rows([1, 3])
+
+    # Check resulting size
+    assert matrix.num_rows == 2
+    assert matrix.get_numeric_array(0) == [10.0, 30.0]
+    assert matrix.get_categorical_array(1) == ["apple", "cherry"]
+
+    # Check normalized values
+    np.testing.assert_array_equal(matrix.get_normalized_array(0), np.array([-1.0, 1.0]))
+    np.testing.assert_array_equal(matrix.get_normalized_array(1), np.array([-1.0, 1.0]))
+
+
+def test_remove_rows_invalid_index():
+    data = [
+        [1.0, "a"],
+        [2.0, "b"]
+    ]
+    matrix = NormalizedMatrix(data=data)
+
+    # Index out of range
+    with pytest.raises(IndexError, match="out of bounds"):
+        matrix.remove_rows([2])
+
+    # Non-integer input
+    with pytest.raises(TypeError, match="sequence of integers"):
+        matrix.remove_rows(["not-an-index"]) # type: ignore
+
+
+def test_remove_rows_empty_list_does_nothing():
+    data = [
+        [1.0, "x"],
+        [2.0, "y"]
+    ]
+    matrix = NormalizedMatrix(data=data)
+
+    matrix.remove_rows([])
+
+    assert matrix.num_rows == 2
+    assert matrix.get_numeric_array(0) == [1.0, 2.0]

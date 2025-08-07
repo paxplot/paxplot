@@ -313,6 +313,34 @@ class NormalizedMatrix(BaseModel):
         for i, column in enumerate(self._columns):
             column.append_array(arr[:, i].tolist())
 
+    def remove_rows(self, indices: Sequence[int]) -> None:
+        """
+        Remove rows from the matrix at the specified indices.
+
+        Parameters
+        ----------
+        indices : Sequence[int]
+            A sequence of row indices to remove.
+
+        Raises
+        ------
+        TypeError
+            If indices are not a sequence of integers.
+        IndexError
+            If any index is out of bounds.
+        """
+        if not isinstance(indices, Sequence) or not all(isinstance(i, int) for i in indices):
+            raise TypeError("Indices must be a sequence of integers.")
+
+        if not indices:
+            return
+
+        if any(i < 0 or i >= self.num_rows for i in indices):
+            raise IndexError("One or more indices are out of bounds.")
+
+        for column in self._columns:
+            column.remove_indices(indices)
+
     def set_custom_bounds(
         self,
         column_index: int,
