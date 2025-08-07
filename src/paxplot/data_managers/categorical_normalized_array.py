@@ -1,6 +1,6 @@
 """Categorical normalized array class for handling and normalizing string data."""
 
-from typing import Sequence, Any
+from typing import Sequence
 import numpy as np
 from numpy.typing import NDArray
 from pydantic import PrivateAttr
@@ -95,50 +95,3 @@ class CategoricalNormalizedArray(BaseNormalizedArray):
         # Append to existing array and update normalizer
         self.array = list(self.array) + list(new_data)
         self._normalizer.append_array(new_index_array)
-
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Converts the object to a dictionary for serialization.
-        This method includes the raw array and custom bounds in the output.
-
-        Returns
-        -------
-        dict
-            A dictionary containing the raw array and custom bounds.
-        """
-        return {
-            "array": list(self.array),
-            "_schema_version": self._schema_version
-        }
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "CategoricalNormalizedArray":
-        """
-        Creates a CategoricalNormalizedArray instance from a dictionary.
-        This method handles schema version checking and reconstructs the object
-
-        Parameters
-        ----------
-        data : dict
-            A dictionary containing the raw array and custom bounds. Must include
-            the '_schema_version' key.
-
-        Returns
-        -------
-        CategoricalNormalizedArray
-            The reconstructed CategoricalNormalizedArray instance.
-
-        Raises
-        ------
-        ValueError
-            If the schema version in the data is not supported.
-        """
-        version = data.get("_schema_version", 0)
-        if version > cls._schema_version:
-            raise ValueError(
-                f"Unsupported schema version: {version}. "
-                f"Current supported version is {cls._schema_version}."
-            )
-
-        instance = cls(array=data["array"])
-        return instance

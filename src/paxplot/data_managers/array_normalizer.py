@@ -1,6 +1,6 @@
 """The ArrayNormalizer class"""
 
-from typing import Any, Type, ClassVar
+from typing import Any, Type
 
 import numpy as np
 from numpy.typing import NDArray
@@ -12,7 +12,6 @@ class ArrayNormalizer(BaseModel):
     Class to normalize arrays
     """
 
-    _schema_version: ClassVar[int] = 1
     array: NDArray[np.float64]
     custom_min_val: float | None = None
     custom_max_val: float | None = None
@@ -296,52 +295,3 @@ class ArrayNormalizer(BaseModel):
         self.custom_min_val = min_val
         self.custom_max_val = max_val
         self._recompute_normalization()
-
-    def to_dict(self, **kwargs) -> dict:
-        """
-        Serializes the model to a dictionary, converting the NumPy array to a list.
-
-        Parameters
-        ----------
-        **kwargs
-            Additional keyword arguments to pass to `model_dump()`.
-
-        Returns
-        -------
-        dict
-            A dictionary representation of the model with the array converted to a list.
-        """
-        raw = self.model_dump(**kwargs)
-        raw["array"] = self.array.tolist()
-        raw["_schema_version"] = self._schema_version
-        return raw
-
-    @classmethod
-    def from_dict(cls: Type["ArrayNormalizer"], data: dict) -> "ArrayNormalizer":
-        """
-        Creates an ArrayNormalizer instance from a dictionary, converting
-        the array list back into a NumPy array.
-
-        Parameters
-        ----------
-        data : dict
-            Dictionary representation of the serialized ArrayNormalizer model.
-
-        Returns
-        -------
-        ArrayNormalizer
-            A new instance of ArrayNormalizer with the array restored as a NumPy array.
-        """
-        version = data.get("_schema_version", 0)
-        if version > cls._schema_version:
-            raise ValueError(
-                f"Unsupported schema version: {version}. "
-                f"Current supported version is {cls._schema_version}."
-            )
-
-        arr = np.array(data["array"])
-        return cls(
-            array=arr,
-            custom_min_val=data.get("custom_min_val"),
-            custom_max_val=data.get("custom_max_val"),
-        )

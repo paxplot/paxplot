@@ -4,7 +4,6 @@
 import numpy as np
 import pytest
 from pydantic import ValidationError
-from numpy.testing import assert_allclose
 from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
 
 def test_numeric_normalized_array():
@@ -82,63 +81,3 @@ def test_set_custom_bounds():
     obj = NumericNormalizedArray(array=arr)
     obj.set_custom_bounds(min_val=0.0, max_val=10.0)
     assert np.allclose(obj.array_normalized, [-0.8, -0.6, -0.4])
-
-def test_to_dict_basic():
-    nna = NumericNormalizedArray(array=[1.0, 2.0, 3.0])
-    data = nna.to_dict()
-
-    assert data["array"] == [1.0, 2.0, 3.0]
-    assert data["custom_min_val"] is None
-    assert data["custom_max_val"] is None
-    assert data["_schema_version"] == nna._schema_version
-
-def test_from_dict_basic():
-    data = {
-        "array": [10.0, 20.0, 30.0],
-        "custom_min_val": None,
-        "custom_max_val": None,
-        "_schema_version": 1
-    }
-
-    nna = NumericNormalizedArray.from_dict(data)
-
-    assert nna.array == [10.0, 20.0, 30.0]
-    assert nna.custom_min_val is None
-    assert nna.custom_max_val is None
-    assert isinstance(nna.array_normalized, np.ndarray)
-
-def test_round_trip_serialization():
-    original = NumericNormalizedArray(array=[100.0, 200.0, 300.0])
-    original.set_custom_bounds(min_val=0.0, max_val=400.0)
-
-    data = original.to_dict()
-    restored = NumericNormalizedArray.from_dict(data)
-
-    assert np.allclose(original.array_normalized, restored.array_normalized)
-    assert restored.custom_min_val == 0.0
-    assert restored.custom_max_val == 400.0
-    assert restored.array == [100.0, 200.0, 300.0]
-
-def test_schema_version_check_raises():
-    data = {
-        "array": [1.0, 2.0],
-        "custom_min_val": 0.0,
-        "custom_max_val": 5.0,
-        "_schema_version": 999  # intentionally too new
-    }
-
-    with pytest.raises(ValueError, match="Unsupported schema version"):
-        NumericNormalizedArray.from_dict(data)
-
-def test_from_dict_restores_normalized_array():
-    original = NumericNormalizedArray(array=[100.0, 200.0, 300.0])
-    original.set_custom_bounds(min_val=0.0, max_val=400.0)
-    expected_normalized = original.array_normalized.copy()
-
-    data = original.to_dict()
-    restored = NumericNormalizedArray.from_dict(data)
-
-    assert restored.array == [100.0, 200.0, 300.0]
-    assert restored.custom_min_val == 0.0
-    assert restored.custom_max_val == 400.0
-    assert_allclose(restored.array_normalized, expected_normalized)

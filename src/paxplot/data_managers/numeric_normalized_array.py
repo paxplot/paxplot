@@ -12,7 +12,7 @@ NumericNormalizedArray
     A concrete implementation of BaseNormalizedArray for numeric (int or float) sequences.
 """
 
-from typing import Sequence, Any
+from typing import Sequence
 
 from pydantic import validate_call
 import numpy as np
@@ -95,56 +95,3 @@ class NumericNormalizedArray(BaseNormalizedArray):
             Custom maximum value for normalization.
         """
         self._normalizer.set_custom_bounds(min_val=min_val, max_val=max_val)
-
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Converts the object to a dictionary for serialization.
-        This method includes the raw array and custom bounds in the output.
-
-        Returns
-        -------
-        dict
-            A dictionary containing the raw array and custom bounds.
-        """
-        return {
-            "array": list(self.array),
-            "custom_min_val": self.custom_min_val,
-            "custom_max_val": self.custom_max_val,
-            "_schema_version": self._schema_version
-        }
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "NumericNormalizedArray":
-        """
-        Creates a NumericNormalizedArray instance from a dictionary.
-        This method handles schema version checking and reconstructs the object
-
-        Parameters
-        ----------
-        data : dict
-            A dictionary containing the raw array and custom bounds. Must include
-            the '_schema_version' key.
-
-        Returns
-        -------
-        NumericNormalizedArray
-            The reconstructed NumericNormalizedArray instance.
-
-        Raises
-        ------
-        ValueError
-            If the schema version in the data is not supported.
-        """
-        version = data.get("_schema_version", 0)
-        if version > cls._schema_version:
-            raise ValueError(
-                f"Unsupported schema version: {version}. "
-                f"Current supported version is {cls._schema_version}."
-            )
-
-        instance = cls(array=data["array"])
-        instance.set_custom_bounds(
-            min_val=data.get("custom_min_val"),
-            max_val=data.get("custom_max_val")
-        )
-        return instance

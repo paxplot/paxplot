@@ -13,7 +13,7 @@ Notes
 - Column access is zero-indexed.
 """
 
-from typing import Sequence, Union, List, Any, ClassVar
+from typing import Sequence, Union, List
 from enum import Enum
 from pydantic import BaseModel, field_validator
 import numpy as np
@@ -53,7 +53,6 @@ class NormalizedMatrix(BaseModel):
 
     data: Sequence[Sequence[Union[str, int, float]]]
     _columns: List[BaseNormalizedArray] = []
-    _schema_version: ClassVar[int] = 1
 
     class Config:
         """
@@ -357,84 +356,3 @@ class NormalizedMatrix(BaseModel):
         if not isinstance(column, NumericNormalizedArray):
             raise TypeError(f"Column {column_index} is not numeric and has no custom bounds.")
         return (column.custom_min_val, column.custom_max_val)
-
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Serialize the NormalizedMatrix to a dict.
-
-        Includes:
-        - raw data (list of rows)
-        - column types (list of strings)
-        - custom min/max bounds for numeric columns (dict mapping col index to (min, max))
-        - schema version
-
-        Returns
-        -------
-        dict
-        """
-        # Serialize column types as string list for clarity
-        column_types = [self.get_column_type(i).value for i in range(self.num_columns)]
-
-        # Gather custom bounds for numeric columns only
-        custom_bounds = {}
-        for i, col in enumerate(self._columns):
-            if isinstance(col, NumericNormalizedArray):
-                custom_bounds[i] = {
-                    "custom_min_val": col.custom_min_val,
-                    "custom_max_val": col.custom_max_val,
-                }
-
-        return {
-            "data": [list(row) for row in self.data],  # Ensure serializable
-            "column_types": column_types,
-            "custom_bounds": custom_bounds,
-            "_schema_version": getattr(self, "_schema_version", 1),
-        }
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "NormalizedMatrix":
-        """
-        Create a NormalizedMatrix instance from a serialized dictionary.
-
-        This method reconstructs the matrix including its raw data, column types,
-        and applies any custom min/max normalization bounds for numeric columns.
-        It also validates the schema version for compatibility.
-
-        Parameters
-        ----------
-        data : dict[str, Any]
-            A dictionary containing the serialized NormalizedMatrix data.
-            Expected keys include:
-            - "data": The raw 2D data as a list of rows.
-            - "column_types": A list of column type strings ("numeric" or "categorical").
-            - "custom_bounds": A dictionary mapping numeric column indices to
-            their custom min/max bounds, e.g.,
-            {0: {"custom_min_val": 0.0, "custom_max_val": 5.0}}.
-            - "_schema_version": An integer representing the serialization schema version.
-
-        Returns
-        -------
-        NormalizedMatrix
-            The reconstructed NormalizedMatrix instance with normalization state restored.
-
-        Raises
-        ------
-        ValueError
-            If the schema version in the input dictionary is greater than the supported version,
-            indicating incompatibility.
-        """
-        version = data.get("_schema_version", 0)
-        if version > getattr(cls, "_schema_version", 1):
-            raise ValueError(f"Unsupported schema version: {version}")
-
-        matrix = cls(data=data["data"])
-
-        # Set custom bounds for numeric columns
-        custom_bounds = data.get("custom_bounds", {})
-        for col_index, bounds in custom_bounds.items():
-            matrix.set_custom_bounds(
-                int(col_index),
-                min_val=bounds.get("custom_min_val"),
-                max_val=bounds.get("custom_max_val"),
-            )
-        return matrix

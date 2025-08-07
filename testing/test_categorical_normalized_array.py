@@ -62,17 +62,6 @@ def test_append_array_with_existing_labels_only():
     expected_normalized = np.array([-1.0, 0.0, 1.0, 0.0, 1.0, -1.0])
     np.testing.assert_allclose(arr.array_normalized, expected_normalized, rtol=1e-6)
 
-def test_to_dict_and_from_dict():
-    original = CategoricalNormalizedArray(array=["x", "y", "z", "x"])
-    data = original.to_dict()
-
-    restored = CategoricalNormalizedArray.from_dict(data)
-
-    np.testing.assert_array_equal(restored.array, np.array(["x", "y", "z", "x"]))
-    assert restored._label_to_index == original._label_to_index
-    np.testing.assert_array_equal(restored.array_indeces, original.array_indeces)
-    np.testing.assert_allclose(restored.array_normalized, original.array_normalized)
-
 def test_append_array_extends_normalization_range():
     arr = CategoricalNormalizedArray(array=["one", "two"])
     arr.append_array(["three", "four", "five"])
