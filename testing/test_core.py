@@ -5,10 +5,13 @@ import unittest
 import warnings
 import matplotlib.pyplot as plt
 import numpy as np
+import pytest
+
 import paxplot
 
 
 class PaxplotLib(unittest.TestCase):
+    @pytest.mark.legacy
     def test_parallel_blank(self):
         """
         Test of blank figure
@@ -52,6 +55,7 @@ class PaxplotLib(unittest.TestCase):
         width = position.x1 - position.x0
         self.assertEqual(width, 0.0)
 
+    @pytest.mark.legacy
     def test_parallel_basic(self):
         """
         Basic test of parallel functionality
@@ -96,6 +100,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[0].get_yticklabels()[-1].get_position()[1], 1.0
         )
 
+    @pytest.mark.legacy
     def test_parallel_limits(self):
         """
         Testing plotting with custom limits
@@ -164,6 +169,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
         )
 
+    @pytest.mark.legacy
     def test_parallel_ticks(self):
         """
         Testing plotting with modified ticks
@@ -213,6 +219,7 @@ class PaxplotLib(unittest.TestCase):
             2
         )
 
+    @pytest.mark.legacy
     def test_parallel_even_ticks(self):
         """
         Test even tick setting
@@ -247,6 +254,7 @@ class PaxplotLib(unittest.TestCase):
                 str(round(i*0.1, 2)),
             )
 
+    @pytest.mark.legacy
     def test_parallel_custom_ticks(self):
         """
         Testing plotting with custom ticks
@@ -281,6 +289,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[0].get_yticklabels()[2].get_position()[1], 1.0
         )
 
+    @pytest.mark.legacy
     def test_parallel_label(self):
         """
         Testing setting label
@@ -312,6 +321,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[1].get_xticklabels()[0].get_text(), 'Cmaj7-B7'
         )
 
+    @pytest.mark.legacy
     def test_parallel_labels(self):
         """
         Testing setting labels
@@ -336,6 +346,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[1].get_xticklabels()[0].get_text(), 'B'
         )
 
+    @pytest.mark.legacy
     def test_parallel_invert(self):
         """
         Test inverting axis
@@ -381,6 +392,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
         )
 
+    @pytest.mark.legacy
     def test_parallel_invert_middle(self):
         """
         Test inverting middle axes
@@ -425,6 +437,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[2].get_yticklabels()[-1].get_position()[1], 1.0
         )
 
+    @pytest.mark.legacy
     def test_parallel_legend(self):
         """
         Test creating legend
@@ -453,6 +466,7 @@ class PaxplotLib(unittest.TestCase):
             [1.0, 1.0, 0.0, 1.0]
         )
 
+    @pytest.mark.legacy
     def test_parallel_colorbar(self):
         """
         Test creating colorbar
@@ -503,6 +517,7 @@ class PaxplotLib(unittest.TestCase):
             [1.0, 1.0, 0.0, 0.5]
         )
 
+    @pytest.mark.legacy
     def test_parallel_combo(self):
         """
         Test applying multiple functions. This is more of an
@@ -567,6 +582,7 @@ class PaxplotLib(unittest.TestCase):
             (0.0, 4.0)
         )
 
+    @pytest.mark.legacy
     def test_parallel_singleton(self):
         """
         Testing if axis has all same points and still render plot
@@ -592,6 +608,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig.axes[1].get_yticklabels()[-1].get_text(), '2.0'
         )
 
+    @pytest.mark.legacy
     def test_parallel_savefig(self):
         """
         Testing if possible to save figure
@@ -606,6 +623,7 @@ class PaxplotLib(unittest.TestCase):
         # Cleanup
         os.remove('test.png')
 
+    @pytest.mark.legacy
     def test_parallel_not_supported(self):
         """
         Testing if unsupported
@@ -617,6 +635,7 @@ class PaxplotLib(unittest.TestCase):
         with self.assertWarns(Warning):
             paxfig.suptitle('Test')
 
+    @pytest.mark.legacy
     def test_parallel_supported_top_level(self):
         """
         Testing if top_level functions raise warnings
@@ -631,6 +650,7 @@ class PaxplotLib(unittest.TestCase):
             # Test
             self.assertEqual(len(w), 0)
 
+    @pytest.mark.legacy
     def test_parallel_figshow(self):
         """
         Testing if .show raises warnings
@@ -645,6 +665,7 @@ class PaxplotLib(unittest.TestCase):
             # Test
             self.assertEqual(len(w), 0)
 
+    @pytest.mark.legacy
     def test_multi_plot(self):
         """
         Calling plot multiple times
@@ -685,6 +706,7 @@ class PaxplotLib(unittest.TestCase):
             decimal=1
         )
 
+    @pytest.mark.legacy
     def test_custom_multi_plot(self):
         """
         Multiple calls to plot with custom ticks and limits
@@ -731,6 +753,7 @@ class PaxplotLib(unittest.TestCase):
             [0.0, 1.0, 2.0]
         )
 
+    @pytest.mark.legacy
     def test_attributes_plot(self):
         """
         Calling plot with attrubutes
@@ -763,6 +786,7 @@ class PaxplotLib(unittest.TestCase):
             'B'
         )
 
+    @pytest.mark.legacy
     def test_string_plot(self):
         """
         Calling plot with string inputs
@@ -792,6 +816,7 @@ class PaxplotLib(unittest.TestCase):
             paxfig._pax_ticks_labels[0]
         )
 
+    @pytest.mark.legacy
     def test_string_plot_multi(self):
         """
         Calling plot with string inputs with multiple input
@@ -823,6 +848,8 @@ class PaxplotLib(unittest.TestCase):
 
 
 class PaxplotException(unittest.TestCase):
+
+    @pytest.mark.legacy
     def test_paxfig_creation(self):
         """
         Various ways to fail figure creation
@@ -835,6 +862,7 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(TypeError):
             paxplot.pax_parallel(n_axes=0.1)
 
+    @pytest.mark.legacy
     def test_plot(self):
         """
         Various ways PaxFigure.plot can fail
@@ -859,6 +887,7 @@ class PaxplotException(unittest.TestCase):
                 ]
             )
 
+    @pytest.mark.legacy
     def test_lim(self):
         """
         Various ways PaxFigure.set_lim can fail
@@ -888,6 +917,7 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(TypeError):
             paxfig.set_lim(ax_idx=0, bottom=0, top='foo')
 
+    @pytest.mark.legacy
     def test_ticks(self):
         """
         Various ways PaxFigure.set_ticks can fail
@@ -921,6 +951,7 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(ValueError):
             paxfig.set_ticks(ax_idx=0, ticks=[1, 2, 3], labels='A')
 
+    @pytest.mark.legacy
     def test_even_ticks(self):
         """
         Various ways PaxFigure.set_even_ticks can fail
@@ -972,6 +1003,7 @@ class PaxplotException(unittest.TestCase):
                 maximum=0.0
             )
 
+    @pytest.mark.legacy
     def test_label(self):
         """
         Various ways PaxFigure.set_label can fail
@@ -993,6 +1025,7 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(TypeError):
             paxfig.set_label(ax_idx='foo', label='bar')
 
+    @pytest.mark.legacy
     def test_labels(self):
         """
         Various ways PaxFigure.set_labels can fail
@@ -1010,6 +1043,7 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(IndexError):
             paxfig.set_labels(['A', 'B', 'C'])
 
+    @pytest.mark.legacy
     def test_invert(self):
         """
         Various ways PaxFigure.invert_axis can fail
@@ -1031,6 +1065,7 @@ class PaxplotException(unittest.TestCase):
         with self.assertRaises(TypeError):
             paxfig.invert_axis(ax_idx='foo')
 
+    @pytest.mark.legacy
     def test_legend(self):
         """
         Various ways PaxFigure.add_legend can fail
@@ -1052,6 +1087,7 @@ class PaxplotException(unittest.TestCase):
         with self.assertWarns(Warning):
             paxfig.add_legend(labels=['A', 'B', 'C', 'D'])
 
+    @pytest.mark.legacy
     def test_colorbar(self):
         """
         Various ways PaxFigure.add_colorbar can fail
@@ -1086,6 +1122,7 @@ class PaxplotException(unittest.TestCase):
                 cmap='foo',
             )
 
+    @pytest.mark.legacy
     def test_no_data(self):
         """
         Various ways PaxFigure can fail if no data is plotted

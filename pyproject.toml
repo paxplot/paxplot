@@ -44,3 +44,8 @@ where = ["src"]
 [tool.black]
 line-length = 79
 target-version = ["py312"]
+
+[tool.pytest.ini_options]
+markers = [
+    "legacy: marks tests as covering legacy behavior (deselect with '-m \"not legacy\"')"
+]
