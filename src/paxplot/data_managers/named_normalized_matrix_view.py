@@ -78,6 +78,33 @@ class NamedNormalizedMatrixView:
         """
         return self._index_to_name.copy()
 
+
+    def set_column_names(self, new_names: Sequence[str]) -> None:
+        """
+        Set all column names at once.
+
+        Parameters
+        ----------
+        new_names : Sequence[str]
+            New list of column names, must match matrix column count and be unique.
+
+        Raises
+        ------
+        ValueError
+            If length mismatch or duplicate names found.
+        TypeError
+            If any name is not a string.
+        """
+        if not isinstance(new_names, Sequence) or not all(isinstance(n, str) for n in new_names):
+            raise TypeError("new_names must be a sequence of strings.")
+        if len(new_names) != self._matrix.num_columns:
+            raise ValueError(f"Number of new names ({len(new_names)}) must match matrix columns ({self._matrix.num_columns}).")
+        if len(set(new_names)) != len(new_names):
+            raise ValueError("All column names must be unique.")
+
+        self._index_to_name = list(new_names)
+        self._name_to_index = {name: idx for idx, name in enumerate(self._index_to_name)}
+
     @property
     def matrix(self) -> NormalizedMatrix:
         """
@@ -112,6 +139,59 @@ class NamedNormalizedMatrixView:
         if column_name not in self._name_to_index:
             raise KeyError(f"Column '{column_name}' not found.")
         return self._name_to_index[column_name]
+
+    def get_column_name(self, column_index: int) -> str:
+        """
+        Get the name of a column by index.
+
+        Parameters
+        ----------
+        column_index : int
+
+        Returns
+        -------
+        str
+            The column name.
+
+        Raises
+        ------
+        IndexError
+            If the column_index is out of range.
+        """
+        if column_index < 0 or column_index >= len(self._index_to_name):
+            raise IndexError("Column index out of range.")
+        return self._index_to_name[column_index]
+
+
+    def set_column_name(self, column_index: int, new_name: str) -> None:
+        """
+        Set the name of a column by index.
+
+        Parameters
+        ----------
+        column_index : int
+        new_name : str
+            The new column name. Must be unique.
+
+        Raises
+        ------
+        IndexError
+            If the column_index is out of range.
+        ValueError
+            If new_name is not a string or not unique.
+        """
+        if not isinstance(new_name, str):
+            raise ValueError("Column name must be a string.")
+        if column_index < 0 or column_index >= len(self._index_to_name):
+            raise IndexError("Column index out of range.")
+        if new_name in self._name_to_index and self._name_to_index[new_name] != column_index:
+            raise ValueError(f"Column name '{new_name}' already exists.")
+
+        old_name = self._index_to_name[column_index]
+        # Update mappings
+        self._index_to_name[column_index] = new_name
+        del self._name_to_index[old_name]
+        self._name_to_index[new_name] = column_index
 
     def get_normalized_array(self, column_name: str) -> NDArray[np.float64]:
         """

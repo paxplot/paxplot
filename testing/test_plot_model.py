@@ -12,57 +12,48 @@ INITIAL_DATA = [
 ]
 
 def test_initialization():
-    model = PlotModel(initial_data=INITIAL_DATA)
+    model = PlotModel(INITIAL_DATA)
     assert model.num_rows == 3
     assert model.num_columns == 3
 
 def test_append_rows():
-    model = PlotModel(initial_data=INITIAL_DATA)
+    model = PlotModel(INITIAL_DATA)
     new_rows = [
         [4.0, "dog", 40],
         [5.0, "mouse", 50],
     ]
     model.append_rows(new_rows)
     assert model.num_rows == 5
-
-    # Confirm raw data updated
     raw_col0 = model.get_raw_column(0)
     assert raw_col0[-2:] == [4.0, 5.0]
 
 def test_remove_rows():
-    model = PlotModel(initial_data=INITIAL_DATA)
-    model.remove_rows([0])  # Remove first row
+    model = PlotModel(INITIAL_DATA)
+    model.remove_rows([0])
     assert model.num_rows == 2
-
-    # Confirm that remaining raw data does not include removed row
     raw_col1 = model.get_raw_column(1)
-    assert "cat" in raw_col1
-    assert "dog" in raw_col1
+    assert "cat" in raw_col1 and "dog" in raw_col1
     assert len(raw_col1) == 2
 
 def test_get_normalized_column_returns_list_of_floats():
-    model = PlotModel(initial_data=INITIAL_DATA)
+    model = PlotModel(INITIAL_DATA)
     normalized = model.get_normalized_column(0)
     assert isinstance(normalized, list)
     assert all(isinstance(x, float) for x in normalized)
 
 def test_get_raw_column_types():
-    model = PlotModel(initial_data=INITIAL_DATA)
-    # Numeric column
+    model = PlotModel(INITIAL_DATA)
     raw_numeric = model.get_raw_column(0)
     assert all(isinstance(x, (int, float)) for x in raw_numeric)
-    # Categorical column
     raw_categorical = model.get_raw_column(1)
     assert all(isinstance(x, str) for x in raw_categorical)
 
 def test_set_and_get_custom_bounds():
-    model = PlotModel(initial_data=INITIAL_DATA)
-    # Set custom bounds on numeric column 0
+    model = PlotModel(INITIAL_DATA)
     model.set_custom_bounds(0, min_val=0.0, max_val=10.0)
     bounds = model.get_custom_bounds(0)
     assert bounds == (0.0, 10.0)
 
-    # Setting bounds on a categorical column should raise TypeError
     with pytest.raises(TypeError):
         model.set_custom_bounds(1, min_val=0.0)
 
@@ -70,19 +61,106 @@ def test_set_and_get_custom_bounds():
         model.get_custom_bounds(1)
 
 def test_append_invalid_data_raises():
-    model = PlotModel(initial_data=INITIAL_DATA)
-    # Append row with wrong number of columns
+    model = PlotModel(INITIAL_DATA)
     with pytest.raises(ValueError):
-        model.append_rows([[1.0, "cat"]])  # only 2 columns, should be 3
-
-    # Append row with wrong type in numeric column
+        model.append_rows([[1.0, "cat"]])
     with pytest.raises(TypeError):
         model.append_rows([["not-a-number", "cat", 10]])
 
 def test_remove_rows_invalid_index_raises():
-    model = PlotModel(initial_data=INITIAL_DATA)
+    model = PlotModel(INITIAL_DATA)
     with pytest.raises(IndexError):
-        model.remove_rows([100])  # out of bounds
-
+        model.remove_rows([100])
     with pytest.raises(TypeError):
-        model.remove_rows(["not-an-int"]) # type: ignore
+        model.remove_rows(["not-an-int"])  # type: ignore
+
+def test_set_and_get_column_names():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    assert model.get_column_names() == names
+    assert model.get_column_name(1) == "animal"
+
+def test_set_column_name_and_get_it():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    model.set_column_name(2, "count")
+    assert model.get_column_name(2) == "count"
+
+def test_get_column_names_before_set_raises():
+    model = PlotModel(INITIAL_DATA)
+    with pytest.raises(RuntimeError):
+        _ = model.get_column_names()
+
+def test_get_column_name_before_set_raises():
+    model = PlotModel(INITIAL_DATA)
+    with pytest.raises(RuntimeError):
+        _ = model.get_column_name(0)
+
+def test_set_column_name_before_set_raises():
+    model = PlotModel(INITIAL_DATA)
+    with pytest.raises(RuntimeError):
+        model.set_column_name(0, "newname")
+
+def test_get_normalized_column_by_name():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    normalized = model.get_normalized_column_by_name("num1")
+    assert isinstance(normalized, list)
+    assert all(isinstance(x, float) for x in normalized)
+
+def test_get_raw_column_by_name():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    raw_numeric = model.get_raw_column_by_name("num1")
+    assert all(isinstance(x, (int, float)) for x in raw_numeric)
+    raw_categorical = model.get_raw_column_by_name("animal")
+    assert all(isinstance(x, str) for x in raw_categorical)
+
+def test_get_columns_by_name_before_set_raises():
+    model = PlotModel(INITIAL_DATA)
+    with pytest.raises(RuntimeError):
+        model.get_normalized_column_by_name("num1")
+    with pytest.raises(RuntimeError):
+        model.get_raw_column_by_name("animal")
+
+def test_set_and_get_custom_bounds_by_name():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    model.set_custom_bounds_by_name("num1", min_val=1.0, max_val=100.0)
+    bounds = model.get_custom_bounds_by_name("num1")
+    assert bounds == (1.0, 100.0)
+
+def test_set_custom_bounds_by_name_on_categorical_raises():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    with pytest.raises(TypeError):
+        model.set_custom_bounds_by_name("animal", min_val=0.0)
+
+def test_get_custom_bounds_by_name_on_categorical_raises():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    with pytest.raises(TypeError):
+        model.get_custom_bounds_by_name("animal")
+
+def test_column_name_not_found_raises():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    with pytest.raises(KeyError):
+        model.get_normalized_column_by_name("nonexistent")
+
+    with pytest.raises(KeyError):
+        model.get_raw_column_by_name("nonexistent")
+
+    with pytest.raises(KeyError):
+        model.set_custom_bounds_by_name("nonexistent", min_val=0.0)
+
+    with pytest.raises(KeyError):
+        model.get_custom_bounds_by_name("nonexistent")
