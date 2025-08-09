@@ -11,7 +11,7 @@ The module depends on NumPy for array handling and Pydantic for data validation.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Sequence
+from typing import Any, Sequence, Callable
 import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, PrivateAttr, validate_call
@@ -119,3 +119,15 @@ class BaseNormalizedArray(BaseModel, ABC):
         mask = np.ones(len(array_np), dtype=bool)
         mask[index_array] = False
         self.array = array_np[mask].tolist()
+
+    def register_observer(self, callback: Callable[[], None]) -> None:
+        """
+        Registers a callback to be called after normalization is recomputed.
+        """
+        self._normalizer.register_observer(callback)
+
+    def unregister_observer(self, callback: Callable[[], None]) -> None:
+        """
+        Unregisters a previously registered observer callback.
+        """
+        self._normalizer.unregister_observer(callback)
