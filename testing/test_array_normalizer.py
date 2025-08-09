@@ -441,3 +441,36 @@ def test_remove_indices_duplicates():
     normalizer.remove_indices(np.array([1, 1, 2]))
 
     np.testing.assert_array_equal(normalizer.array, np.array([1.0, 4.0]))
+
+def test_observer_callback_triggered_on_recompute():
+    arr = np.array([1.0, 2.0, 3.0])
+    normalizer = ArrayNormalizer(array=arr)
+
+    called = {"count": 0}
+
+    def observer_callback():
+        called["count"] += 1
+
+    # Register the observer
+    normalizer.register_observer(observer_callback)
+
+    # Initial registration does not call yet
+    assert called["count"] == 0
+
+    # Trigger recompute explicitly
+    normalizer._recompute_normalization()
+    assert called["count"] == 1
+
+    # Trigger recompute again
+    normalizer._recompute_normalization()
+    assert called["count"] == 2
+
+    # Also test that update_array triggers notification
+    new_arr = np.array([10.0, 20.0, 30.0])
+    normalizer.update_array(new_arr)
+    assert called["count"] == 3
+
+    # Test unregistering the observer
+    normalizer.unregister_observer(observer_callback)
+    normalizer._recompute_normalization()
+    assert called["count"] == 3  # no increment after unregister

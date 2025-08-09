@@ -1,6 +1,6 @@
 """The ArrayNormalizer class"""
 
-from typing import Any, Type
+from typing import Any, Type, Callable, List
 
 import numpy as np
 from numpy.typing import NDArray
@@ -18,6 +18,7 @@ class ArrayNormalizer(BaseModel):
     _array_normalized: NDArray[np.float64] | None = None
     _effective_min_val: float | None = None
     _effective_max_val: float | None = None
+    _observers: List[Callable[[], None]] = []
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @property
@@ -123,6 +124,26 @@ class ArrayNormalizer(BaseModel):
         self._recompute_normalization()
         return self
 
+    def register_observer(self, callback: Callable[[], None]) -> None:
+        """
+        Registers a callback function to be called after normalization is recomputed.
+        The callback should accept no arguments.
+        """
+        self._observers.append(callback)
+
+    def unregister_observer(self, callback: Callable[[], None]) -> None:
+        """
+        Unregisters a previously registered callback.
+        """
+        self._observers.remove(callback)
+
+    def _notify_observers(self) -> None:
+        """
+        Calls all registered observer callbacks.
+        """
+        for callback in self._observers:
+            callback()
+
     def _recompute_normalization(self) -> None:
         """
         Computes the normalized array (`_array_normalized`) and stores the
@@ -151,6 +172,8 @@ class ArrayNormalizer(BaseModel):
             self._array_normalized = self._normalize_to_minus1_plus1(
                 self.array, min_val, max_val
             )
+        
+        self._notify_observers()
 
     @staticmethod
     def _normalize_to_minus1_plus1(
