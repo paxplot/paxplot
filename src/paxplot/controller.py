@@ -1,0 +1,1 @@
+"""Controller that calls plot model and renderer"""

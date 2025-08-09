@@ -1,0 +1,1 @@
+"""Functionality to update matplotlib renders"""
