@@ -3,7 +3,7 @@
 from typing import Sequence
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import PrivateAttr
+from pydantic import PrivateAttr, ConfigDict
 from paxplot.data_managers.array_normalizer import ArrayNormalizer
 from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
 
@@ -27,10 +27,7 @@ class CategoricalNormalizedArray(BaseNormalizedArray):
 
     array: Sequence[str]
     _label_to_index: dict[str, int] = PrivateAttr(default_factory=dict)
-
-    class Config:
-        """Pydantic configuration to allow arbitrary types such as NumPy arrays."""
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def _init_normalizer(self) -> ArrayNormalizer:
         """

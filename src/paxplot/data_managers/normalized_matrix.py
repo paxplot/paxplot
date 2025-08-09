@@ -15,7 +15,7 @@ Notes
 
 from typing import Sequence, Union, List
 from enum import Enum
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, ConfigDict
 import numpy as np
 from numpy.typing import NDArray
 
@@ -53,13 +53,10 @@ class NormalizedMatrix(BaseModel):
 
     data: Sequence[Sequence[Union[str, int, float]]]
     _columns: List[BaseNormalizedArray] = []
-
-    class Config:
-        """
-        Pydantic configuration for the NormalizedMatrix class.
-        """
-        arbitrary_types_allowed = True
-        extra = "forbid"
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="forbid"
+    )
 
     @field_validator("data", mode="before")
     @classmethod
