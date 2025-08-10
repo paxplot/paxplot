@@ -98,10 +98,12 @@ class NumericAxisTickManager:
         max_val: float,
         max_ticks: int = 10,
         integer: bool = False,
+        axis_data: Optional[NumericNormalizedArray] = None,
     ) -> "NumericAxisTickManager":
         """
         Create an instance by generating "nice" ticks in [min_val, max_val]
-        using matplotlib logic.
+        using matplotlib logic, optionally associating it with an axis_data
+        NumericNormalizedArray.
 
         Parameters
         ----------
@@ -113,14 +115,16 @@ class NumericAxisTickManager:
             Maximum number of ticks to generate (default 10).
         integer : bool, optional
             Whether to generate integer ticks only (default False).
+        axis_data : NumericNormalizedArray, optional
+            Existing axis data object to link for normalization tracking.
 
         Returns
         -------
         NumericAxisTickManager
-            New instance initialized with generated ticks.
+            New instance initialized with generated ticks and optional axis data.
         """
         ticks = cls._compute_ticks(min_val, max_val, max_ticks=max_ticks, integer=integer)
-        return cls(tick_values=ticks)
+        return cls(tick_values=ticks, axis_data=axis_data)
 
     def generate_ticks(
         self,
@@ -192,12 +196,25 @@ class NumericAxisTickManager:
         return self._ticks.array_normalized.tolist()
 
     def _on_axis_data_normalization_recomputed(self) -> None:
-        """_summary_
+        """
+        Observer callback invoked when the linked axis_data's normalization
+        parameters are recomputed.
+
+        This method ensures that the tick bounds remain synchronized with the
+        current effective min/max values of the associated axis data by calling
+        `_set_tick_bounds_equal_to_axis_bounds()`.
         """
         self._set_tick_bounds_equal_to_axis_bounds()
 
-    def _set_tick_bounds_equal_to_axis_bounds(self):
-        """_summary_
+    def _set_tick_bounds_equal_to_axis_bounds(self) -> None:
+        """
+        Update the tick manager's normalization bounds to match the linked
+        axis_data's normalization bounds.
+
+        If `self._axis_data` is set, this method overrides the internal
+        NumericNormalizedArray's normalization bounds so that tick values are
+        normalized relative to the same range as the axis data. This ensures
+        consistent scaling between axis labels and plotted data.
         """
         if self._axis_data is not None:
             self._ticks.set_custom_bounds(
