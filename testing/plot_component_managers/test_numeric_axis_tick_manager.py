@@ -4,6 +4,7 @@
 import pytest
 
 from paxplot.plot_component_managers.numeric_axis_tick_manager import NumericAxisTickManager
+from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
 
 
 def test_initialization():
@@ -109,3 +110,18 @@ def test_generate_ticks_with_existing_ticks_replacement():
     ticks = manager.get_raw_values()
     assert all(50 <= t <= 100 for t in ticks)
     assert len(ticks) <= 5  # max_ticks + 1
+
+def test_axis_data_observer_triggers():
+    axis_data = NumericNormalizedArray(array=[1, 2, 3, 4, 5])
+    tick_manager = NumericAxisTickManager([1, 3, 5], axis_data=axis_data)
+
+    assert axis_data.normalizer.effective_min_val == 1
+    assert axis_data.normalizer.effective_max_val == 5
+    assert tick_manager._ticks.normalizer.effective_min_val == 1
+    assert tick_manager._ticks.normalizer.effective_max_val == 5
+
+    axis_data.append_array([10])
+    assert axis_data.normalizer.effective_min_val == 1
+    assert axis_data.normalizer.effective_max_val == 10
+    assert tick_manager._ticks.normalizer.effective_min_val == 1
+    assert tick_manager._ticks.normalizer.effective_max_val == 10

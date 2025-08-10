@@ -172,7 +172,7 @@ class ArrayNormalizer(BaseModel):
             self._array_normalized = self._normalize_to_minus1_plus1(
                 self.array, min_val, max_val
             )
-        
+
         self._notify_observers()
 
     @staticmethod

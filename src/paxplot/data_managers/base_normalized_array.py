@@ -47,6 +47,18 @@ class BaseNormalizedArray(BaseModel, ABC):
         self.array = list(self.array)
         self._normalizer = self._init_normalizer()
 
+    @property
+    def normalizer(self) -> ArrayNormalizer:
+        """
+        Returns the internal ArrayNormalizer instance responsible for normalization.
+
+        Returns
+        -------
+        ArrayNormalizer
+            The normalizer instance.
+        """
+        return self._normalizer
+
     @abstractmethod
     def _init_normalizer(self) -> ArrayNormalizer:
         """Subclasses must return a proper normalizer instance.

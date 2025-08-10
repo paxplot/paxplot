@@ -35,7 +35,11 @@ class NumericAxisTickManager:
     storing ticks only inside the internal NumericNormalizedArray.
     """
 
-    def __init__(self, tick_values: Optional[Sequence[Union[int, float]]] = None):
+    def __init__(
+            self,
+            tick_values: Optional[Sequence[Union[int, float]]] = None,
+            axis_data: Optional[NumericNormalizedArray] = None
+        ):
         """
         Initialize with a sequence of numeric tick values.
 
@@ -46,7 +50,12 @@ class NumericAxisTickManager:
         """
         if tick_values is None:
             tick_values = [0.0]
-        self._normalized_array = NumericNormalizedArray(array=tick_values)
+        self._ticks = NumericNormalizedArray(array=tick_values)
+
+        if axis_data is not None:
+            self._axis_data = axis_data
+            self._set_tick_bounds_equal_to_axis_bounds()
+            self._axis_data.register_observer(self._on_axis_data_normalization_recomputed)
 
     @classmethod
     def _compute_ticks(
@@ -147,7 +156,7 @@ class NumericAxisTickManager:
         tick_values : Sequence[Union[int, float]]
             New tick values.
         """
-        self._normalized_array = NumericNormalizedArray(array=tick_values)
+        self._ticks = NumericNormalizedArray(array=tick_values)
 
     def add_tick(self, tick_value: Union[int, float]) -> None:
         """
@@ -158,7 +167,7 @@ class NumericAxisTickManager:
         tick_value : Union[int, float]
             Tick value to add.
         """
-        self._normalized_array.append_array([tick_value])
+        self._ticks.append_array([tick_value])
 
     def get_raw_values(self) -> List[Union[int, float]]:
         """
@@ -169,7 +178,7 @@ class NumericAxisTickManager:
         List[Union[int, float]]
             Raw tick values.
         """
-        return list(self._normalized_array.array)
+        return list(self._ticks.array)
 
     def get_normalized_values(self) -> List[float]:
         """
@@ -180,4 +189,18 @@ class NumericAxisTickManager:
         List[float]
             Normalized tick values.
         """
-        return self._normalized_array.array_normalized.tolist()
+        return self._ticks.array_normalized.tolist()
+
+    def _on_axis_data_normalization_recomputed(self) -> None:
+        """_summary_
+        """
+        self._set_tick_bounds_equal_to_axis_bounds()
+
+    def _set_tick_bounds_equal_to_axis_bounds(self):
+        """_summary_
+        """
+        if self._axis_data is not None:
+            self._ticks.set_custom_bounds(
+                self._axis_data.normalizer.effective_min_val,
+                self._axis_data.normalizer.effective_max_val
+            )
