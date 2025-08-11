@@ -1,27 +1,22 @@
 """
-numeric_axis_tick_manager module.
+Numeric Axis Tick Management for PaxPlot
 
-Provides the NumericAxisTickManager class to manage numeric axis ticks with
-normalization to the range [-1, 1]. Tick values are stored internally using the
-NumericNormalizedArray class, ensuring consistent normalization and easy access
-to both raw and normalized tick values.
+This module provides the NumericAxisTickManager class which handles the creation,
+normalization, and management of numeric tick marks for plot axes.
 
-The class supports:
-- Initialization with a sequence of numeric tick values.
-- Generating “nice” tick values for a given numeric range using matplotlib's
-  tick locating logic.
-- Adding individual tick values.
-- Retrieving raw and normalized tick values.
-- Convenient class method constructor for creating instances by specifying
-  a numeric range and desired tick characteristics.
+The NumericAxisTickManager maintains tick values synchronized with axis data bounds, 
+ensuring ticks are properly normalized to the [-1, 1] internal coordinate system
+used by PaxPlot. It provides methods for:
 
-This module leverages matplotlib.ticker.MaxNLocator to compute aesthetically
-pleasing and logically spaced tick values suitable for plotting numeric axes.
+- Generating evenly-spaced, "nice" tick marks using matplotlib's locator algorithms
+- Setting custom tick values
+- Adding individual tick marks
+- Retrieving both raw and normalized tick values
+- Automatic updates when axis bounds change
 
-Dependencies:
-- matplotlib
-- numpy
-- paxplot.data_managers.numeric_normalized_array.NumericNormalizedArray
+The manager acts as an observer to its associated axis data, automatically
+adjusting its normalization parameters when the axis data changes to maintain
+visual consistency between data and tick marks.
 """
 
 from typing import Optional, Sequence, Union, List
@@ -37,8 +32,8 @@ class NumericAxisTickManager:
 
     def __init__(
             self,
-            tick_values: Optional[Sequence[Union[int, float]]] = None,
-            axis_data: Optional[NumericNormalizedArray] = None
+            axis_data: NumericNormalizedArray,
+            tick_values: Optional[Sequence[Union[int, float]]] = None
         ):
         """
         Initialize with a sequence of numeric tick values.
@@ -52,10 +47,9 @@ class NumericAxisTickManager:
             tick_values = [0.0]
         self._ticks = NumericNormalizedArray(array=tick_values)
 
-        if axis_data is not None:
-            self._axis_data = axis_data
-            self._set_tick_bounds_equal_to_axis_bounds()
-            self._axis_data.register_observer(self._on_axis_data_normalization_recomputed)
+        self._axis_data = axis_data
+        self._set_tick_bounds_equal_to_axis_bounds()
+        self._axis_data.register_observer(self._on_axis_data_normalization_recomputed)
 
     @classmethod
     def _compute_ticks(
@@ -96,13 +90,13 @@ class NumericAxisTickManager:
         cls,
         min_val: float,
         max_val: float,
+        axis_data: NumericNormalizedArray,
         max_ticks: int = 10,
         integer: bool = False,
-        axis_data: Optional[NumericNormalizedArray] = None,
     ) -> "NumericAxisTickManager":
         """
         Create an instance by generating "nice" ticks in [min_val, max_val]
-        using matplotlib logic, optionally associating it with an axis_data
+        using matplotlib logic and associating it with an axis_data
         NumericNormalizedArray.
 
         Parameters
@@ -111,20 +105,20 @@ class NumericAxisTickManager:
             Minimum value of the axis range.
         max_val : float
             Maximum value of the axis range.
+        axis_data : NumericNormalizedArray
+            Existing axis data object to link for normalization tracking.
         max_ticks : int, optional
             Maximum number of ticks to generate (default 10).
         integer : bool, optional
             Whether to generate integer ticks only (default False).
-        axis_data : NumericNormalizedArray, optional
-            Existing axis data object to link for normalization tracking.
 
         Returns
         -------
         NumericAxisTickManager
-            New instance initialized with generated ticks and optional axis data.
+            New instance initialized with generated ticks and axis data.
         """
         ticks = cls._compute_ticks(min_val, max_val, max_ticks=max_ticks, integer=integer)
-        return cls(tick_values=ticks, axis_data=axis_data)
+        return cls(axis_data=axis_data, tick_values=ticks)
 
     def generate_ticks(
         self,
@@ -216,8 +210,7 @@ class NumericAxisTickManager:
         normalized relative to the same range as the axis data. This ensures
         consistent scaling between axis labels and plotted data.
         """
-        if self._axis_data is not None:
-            self._ticks.set_custom_bounds(
-                self._axis_data.normalizer.effective_min_val,
-                self._axis_data.normalizer.effective_max_val
-            )
+        self._ticks.set_custom_bounds(
+            self._axis_data.normalizer.effective_min_val,
+            self._axis_data.normalizer.effective_max_val
+        )
