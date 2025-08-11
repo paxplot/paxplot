@@ -83,6 +83,26 @@ class NumericNormalizedArray(BaseNormalizedArray):
         self.array = list(self.array) + list(new_data)
 
     @validate_call
+    def update_array(self, new_data: Sequence[float | int]) -> None:
+        """
+        Replaces the current raw array with new numeric data and updates
+        the normalized values accordingly.
+
+        Parameters
+        ----------
+        new_data : Sequence[float | int]
+            A sequence of numeric values to replace the current array.
+
+        Raises
+        ------
+        TypeError
+            If the input is not a sequence of numeric values.
+        """
+        new_array = np.array(new_data, dtype=np.float64)
+        self.normalizer.update_array(new_array)
+        self.array = list(new_data)
+
+    @validate_call
     def set_custom_bounds(self, min_val: float | None = None, max_val: float | None = None) -> None:
         """
         Sets custom min and/or max bounds for normalization and updates normalized array.

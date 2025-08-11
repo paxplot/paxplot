@@ -154,7 +154,7 @@ class NumericAxisTickManager:
         tick_values : Sequence[Union[int, float]]
             New tick values.
         """
-        self._ticks = NumericNormalizedArray(array=tick_values)
+        self._ticks.update_array(tick_values)
 
     def add_tick(self, tick_value: Union[int, float]) -> None:
         """

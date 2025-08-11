@@ -81,3 +81,15 @@ def test_set_custom_bounds():
     obj = NumericNormalizedArray(array=arr)
     obj.set_custom_bounds(min_val=0.0, max_val=10.0)
     assert np.allclose(obj.array_normalized, [-0.8, -0.6, -0.4])
+
+def test_update_array():
+    obj = NumericNormalizedArray(array=[1, 2, 3])
+
+    # Replace with a completely different array
+    obj.update_array([10, 20, 30])
+
+    # The normalized array should reflect the new range
+    assert obj.array == [10, 20, 30]
+    np.testing.assert_array_almost_equal(
+        obj.array_normalized, np.array([-1.0, 0.0, 1.0])
+    )

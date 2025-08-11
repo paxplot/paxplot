@@ -2,6 +2,7 @@
 """Tests for the NumericAxisTickManager"""
 
 import pytest
+from numpy.testing import assert_almost_equal
 
 from paxplot.plot_component_managers.numeric_axis_tick_manager import NumericAxisTickManager
 from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
@@ -20,15 +21,16 @@ def test_initialization():
 
 
 def test_set_ticks():
-    axis_data = NumericNormalizedArray(array=[1, 2])
+    axis_data = NumericNormalizedArray(array=[-10.0, 10.0])
     manager = NumericAxisTickManager(axis_data=axis_data, tick_values=[1, 2])
-    manager.set_ticks([5, 10, 15])
-    assert manager.get_raw_values() == [5, 10, 15]
 
-    normalized = manager.get_normalized_values()
-    assert all(-1.0 <= v <= 1.0 for v in normalized)
-    assert abs(normalized[0] + 1) < 1e-6
-    assert abs(normalized[-1] - 1) < 1e-6
+    assert manager.get_raw_values() == [1, 2]
+    assert_almost_equal(manager.get_normalized_values(), [0.1, 0.2])
+
+    manager.set_ticks([3, 4])
+
+    assert manager.get_raw_values() == [3, 4]
+    assert_almost_equal(manager.get_normalized_values(), [0.3, 0.4])
 
 
 def test_add_tick():
@@ -53,16 +55,18 @@ def test_single_value_behavior():
 
 
 def test_add_after_set():
-    axis_data = NumericNormalizedArray(array=[10, 20])
-    manager = NumericAxisTickManager(axis_data=axis_data, tick_values=[10, 20])
-    manager.set_ticks([100, 200])
-    manager.add_tick(300)
-    assert manager.get_raw_values() == [100, 200, 300]
+    axis_data = NumericNormalizedArray(array=[-10.0, 10.0])
+    manager = NumericAxisTickManager(axis_data=axis_data, tick_values=[1, 2])
 
-    normalized = manager.get_normalized_values()
-    assert all(-1.0 <= v <= 1.0 for v in normalized)
-    assert abs(normalized[0] + 1) < 1e-6
-    assert abs(normalized[-1] - 1) < 1e-6
+    # Replace ticks
+    manager.set_ticks([3, 4])
+    assert manager.get_raw_values() == [3, 4]
+    assert_almost_equal(manager.get_normalized_values(), [0.3, 0.4])
+
+    # Add a tick and verify updated state
+    manager.add_tick(5)
+    assert manager.get_raw_values() == [3, 4, 5]
+    assert_almost_equal(manager.get_normalized_values(), [0.3, 0.4, 0.5])
 
 
 def test_generate_ticks_basic():
