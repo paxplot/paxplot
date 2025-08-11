@@ -35,7 +35,10 @@ class CategoricalNormalizedArray(BaseNormalizedArray):
                 categories.append(category)
         self._categories = categories
 
-        indices = np.array([categories.index(category) for category in self.array], dtype=np.float64)
+        indices = np.array(
+            [categories.index(category) for category in self.array],
+            dtype=np.float64
+        )
         return ArrayNormalizer(array=indices)
 
     @property

@@ -98,13 +98,9 @@ class CategoricalAxisTickManager:
         For categorical data, this ensures that any changes in the axis data's
         label-to-index mapping are properly reflected in the tick positions.
         """
-        self._update_ticks_normalization()
+        self._update_ticks_to_match_axis_data()
 
-    def _update_ticks_normalization(self) -> None:
+    def _update_ticks_to_match_axis_data(self) -> None:
+        """Update ticks to match the axis data's categories.
         """
-        Update the tick normalization to ensure alignment with the axis data.
-        
-        For categorical data, this ensures that ticks use the same label-to-index
-        mapping as the axis data, so they appear at the correct positions.
-        """
-        pass
+        self.set_ticks(self._axis_data.categories)
