@@ -76,3 +76,27 @@ def test_append_array_extends_normalization_range():
     # Normalized range [-1, 1]
     expected_normalized = np.linspace(-1, 1, 5)
     np.testing.assert_allclose(arr.array_normalized, expected_normalized, rtol=1e-6)
+
+def test_update_array():
+    arr = CategoricalNormalizedArray(array=["apple", "banana", "cherry"])
+
+    # Replace the array entirely
+    arr.update_array(["date", "elderberry", "fig", "date"])
+
+    # The internal label-to-index mapping should be rebuilt
+    expected_label_to_index = {"date": 0, "elderberry": 1, "fig": 2}
+    assert arr._label_to_index == expected_label_to_index
+
+    # Raw array should be updated
+    np.testing.assert_array_equal(
+        arr.array,
+        np.array(["date", "elderberry", "fig", "date"], dtype=np.str_)
+    )
+
+    # Numeric indices should correspond to new mapping
+    expected_indices = np.array([0, 1, 2, 0], dtype=np.float64)
+    np.testing.assert_array_equal(arr.array_indeces, expected_indices)
+
+    # Normalized values should be scaled between -1 and 1
+    expected_normalized = np.array([-1.0, 0.0, 1.0, -1.0])
+    np.testing.assert_allclose(arr.array_normalized, expected_normalized, rtol=1e-6)

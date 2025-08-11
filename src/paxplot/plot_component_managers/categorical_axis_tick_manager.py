@@ -66,8 +66,7 @@ class CategoricalAxisTickManager:
         tick_values : Sequence[str]
             New tick values.
         """
-        self._ticks = CategoricalNormalizedArray(array=tick_values)
-        self._update_ticks_normalization()
+        self._ticks.update_array(tick_values)
 
     def get_raw_values(self) -> List[str]:
         """

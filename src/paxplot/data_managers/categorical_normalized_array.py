@@ -92,3 +92,30 @@ class CategoricalNormalizedArray(BaseNormalizedArray):
         # Append to existing array and update normalizer
         self.array = list(self.array) + list(new_data)
         self._normalizer.append_array(new_index_array)
+
+    def update_array(self, new_data: Sequence[str]) -> None:
+        """
+        Replaces the current raw array with new categorical data and updates
+        the label-to-index mapping and normalized values accordingly.
+
+        This method rebuilds the internal label-to-index mapping from scratch
+        based on the new data.
+
+        Parameters
+        ----------
+        new_data : Sequence[str]
+            New categorical string values to replace the current array.
+        """
+        # Rebuild mapping from scratch
+        label_to_index = {}
+        indices = []
+        for label in new_data:
+            if label not in label_to_index:
+                label_to_index[label] = len(label_to_index)
+            indices.append(label_to_index[label])
+
+        self._label_to_index = label_to_index
+        self.array = list(new_data)
+
+        index_array = np.array(indices, dtype=np.float64)
+        self._normalizer.update_array(index_array)
