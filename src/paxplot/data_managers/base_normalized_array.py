@@ -1,13 +1,16 @@
-# pylint: disable=W2301
 """
 Base classes for normalized array types.
 
-This module defines the abstract base class `BaseNormalizedArray`, which provides
-a common interface and shared functionality for normalized array data structures.
-It manages raw data storage and eager construction of an internal `ArrayNormalizer`
-for normalization operations.
+This module provides abstract base classes to support normalized array data structures.
+It includes the `BaseNormalizedArray` abstract class, which defines a consistent interface
+for managing raw data sequences stored as Python lists and producing normalized NumPy arrays
+scaled to the range [-1, 1].
 
-The module depends on NumPy for array handling and Pydantic for data validation.
+Normalization logic is delegated to an internal `ArrayNormalizer` instance, which subclasses
+must initialize appropriately.
+
+The module depends on NumPy for numerical array operations and may utilize Pydantic
+for validation in related components.
 """
 
 from abc import ABC, abstractmethod
@@ -23,18 +26,25 @@ class BaseNormalizedArray(ABC, Generic[T]):
     Abstract base class for normalized arrays.
 
     This class provides a common interface and partial implementation for
-    normalized array types, managing a sequence of raw values and an internal
-    ArrayNormalizer instance to perform normalization.
+    normalized array types. Raw values are always stored internally as a
+    mutable Python ``list`` of elements, while normalized values are returned
+    as a NumPy ``ndarray`` scaled to the range [-1, 1].
 
-    Subclasses must implement methods for appending data and removing elements by index.
+    An internal :class:`ArrayNormalizer` instance handles the normalization
+    process, ensuring consistent scaling behavior across subclasses.
+
+    Subclasses must implement methods for appending data and removing elements
+    by index, as well as providing the correct normalizer type.
 
     Parameters
     ----------
-    array : Sequence[Any]
-        The raw input data sequence to be normalized.
+    values : Sequence[T]
+        The raw input data sequence to be stored and normalized.
 
     Attributes
     ----------
+    values : list[T]
+        Raw values stored internally as a Python list.
     _normalizer : ArrayNormalizer
         Internal instance responsible for normalization operations.
     """
@@ -49,7 +59,7 @@ class BaseNormalizedArray(ABC, Generic[T]):
     @property
     def custom_min_val(self) -> float | None:
         """
-        Returns the custom minimum value used for normalization, if any.
+        The custom minimum value used for normalization, if any.
 
         Returns
         -------
@@ -61,7 +71,7 @@ class BaseNormalizedArray(ABC, Generic[T]):
     @property
     def custom_max_val(self) -> float | None:
         """
-        Returns the custom maximum value used for normalization, if any.
+        The custom maximum value used for normalization, if any.
 
         Returns
         -------
@@ -72,36 +82,44 @@ class BaseNormalizedArray(ABC, Generic[T]):
 
     @property
     def effective_min_val(self) -> float:
-        """Returns the effective minimum value, defaults to custom_min_val
+        """
+        The effective minimum value used for normalization.
+
+        This is usually ``custom_min_val`` if set, otherwise derived from the data.
 
         Returns
         -------
         float
-            Efective minimum value, defaults to custom_min_val
+            Effective minimum value.
         """
         return self._normalizer.effective_min_val
 
     @property
     def effective_max_val(self) -> float:
-        """Returns the effective maximum value, defaults to custom_max_val
+        """
+        The effective maximum value used for normalization.
+
+        This is usually ``custom_max_val`` if set, otherwise derived from the data.
 
         Returns
         -------
         float
-            Effective maximum value, defaults to custom_max_val
+            Effective maximum value.
         """
         return self._normalizer.effective_max_val
 
     @abstractmethod
     def _init_normalizer(self) -> ArrayNormalizer:
-        """Subclasses must return a proper normalizer instance.
+        """
+        Subclasses must return the appropriate :class:`ArrayNormalizer` instance
+        for their data type.
 
         Returns
         -------
         ArrayNormalizer
             The normalizer instance for this array type.
         """
-        ...
+        ...  # pylint: disable=W2301
 
     def __len__(self) -> int:
         return len(self.values)
@@ -112,12 +130,15 @@ class BaseNormalizedArray(ABC, Generic[T]):
     @property
     def values_normalized(self) -> NDArray[np.float64]:
         """
-        Returns the normalized NumPy values scaled to the range [-1, 1].
+        The normalized data values as a NumPy array scaled to [-1, 1].
+
+        The raw values are first normalized by the internal normalizer
+        according to the current effective min/max values.
 
         Returns
         -------
         NDArray[np.float64]
-            The normalized array of float64 values.
+            A NumPy array of normalized float64 values.
         """
         return self._normalizer.array_normalized
 
@@ -134,22 +155,22 @@ class BaseNormalizedArray(ABC, Generic[T]):
         new_data : Sequence[Any]
             New elements to append to the array.
         """
-        ...
+        ...  # pylint: disable=W2301
 
     def remove_indices(self, indices: Sequence[int]) -> None:
         """
-        Removes elements at the specified indices from the raw array and updates the internal
-        normalization.
+        Remove elements at the specified indices from the raw values list
+        and update the internal normalization state.
 
         Parameters
         ----------
         indices : Sequence[int]
-            A sequence of integer indices indicating which elements to remove.
+            Sequence of integer indices indicating which elements to remove.
 
         Raises
         ------
         TypeError
-            If the input is not a sequence of integers.
+            If ``indices`` is not a sequence of integers.
         IndexError
             If any index is out of bounds.
         """

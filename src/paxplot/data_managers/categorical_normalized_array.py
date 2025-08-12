@@ -1,4 +1,16 @@
-"""Categorical normalized array class for handling and normalizing string data."""
+"""
+Categorical normalized array class for handling and normalizing string data.
+
+This module defines the `CategoricalNormalizedArray` class, a concrete
+implementation of `BaseNormalizedArray` designed for categorical string data.
+
+Raw categorical values are stored internally as a Python list of strings,
+while normalization maps these categories to numeric indices which are
+scaled to [-1, 1] using an internal `ArrayNormalizer`.
+
+The class manages an ordered list of unique categories and updates normalization
+when new data is appended or the array is replaced.
+"""
 
 from typing import Sequence, List
 import numpy as np
@@ -12,8 +24,17 @@ class CategoricalNormalizedArray(BaseNormalizedArray[str]):
     """
     A normalized array class for categorical (string) data.
 
-    Stores a list of unique categories in the order they appear.
-    Numeric indices correspond to the position of each category in this list.
+    Raw categorical values are stored as a Python list of strings.
+    Unique categories are tracked in the order of appearance.
+    Normalization maps these categories to numeric indices internally
+    and scales them to the range [-1, 1].
+
+    Attributes
+    ----------
+    values : list[str]
+        Raw categorical string values stored internally.
+    _categories : list[str]
+        Ordered list of unique category labels.
     """
 
     _categories: List[str] = PrivateAttr(default_factory=list)
@@ -21,12 +42,13 @@ class CategoricalNormalizedArray(BaseNormalizedArray[str]):
 
     def _init_normalizer(self) -> ArrayNormalizer:
         """
-        Initializes the ArrayNormalizer by mapping strings to indices via the categories list.
+        Initialize the internal ArrayNormalizer by mapping categorical strings
+        to numeric indices based on the order of categories.
 
         Returns
         -------
         ArrayNormalizer
-            The normalizer initialized with numeric indices derived from the categorical data.
+            The normalizer initialized with numeric indices derived from categorical data.
         """
         categories = []
         for category in self.values:
@@ -43,35 +65,35 @@ class CategoricalNormalizedArray(BaseNormalizedArray[str]):
     @property
     def value_indices(self) -> NDArray[np.float64]:
         """
-        Returns the numeric index array corresponding to the original categorical values.
+        Numeric index array corresponding to the original categorical values.
 
         Returns
         -------
         NDArray[np.float64]
-            A NumPy array of float64 values representing category indices.
+            NumPy array of category indices as float64 values.
         """
         return self._normalizer.array
 
     @property
     def categories(self) -> List[str]:
         """
-        Returns the list of unique categories in order.
+        List of unique categories in the order they appear.
 
         Returns
         -------
         List[str]
-            The list of unique category labels.
+            Unique category labels.
         """
         return self._categories
 
     def append_array(self, new_data: Sequence[str]) -> None:
         """
-        Appends new categorical data to the array and updates normalization.
+        Append new categorical string values and update normalization.
 
         Parameters
         ----------
         new_data : Sequence[str]
-            New categorical string values to append.
+            New categorical strings to append.
         """
         categories = self._categories
         indices = []
@@ -87,12 +109,13 @@ class CategoricalNormalizedArray(BaseNormalizedArray[str]):
 
     def update_array(self, new_data: Sequence[str]) -> None:
         """
-        Replaces the current array with new data and rebuilds categories and normalization.
+        Replace the current categorical array with new data,
+        rebuild categories, and update normalization.
 
         Parameters
         ----------
         new_data : Sequence[str]
-            New categorical string values to replace the current array.
+            New categorical strings to replace the current array.
         """
         categories = []
         for category in new_data:

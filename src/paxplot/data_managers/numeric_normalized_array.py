@@ -1,10 +1,11 @@
-"""Defines the NumericNormalizedArray class, a specialized normalized array 
+"""
+Defines the NumericNormalizedArray class, a specialized normalized array 
 for numeric data (floats and integers).
 
 This module extends the abstract BaseNormalizedArray class to support sequences 
-of numeric values that are automatically normalized to the range [-1, 1] using 
-min-max scaling. It provides methods to append new values and maintain normalization 
-state efficiently.
+of numeric values stored internally as Python lists and normalized to the range 
+[-1, 1] via min-max scaling. It provides concrete implementations for appending 
+and updating numeric data, maintaining normalization state efficiently.
 
 Classes
 -------
@@ -25,23 +26,35 @@ class NumericNormalizedArray(BaseNormalizedArray[float | int]):
     """
     A normalized array specifically for numeric (float or int) sequences.
 
-    Automatically normalizes the input sequence to the range [-1, 1]
-    using min-max scaling via the internal ArrayNormalizer.
+    Raw numeric values are stored internally as a Python list of floats or ints.
+    The normalized representation is produced by min-max scaling these values
+    to the range [-1, 1] using an internal :class:`ArrayNormalizer`.
+
+    This class provides concrete methods to append new numeric data or replace
+    the entire dataset, automatically updating the normalization accordingly.
 
     Attributes
     ----------
-    array : Sequence[float | int]
-        The raw sequence of numeric values.
+    values : list[float | int]
+        Raw numeric values stored internally.
     """
 
     def _init_normalizer(self) -> ArrayNormalizer:
+        """
+        Initialize the internal ArrayNormalizer with the current raw numeric values.
+
+        Returns
+        -------
+        ArrayNormalizer
+            The normalizer instance configured with the numeric data.
+        """
         arr = np.array(self.values, dtype=np.float64)
         return ArrayNormalizer(array=arr)
 
     @validate_call
     def append_array(self, new_data: Sequence[float | int]) -> None:
         """
-        Appends new numeric data to the raw array and updates the normalized values.
+        Append new numeric data to the raw values list and update normalization.
 
         Parameters
         ----------
@@ -60,8 +73,7 @@ class NumericNormalizedArray(BaseNormalizedArray[float | int]):
     @validate_call
     def update_array(self, new_data: Sequence[float | int]) -> None:
         """
-        Replaces the current raw array with new numeric data and updates
-        the normalized values accordingly.
+        Replace the current raw numeric values with a new sequence and update normalization.
 
         Parameters
         ----------
@@ -80,7 +92,7 @@ class NumericNormalizedArray(BaseNormalizedArray[float | int]):
     @validate_call
     def set_custom_bounds(self, min_val: float | None = None, max_val: float | None = None) -> None:
         """
-        Sets custom min and/or max bounds for normalization and updates normalized array.
+        Set custom minimum and/or maximum bounds for normalization and update the normalized array.
 
         Parameters
         ----------
