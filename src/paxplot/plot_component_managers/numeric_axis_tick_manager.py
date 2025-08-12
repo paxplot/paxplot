@@ -45,7 +45,7 @@ class NumericAxisTickManager:
         """
         if tick_values is None:
             tick_values = [0.0]
-        self._ticks = NumericNormalizedArray(array=tick_values)
+        self._ticks = NumericNormalizedArray(values=tick_values)
 
         self._axis_data = axis_data
         self._set_tick_bounds_equal_to_axis_bounds()
@@ -176,7 +176,7 @@ class NumericAxisTickManager:
         List[Union[int, float]]
             Raw tick values.
         """
-        return list(self._ticks.array)
+        return list(self._ticks.values)
 
     def get_normalized_values(self) -> List[float]:
         """
@@ -187,7 +187,7 @@ class NumericAxisTickManager:
         List[float]
             Normalized tick values.
         """
-        return self._ticks.array_normalized.tolist()
+        return self._ticks.values_normalized.tolist()
 
     def _on_axis_data_normalization_recomputed(self) -> None:
         """
@@ -211,6 +211,6 @@ class NumericAxisTickManager:
         consistent scaling between axis labels and plotted data.
         """
         self._ticks.set_custom_bounds(
-            self._axis_data.normalizer.effective_min_val,
-            self._axis_data.normalizer.effective_max_val
+            self._axis_data.effective_min_val,
+            self._axis_data.effective_max_val
         )

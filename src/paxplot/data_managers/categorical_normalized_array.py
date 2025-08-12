@@ -16,7 +16,7 @@ class CategoricalNormalizedArray(BaseNormalizedArray):
     Numeric indices correspond to the position of each category in this list.
     """
 
-    array: Sequence[str]
+    values: Sequence[str]
     _categories: List[str] = PrivateAttr(default_factory=list)
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -30,19 +30,19 @@ class CategoricalNormalizedArray(BaseNormalizedArray):
             The normalizer initialized with numeric indices derived from the categorical data.
         """
         categories = []
-        for category in self.array:
+        for category in self.values:
             if category not in categories:
                 categories.append(category)
         self._categories = categories
 
         indices = np.array(
-            [categories.index(category) for category in self.array],
+            [categories.index(category) for category in self.values],
             dtype=np.float64
         )
         return ArrayNormalizer(array=indices)
 
     @property
-    def array_indices(self) -> NDArray[np.float64]:
+    def value_indices(self) -> NDArray[np.float64]:
         """
         Returns the numeric index array corresponding to the original categorical values.
 
@@ -83,7 +83,7 @@ class CategoricalNormalizedArray(BaseNormalizedArray):
 
         new_index_array = np.array(indices, dtype=np.float64)
 
-        self.array = list(self.array) + list(new_data)
+        self.values = list(self.values) + list(new_data)
         self._normalizer.append_array(new_index_array)
 
     def update_array(self, new_data: Sequence[str]) -> None:
@@ -100,7 +100,7 @@ class CategoricalNormalizedArray(BaseNormalizedArray):
             if category not in categories:
                 categories.append(category)
         self._categories = categories
-        self.array = list(new_data)
+        self.values = list(new_data)
 
         indices = np.array([categories.index(category) for category in new_data], dtype=np.float64)
         self._normalizer.update_array(indices)

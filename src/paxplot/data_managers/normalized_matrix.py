@@ -98,9 +98,9 @@ class NormalizedMatrix(BaseModel):
         for i, col_type in enumerate(col_types):
             col_data = arr[:, i].tolist()
             if col_type == ColumnType.NUMERIC:
-                self._columns.append(NumericNormalizedArray(array=col_data))
+                self._columns.append(NumericNormalizedArray(values=col_data))
             elif col_type == ColumnType.CATEGORICAL:
-                self._columns.append(CategoricalNormalizedArray(array=col_data))
+                self._columns.append(CategoricalNormalizedArray(values=col_data))
 
     @staticmethod
     def validate_column_shape_and_nulls(
@@ -188,7 +188,7 @@ class NormalizedMatrix(BaseModel):
         """
         if not self._columns:
             return 0
-        return len(self._columns[0].array)
+        return len(self._columns[0].values)
 
     def get_normalized_array(self, column_index: int) -> NDArray[np.float64]:
         """
@@ -250,7 +250,7 @@ class NormalizedMatrix(BaseModel):
         column_instance = self._columns[column_index]
         if not isinstance(column_instance, NumericNormalizedArray):
             raise TypeError(f"Column {column_index} is not of numeric type")
-        return column_instance.array
+        return column_instance.values
 
     def get_categorical_array(self, column_index: int) -> Sequence[str]:
         """
@@ -274,7 +274,7 @@ class NormalizedMatrix(BaseModel):
         column_instance = self._columns[column_index]
         if not isinstance(column_instance, CategoricalNormalizedArray):
             raise TypeError(f"Column {column_index} is not of categorical type")
-        return column_instance.array
+        return column_instance.values
 
     def append_data(self, new_rows: Sequence[Sequence[Union[str, int, float]]]) -> None:
         """

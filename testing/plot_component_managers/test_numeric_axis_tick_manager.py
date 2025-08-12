@@ -9,7 +9,7 @@ from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArra
 
 
 def test_initialization():
-    axis_data = NumericNormalizedArray(array=[10, 20, 30])
+    axis_data = NumericNormalizedArray(values=[10, 20, 30])
     ticks = [10, 20, 30]
     manager = NumericAxisTickManager(axis_data=axis_data, tick_values=ticks)
     assert manager.get_raw_values() == ticks
@@ -21,7 +21,7 @@ def test_initialization():
 
 
 def test_set_ticks():
-    axis_data = NumericNormalizedArray(array=[-10.0, 10.0])
+    axis_data = NumericNormalizedArray(values=[-10.0, 10.0])
     manager = NumericAxisTickManager(axis_data=axis_data, tick_values=[1, 2])
 
     assert manager.get_raw_values() == [1, 2]
@@ -34,7 +34,7 @@ def test_set_ticks():
 
 
 def test_add_tick():
-    axis_data = NumericNormalizedArray(array=[1, 2, 3, 4])
+    axis_data = NumericNormalizedArray(values=[1, 2, 3, 4])
     manager = NumericAxisTickManager(axis_data=axis_data, tick_values=[1, 2, 3])
     manager.add_tick(4)
     assert manager.get_raw_values() == [1, 2, 3, 4]
@@ -45,7 +45,7 @@ def test_add_tick():
 
 
 def test_single_value_behavior():
-    axis_data = NumericNormalizedArray(array=[42])
+    axis_data = NumericNormalizedArray(values=[42])
     manager = NumericAxisTickManager(axis_data=axis_data, tick_values=[42])
     assert manager.get_raw_values() == [42]
 
@@ -55,7 +55,7 @@ def test_single_value_behavior():
 
 
 def test_add_after_set():
-    axis_data = NumericNormalizedArray(array=[-10.0, 10.0])
+    axis_data = NumericNormalizedArray(values=[-10.0, 10.0])
     manager = NumericAxisTickManager(axis_data=axis_data, tick_values=[1, 2])
 
     # Replace ticks
@@ -70,7 +70,7 @@ def test_add_after_set():
 
 
 def test_generate_ticks_basic():
-    axis_data = NumericNormalizedArray(array=[0, 100])
+    axis_data = NumericNormalizedArray(values=[0, 100])
     manager = NumericAxisTickManager(axis_data=axis_data)
     manager.generate_ticks(0, 100, max_ticks=5)
     ticks = manager.get_raw_values()
@@ -84,7 +84,7 @@ def test_generate_ticks_basic():
 
 
 def test_generate_ticks_integer_only():
-    axis_data = NumericNormalizedArray(array=[3, 17])
+    axis_data = NumericNormalizedArray(values=[3, 17])
     manager = NumericAxisTickManager(axis_data=axis_data)
     manager.generate_ticks(3, 17, max_ticks=4, integer=True)
     ticks = manager.get_raw_values()
@@ -95,14 +95,14 @@ def test_generate_ticks_integer_only():
 
 
 def test_generate_ticks_min_greater_than_max():
-    axis_data = NumericNormalizedArray(array=[10, 5])
+    axis_data = NumericNormalizedArray(values=[10, 5])
     manager = NumericAxisTickManager(axis_data=axis_data)
     with pytest.raises(ValueError):
         manager.generate_ticks(10, 5)
 
 
 def test_generate_ticks_single_tick():
-    axis_data = NumericNormalizedArray(array=[0, 0.0001])
+    axis_data = NumericNormalizedArray(values=[0, 0.0001])
     manager = NumericAxisTickManager(axis_data=axis_data)
     manager.generate_ticks(0, 0.0001, max_ticks=3)
     ticks = manager.get_raw_values()
@@ -112,7 +112,7 @@ def test_generate_ticks_single_tick():
 
 
 def test_generate_ticks_with_existing_ticks_replacement():
-    axis_data = NumericNormalizedArray(array=[10, 20, 30])
+    axis_data = NumericNormalizedArray(values=[10, 20, 30])
     manager = NumericAxisTickManager(axis_data=axis_data, tick_values=[10, 20, 30])
     manager.generate_ticks(50, 100, max_ticks=4)
     ticks = manager.get_raw_values()
@@ -121,16 +121,16 @@ def test_generate_ticks_with_existing_ticks_replacement():
 
 
 def test_axis_data_observer_triggers():
-    axis_data = NumericNormalizedArray(array=[1, 2, 3, 4, 5])
+    axis_data = NumericNormalizedArray(values=[1, 2, 3, 4, 5])
     tick_manager = NumericAxisTickManager(tick_values=[1, 3, 5], axis_data=axis_data)
 
-    assert axis_data.normalizer.effective_min_val == 1
-    assert axis_data.normalizer.effective_max_val == 5
-    assert tick_manager._ticks.normalizer.effective_min_val == 1
-    assert tick_manager._ticks.normalizer.effective_max_val == 5
+    assert axis_data.effective_min_val == 1
+    assert axis_data.effective_max_val == 5
+    assert tick_manager._ticks.effective_min_val == 1
+    assert tick_manager._ticks.effective_max_val == 5
 
     axis_data.append_array([10])
-    assert axis_data.normalizer.effective_min_val == 1
-    assert axis_data.normalizer.effective_max_val == 10
-    assert tick_manager._ticks.normalizer.effective_min_val == 1
-    assert tick_manager._ticks.normalizer.effective_max_val == 10
+    assert axis_data.effective_min_val == 1
+    assert axis_data.effective_max_val == 10
+    assert tick_manager._ticks.effective_min_val == 1
+    assert tick_manager._ticks.effective_max_val == 10

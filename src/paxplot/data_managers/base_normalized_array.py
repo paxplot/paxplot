@@ -39,25 +39,59 @@ class BaseNormalizedArray(BaseModel, ABC):
         Internal instance responsible for normalization operations.
     """
 
-    array: Sequence[Any]
+    values: Sequence[Any]
     _normalizer: ArrayNormalizer = PrivateAttr()
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.array = list(self.array)
+        self.values = list(self.values)
         self._normalizer = self._init_normalizer()
 
     @property
-    def normalizer(self) -> ArrayNormalizer:
+    def custom_min_val(self) -> float | None:
         """
-        Returns the internal ArrayNormalizer instance responsible for normalization.
+        Returns the custom minimum value used for normalization, if any.
 
         Returns
         -------
-        ArrayNormalizer
-            The normalizer instance.
+        float | None
+            The user-specified minimum value, or None if not set.
         """
-        return self._normalizer
+        return self._normalizer.custom_min_val
+
+    @property
+    def custom_max_val(self) -> float | None:
+        """
+        Returns the custom maximum value used for normalization, if any.
+
+        Returns
+        -------
+        float | None
+            The user-specified maximum value, or None if not set.
+        """
+        return self._normalizer.custom_max_val
+
+    @property
+    def effective_min_val(self) -> float:
+        """Returns the effective minimum value, defaults to custom_min_val
+
+        Returns
+        -------
+        float
+            Efective minimum value, defaults to custom_min_val
+        """
+        return self._normalizer.effective_min_val
+
+    @property
+    def effective_max_val(self) -> float:
+        """Returns the effective maximum value, defaults to custom_max_val
+
+        Returns
+        -------
+        float
+            Effective maximum value, defaults to custom_max_val
+        """
+        return self._normalizer.effective_max_val
 
     @abstractmethod
     def _init_normalizer(self) -> ArrayNormalizer:
@@ -71,15 +105,15 @@ class BaseNormalizedArray(BaseModel, ABC):
         ...
 
     def __len__(self) -> int:
-        return len(self.array)
+        return len(self.values)
 
     def __getitem__(self, index: int) -> Any:
-        return self.array[index]
+        return self.values[index]
 
     @property
-    def array_normalized(self) -> NDArray[np.float64]:
+    def values_normalized(self) -> NDArray[np.float64]:
         """
-        Returns the normalized NumPy array scaled to the range [-1, 1].
+        Returns the normalized NumPy values scaled to the range [-1, 1].
 
         Returns
         -------
@@ -127,10 +161,10 @@ class BaseNormalizedArray(BaseModel, ABC):
         self._normalizer.remove_indices(index_array)
 
         # Remove raw entries from `self.array`
-        array_np = np.array(self.array)
+        array_np = np.array(self.values)
         mask = np.ones(len(array_np), dtype=bool)
         mask[index_array] = False
-        self.array = array_np[mask].tolist()
+        self.values = array_np[mask].tolist()
 
     def register_observer(self, callback: Callable[[], None]) -> None:
         """

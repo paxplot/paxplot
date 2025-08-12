@@ -27,7 +27,7 @@ class CategoricalAxisTickManager:
         """
         if tick_values is None:
             tick_values = []
-        self._ticks = CategoricalNormalizedArray(array=tick_values)
+        self._ticks = CategoricalNormalizedArray(values=tick_values)
 
         self._axis_data = axis_data
         # Register to be notified when axis data changes
@@ -77,7 +77,7 @@ class CategoricalAxisTickManager:
         List[str]
             Raw tick values.
         """
-        return list(self._ticks.array)
+        return list(self._ticks.values)
 
     def get_normalized_values(self) -> List[float]:
         """
@@ -88,7 +88,7 @@ class CategoricalAxisTickManager:
         List[float]
             Normalized tick values.
         """
-        return self._ticks.array_normalized.tolist()
+        return self._ticks.values_normalized.tolist()
 
     def _on_axis_data_normalization_recomputed(self) -> None:
         """
