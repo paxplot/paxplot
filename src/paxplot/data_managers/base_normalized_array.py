@@ -11,14 +11,14 @@ The module depends on NumPy for array handling and Pydantic for data validation.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Sequence, Callable
+from typing import Any, Sequence, Callable, List, TypeVar, Generic
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import BaseModel, PrivateAttr, validate_call
 from paxplot.data_managers.array_normalizer import ArrayNormalizer
 
+T = TypeVar("T")
 
-class BaseNormalizedArray(BaseModel, ABC):
+class BaseNormalizedArray(ABC, Generic[T]):
     """
     Abstract base class for normalized arrays.
 
@@ -39,12 +39,11 @@ class BaseNormalizedArray(BaseModel, ABC):
         Internal instance responsible for normalization operations.
     """
 
-    values: Sequence[Any]
-    _normalizer: ArrayNormalizer = PrivateAttr()
+    values: List[T]
+    _normalizer: ArrayNormalizer
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.values = list(self.values)
+    def __init__(self, values: Sequence[T]):
+        self.values = list(values)
         self._normalizer = self._init_normalizer()
 
     @property
@@ -137,7 +136,6 @@ class BaseNormalizedArray(BaseModel, ABC):
         """
         ...
 
-    @validate_call
     def remove_indices(self, indices: Sequence[int]) -> None:
         """
         Removes elements at the specified indices from the raw array and updates the internal

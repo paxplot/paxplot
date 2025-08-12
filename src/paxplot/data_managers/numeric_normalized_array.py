@@ -21,7 +21,7 @@ from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
 from paxplot.data_managers.array_normalizer import ArrayNormalizer
 
 
-class NumericNormalizedArray(BaseNormalizedArray):
+class NumericNormalizedArray(BaseNormalizedArray[float | int]):
     """
     A normalized array specifically for numeric (float or int) sequences.
 
@@ -33,7 +33,6 @@ class NumericNormalizedArray(BaseNormalizedArray):
     array : Sequence[float | int]
         The raw sequence of numeric values.
     """
-    values: Sequence[float | int]
 
     def _init_normalizer(self) -> ArrayNormalizer:
         arr = np.array(self.values, dtype=np.float64)

@@ -8,7 +8,7 @@ from paxplot.data_managers.array_normalizer import ArrayNormalizer
 from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
 
 
-class CategoricalNormalizedArray(BaseNormalizedArray):
+class CategoricalNormalizedArray(BaseNormalizedArray[str]):
     """
     A normalized array class for categorical (string) data.
 
@@ -16,7 +16,6 @@ class CategoricalNormalizedArray(BaseNormalizedArray):
     Numeric indices correspond to the position of each category in this list.
     """
 
-    values: Sequence[str]
     _categories: List[str] = PrivateAttr(default_factory=list)
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
