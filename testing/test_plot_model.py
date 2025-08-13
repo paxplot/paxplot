@@ -37,7 +37,7 @@ def test_remove_rows():
 
 def test_get_normalized_column_returns_list_of_floats():
     model = PlotModel(INITIAL_DATA)
-    normalized = model.get_normalized_column_values(0)
+    normalized = model.get_column_values_normalized(0)
     assert isinstance(normalized, list) or hasattr(normalized, "__array__")
     # Accept both list and numpy array for normalized output
     assert all(isinstance(x, float) for x in normalized)
@@ -107,7 +107,7 @@ def test_get_normalized_column_by_name():
     model = PlotModel(INITIAL_DATA)
     names = ["num1", "animal", "num2"]
     model.set_column_names(names)
-    normalized = model.get_normalized_column_values_by_name("num1")
+    normalized = model.get_column_values_normalized_by_name("num1")
     assert isinstance(normalized, list) or hasattr(normalized, "__array__")
     assert all(isinstance(x, float) for x in normalized)
 
@@ -123,7 +123,7 @@ def test_get_raw_column_by_name():
 def test_get_columns_by_name_before_set_raises():
     model = PlotModel(INITIAL_DATA)
     with pytest.raises(RuntimeError):
-        model.get_normalized_column_values_by_name("num1")
+        model.get_column_values_normalized_by_name("num1")
     with pytest.raises(RuntimeError):
         model.get_column_values_by_name("animal")
 
@@ -143,7 +143,7 @@ def test_column_name_not_found_raises():
     names = ["num1", "animal", "num2"]
     model.set_column_names(names)
     with pytest.raises(KeyError):
-        model.get_normalized_column_values_by_name("nonexistent")
+        model.get_column_values_normalized_by_name("nonexistent")
 
     with pytest.raises(KeyError):
         model.get_column_values_by_name("nonexistent")

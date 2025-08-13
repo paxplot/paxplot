@@ -56,7 +56,7 @@ class PlotModel:
         """Number of columns in the data."""
         return self._matrix.num_columns
 
-    def get_normalized_column_values(self, column_index: int) -> NDArray[np.float64]:
+    def get_column_values_normalized(self, column_index: int) -> NDArray[np.float64]:
         """
         Get the normalized data for the specified column.
 
@@ -258,7 +258,7 @@ class PlotModel:
             raise RuntimeError("Column names have not been set.")
         self._named_view.set_column_name(column_index, new_name)
 
-    def get_normalized_column_values_by_name(self, column_name: str) -> NDArray:
+    def get_column_values_normalized_by_name(self, column_name: str) -> NDArray:
         """
         Get the normalized data for the specified column name.
 
