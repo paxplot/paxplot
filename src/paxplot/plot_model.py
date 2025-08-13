@@ -17,9 +17,14 @@ Typical usage:
 - Define and manage unique column names for improved readability.
 """
 
-from typing import Sequence, Union, Tuple, List, Optional
-from paxplot.data_managers.normalized_matrix import NormalizedMatrix, ColumnType
+from typing import Sequence, Union, List, Optional
+
+import numpy as np
+from numpy.typing import NDArray
+
+from paxplot.data_managers.normalized_matrix import NormalizedMatrix
 from paxplot.data_managers.named_normalized_matrix_view import NamedNormalizedMatrixView
+
 
 class PlotModel:
     """
@@ -51,27 +56,7 @@ class PlotModel:
         """Number of columns in the data."""
         return self._matrix.num_columns
 
-    def append_rows(self, new_rows: Sequence[Sequence[Union[str, int, float]]]) -> None:
-        """
-        Append new rows to the existing data.
-
-        Parameters
-        ----------
-        new_rows : Sequence of rows with mixed-type values
-        """
-        self._matrix.append_data(new_rows)
-
-    def remove_rows(self, indices: Sequence[int]) -> None:
-        """
-        Remove rows by indices.
-
-        Parameters
-        ----------
-        indices : Sequence of row indices to remove
-        """
-        self._matrix.remove_rows(indices)
-
-    def get_normalized_column(self, column_index: int) -> Sequence[float]:
+    def get_normalized_column_values(self, column_index: int) -> NDArray[np.float64]:
         """
         Get the normalized data for the specified column.
 
@@ -84,10 +69,9 @@ class PlotModel:
         Sequence[float]
             The normalized values for the column.
         """
-        arr = self._matrix.get_normalized_array(column_index)
-        return arr.tolist()
+        return self._matrix[column_index].values_normalized
 
-    def get_raw_column(self, column_index: int) -> Sequence[Union[str, int, float]]:
+    def get_column_values(self, column_index: int) -> Sequence[Union[str, int, float]]:
         """
         Get the original raw (unnormalized) data for the specified column.
 
@@ -100,13 +84,67 @@ class PlotModel:
         Sequence[Union[str, int, float]]
             The raw data values for the column.
         """
-        col_type = self._matrix.get_column_type(column_index)
-        if col_type == ColumnType.NUMERIC:
-            return self._matrix.get_numeric_array(column_index)
-        elif col_type == ColumnType.CATEGORICAL:
-            return self._matrix.get_categorical_array(column_index)
-        else:
-            raise ValueError(f"Unknown column type for index {column_index}")
+        return self._matrix[column_index].values
+
+    def get_column_custom_max(self, column_index: int) -> float | None:
+        """
+        Get the custom maximum bound for the specified numeric column.
+
+        Parameters
+        ----------
+        column_index : int
+
+        Returns
+        -------
+        float | None
+            The custom maximum bound, or None if not set.
+        """
+        return self._matrix.get_numeric_column(column_index).custom_max_val
+
+    def get_column_custom_min(self, column_index: int) -> float | None:
+        """
+        Get the custom minimum bound for the specified numeric column.
+
+        Parameters
+        ----------
+        column_index : int
+
+        Returns
+        -------
+        float | None
+            The custom minimum bound, or None if not set.
+        """
+        return self._matrix.get_numeric_column(column_index).custom_min_val
+
+    def get_column_effective_min(self, column_index: int) -> float | None:
+        """
+        Get the effective minimum bound for the specified numeric column.
+
+        Parameters
+        ----------
+        column_index : int
+
+        Returns
+        -------
+        float | None
+            The effective minimum bound, or None if not set.
+        """
+        return self._matrix.get_numeric_column(column_index).effective_min_val
+
+    def get_column_effective_max(self, column_index: int) -> float | None:
+        """
+        Get the effective maximum bound for the specified numeric column.
+
+        Parameters
+        ----------
+        column_index : int
+
+        Returns
+        -------
+        float | None
+            The effective maximum bound, or None if not set.
+        """
+        return self._matrix.get_numeric_column(column_index).effective_max_val
 
     def set_custom_bounds(
         self,
@@ -130,27 +168,29 @@ class PlotModel:
         TypeError
             If the specified column is not numeric.
         """
-        self._matrix.set_custom_bounds(column_index, min_val=min_val, max_val=max_val)
+        self._matrix.get_numeric_column(column_index).set_custom_bounds(min_val, max_val)
 
-    def get_custom_bounds(self, column_index: int) -> Tuple[float | None, float | None]:
+    def append_rows(self, new_rows: Sequence[Sequence[Union[str, int, float]]]) -> None:
         """
-        Get custom min and max bounds for the numeric column.
+        Append new rows to the existing data.
 
         Parameters
         ----------
-        column_index : int
-
-        Returns
-        -------
-        Tuple[float | None, float | None]
-            (min_val, max_val) custom bounds, or (None, None) if none set.
-
-        Raises
-        ------
-        TypeError
-            If the specified column is not numeric.
+        new_rows : Sequence of rows with mixed-type values
         """
-        return self._matrix.get_custom_bounds(column_index)
+        self._matrix.append_data(new_rows)
+
+    def remove_rows(self, indices: Sequence[int]) -> None:
+        """
+        Remove rows by indices.
+
+        Parameters
+        ----------
+        indices : Sequence of row indices to remove
+        """
+        self._matrix.remove_rows(indices)
+
+    # Methods for accessing named columns
 
     def set_column_names(self, column_names: Sequence[str]) -> None:
         """
@@ -218,7 +258,7 @@ class PlotModel:
             raise RuntimeError("Column names have not been set.")
         self._named_view.set_column_name(column_index, new_name)
 
-    def get_normalized_column_by_name(self, column_name: str) -> Sequence[float]:
+    def get_normalized_column_values_by_name(self, column_name: str) -> NDArray:
         """
         Get the normalized data for the specified column name.
 
@@ -229,10 +269,9 @@ class PlotModel:
         """
         if self._named_view is None:
             raise RuntimeError("Column names have not been set.")
-        arr = self._named_view.get_normalized_array(column_name)
-        return arr.tolist()
+        return self._named_view[column_name].values_normalized
 
-    def get_raw_column_by_name(self, column_name: str) -> Sequence[Union[str, int, float]]:
+    def get_column_values_by_name(self, column_name: str) -> Sequence[Union[str, int, float]]:
         """
         Get the original raw (unnormalized) data for the specified column name.
 
@@ -243,14 +282,7 @@ class PlotModel:
         """
         if self._named_view is None:
             raise RuntimeError("Column names have not been set.")
-
-        col_type = self._named_view.get_column_type(column_name)
-        if col_type == ColumnType.NUMERIC:
-            return self._named_view.get_numeric_array(column_name)
-        elif col_type == ColumnType.CATEGORICAL:
-            return self._named_view.get_categorical_array(column_name)
-        else:
-            raise ValueError(f"Unknown column type for name '{column_name}'")
+        return self._named_view[column_name].values
 
     def set_custom_bounds_by_name(
         self,
@@ -268,17 +300,72 @@ class PlotModel:
         """
         if self._named_view is None:
             raise RuntimeError("Column names have not been set.")
-        self._named_view.set_custom_bounds(column_name, min_val=min_val, max_val=max_val)
+        self._named_view.get_numeric_column(column_name).set_custom_bounds(min_val, max_val)
 
-    def get_custom_bounds_by_name(self, column_name: str) -> Tuple[float | None, float | None]:
+    def get_column_custom_max_by_name(self, column_name: str) -> float | None:
         """
-        Get custom min and max bounds for the numeric column name.
+        Get the custom maximum bound for the specified numeric column.
 
-        Raises
-        ------
-        RuntimeError
-            If column names have not been set.
+        Parameters
+        ----------
+        column_name : str
+
+        Returns
+        -------
+        float | None
+            The custom maximum bound, or None if not set.
         """
         if self._named_view is None:
             raise RuntimeError("Column names have not been set.")
-        return self._named_view.get_custom_bounds(column_name)
+        return self._named_view.get_numeric_column(column_name).custom_max_val
+
+    def get_column_custom_min_by_name(self, column_name: str) -> float | None:
+        """
+        Get the custom minimum bound for the specified numeric column.
+
+        Parameters
+        ----------
+        column_name : str
+
+        Returns
+        -------
+        float | None
+            The custom minimum bound, or None if not set.
+        """
+        if self._named_view is None:
+            raise RuntimeError("Column names have not been set.")
+        return self._named_view.get_numeric_column(column_name).custom_min_val
+
+    def get_column_effective_min_by_name(self, column_name: str) -> float | None:
+        """
+        Get the effective minimum bound for the specified numeric column.
+
+        Parameters
+        ----------
+        column_name : str
+
+        Returns
+        -------
+        float | None
+            The effective minimum bound, or None if not set.
+        """
+        if self._named_view is None:
+            raise RuntimeError("Column names have not been set.")
+        return self._named_view.get_numeric_column(column_name).effective_min_val
+
+    def get_column_effective_max_by_name(self, column_name: str) -> float | None:
+        """
+        Get the effective maximum bound for the specified numeric column.
+
+        Parameters
+        ----------
+        column_name : str
+
+        Returns
+        -------
+        float | None
+            The effective maximum bound, or None if not set.
+        """
+        if self._named_view is None:
+            raise RuntimeError("Column names have not been set.")
+        return self._named_view.get_numeric_column(column_name).effective_max_val
