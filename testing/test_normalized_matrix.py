@@ -8,8 +8,6 @@ from paxplot.data_managers.normalized_matrix import NormalizedMatrix, ColumnType
 from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
 from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
 
-
-
 def test_normalized_matrix_basic():
     data = [
         [1.0, "apple"],
@@ -24,21 +22,20 @@ def test_normalized_matrix_basic():
     assert matrix.num_rows == 3
 
     # Test column types
-    col0 = matrix._columns[0]
-    col1 = matrix._columns[1]
+    col0 = matrix[0]
+    col1 = matrix[1]
     assert isinstance(col0, NumericNormalizedArray)
     assert isinstance(col1, CategoricalNormalizedArray)
     assert matrix.get_column_type(0) == ColumnType.NUMERIC
     assert matrix.get_column_type(1) == ColumnType.CATEGORICAL
 
     # Test normalized arrays
-    np.testing.assert_array_equal(matrix.get_normalized_array(0), np.array([-1.0, 0.0, 1.0]))
-    np.testing.assert_array_equal(matrix.get_normalized_array(1), np.array([-1.0, 1.0, -1.0]))
+    np.testing.assert_array_equal(col0.values_normalized, np.array([-1.0, 0.0, 1.0]))
+    np.testing.assert_array_equal(col1.values_normalized, np.array([-1.0, 1.0, -1.0]))
 
     # Testing original arrays
-    assert matrix.get_numeric_array(0) == [1.0, 2.0, 3.0]
-    assert matrix.get_categorical_array(1) == ["apple", "banana", "apple"]
-
+    assert col0.values == [1.0, 2.0, 3.0]
+    assert col1.values == ["apple", "banana", "apple"]
 
 def test_normalized_matrix_raises_on_none():
     """Test that initializing with None values raises a ValueError."""
@@ -65,13 +62,14 @@ def test_append_data_success():
     ])
 
     assert matrix.num_rows == 4
-    assert matrix.get_numeric_array(0) == [1.0, 2.0, 3.0, 4.0]
-    assert matrix.get_categorical_array(1) == ["apple", "banana", "apple", "cherry"]
+    col0 = matrix[0]
+    col1 = matrix[1]
+    assert col0.values == [1.0, 2.0, 3.0, 4.0]
+    assert col1.values == ["apple", "banana", "apple", "cherry"]
 
     np.testing.assert_allclose(
-        matrix.get_normalized_array(0), np.array([-1.0, -0.33333333, 0.33333333, 1.0])
+        col0.values_normalized, np.array([-1.0, -0.33333333, 0.33333333, 1.0])
     )
-
 
 def test_append_data_type_mismatch():
     data = [
@@ -92,7 +90,6 @@ def test_append_data_type_mismatch():
             [3.0, 123]
         ])
 
-
 def test_append_data_dimension_mismatch():
     data = [
         [1.0, "apple"]
@@ -109,7 +106,6 @@ def test_append_data_dimension_mismatch():
             [2.0, "banana", "extra"]
         ])
 
-
 def test_get_column_type_invalid_index():
     data = [
         [1.0, "x"]
@@ -119,11 +115,9 @@ def test_get_column_type_invalid_index():
     with pytest.raises(IndexError):
         _ = matrix.get_column_type(2)  # out of range
 
-
 def test_empty_input_raises():
     with pytest.raises(ValueError, match="Input must be a 2D array-like structure"):
         NormalizedMatrix(data=[])
-
 
 def test_append_empty_list_does_nothing():
     data = [[1, "a"]]
@@ -145,13 +139,14 @@ def test_remove_rows_success():
 
     # Check resulting size
     assert matrix.num_rows == 2
-    assert matrix.get_numeric_array(0) == [10.0, 30.0]
-    assert matrix.get_categorical_array(1) == ["apple", "cherry"]
+    col0 = matrix[0]
+    col1 = matrix[1]
+    assert col0.values == [10.0, 30.0]
+    assert col1.values == ["apple", "cherry"]
 
     # Check normalized values
-    np.testing.assert_array_equal(matrix.get_normalized_array(0), np.array([-1.0, 1.0]))
-    np.testing.assert_array_equal(matrix.get_normalized_array(1), np.array([-1.0, 1.0]))
-
+    np.testing.assert_array_equal(col0.values_normalized, np.array([-1.0, 1.0]))
+    np.testing.assert_array_equal(col1.values_normalized, np.array([-1.0, 1.0]))
 
 def test_remove_rows_invalid_index():
     data = [
@@ -168,7 +163,6 @@ def test_remove_rows_invalid_index():
     with pytest.raises(TypeError, match="sequence of integers"):
         matrix.remove_rows(["not-an-index"]) # type: ignore
 
-
 def test_remove_rows_empty_list_does_nothing():
     data = [
         [1.0, "x"],
@@ -179,4 +173,5 @@ def test_remove_rows_empty_list_does_nothing():
     matrix.remove_rows([])
 
     assert matrix.num_rows == 2
-    assert matrix.get_numeric_array(0) == [1.0, 2.0]
+    assert matrix[0].values == [1.0, 2.0]
+    assert matrix[1].values == ["x", "y"]

@@ -15,9 +15,7 @@ Notes
 
 from typing import Sequence, Union, List
 from enum import Enum
-from pydantic import BaseModel, field_validator, ConfigDict
 import numpy as np
-from numpy.typing import NDArray
 
 from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
 from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
@@ -25,21 +23,18 @@ from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
 
 
 class ColumnType(str, Enum):
-    """
-    Enumeration of possible column types in the NormalizedMatrix.
+    """Represents the type of a column in the normalized matrix.
 
-    Attributes
+    Parameters
     ----------
-    NUMERIC : str
-        Indicates a column with numeric data (int or float), to be normalized using min-max scaling.
-    CATEGORICAL : str
-        Indicates a column with string (categorical) data, to be encoded as numeric indices.
+    ColumnType : Enum
+        Represents the type of a column in the normalized matrix.
     """
     NUMERIC = "numeric"
     CATEGORICAL = "categorical"
 
 
-class NormalizedMatrix(BaseModel):
+class NormalizedMatrix:
     """
     A typed, column-oriented matrix that normalizes each column independently.
 
@@ -51,56 +46,15 @@ class NormalizedMatrix(BaseModel):
     None values are not allowed in the matrix.
     """
 
-    data: Sequence[Sequence[Union[str, int, float]]]
-    _columns: List[BaseNormalizedArray] = []
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        extra="forbid"
-    )
-
-    @field_validator("data", mode="before")
-    @classmethod
-    def validate_input(
-        cls,
-        v: Sequence[Sequence[Union[str, int, float, None]]]
-    ) -> Sequence[Sequence[Union[str, int, float]]]:
-        """
-        Validate the input data structure.
-
-        Parameters
-        ----------
-        v : Sequence[Sequence[Union[str, int, float, None]]]
-            The input data to validate.
-
-        Returns
-        -------
-        Sequence[Sequence[Union[str, int, float]]]
-            The validated input data.
-
-        Raises
-        ------
-        ValueError
-            If the input is not a 2D array-like structure or contains None values.
-        """
-        arr = np.array(v, dtype=object)
-        if arr.ndim != 2:
-            raise ValueError("Input must be a 2D array-like structure")
-        if any(x is None for row in arr for x in row):  # pylint: disable=singleton-comparison
-            raise ValueError("Input contains None values, which are not allowed")
-        return v # type: ignore
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        arr = NormalizedMatrix.validate_column_shape_and_nulls(self.data)
-        col_types = NormalizedMatrix.infer_column_types(arr)
-
-        self._columns = []
-        for i, col_type in enumerate(col_types):
-            col_data = arr[:, i].tolist()
-            if col_type == ColumnType.NUMERIC:
-                self._columns.append(NumericNormalizedArray(values=col_data))
-            elif col_type == ColumnType.CATEGORICAL:
-                self._columns.append(CategoricalNormalizedArray(values=col_data))
+    def __init__(self, data: Sequence[Sequence[Union[str, int, float]]]):
+        arr = self.validate_column_shape_and_nulls(data)
+        col_types = self.infer_column_types(arr)
+        self._columns: List[BaseNormalizedArray] = [
+            NumericNormalizedArray(values=arr[:, i].tolist())
+            if col_type == ColumnType.NUMERIC
+            else CategoricalNormalizedArray(values=arr[:, i].tolist())
+            for i, col_type in enumerate(col_types)
+        ]
 
     @staticmethod
     def validate_column_shape_and_nulls(
@@ -164,61 +118,47 @@ class NormalizedMatrix(BaseModel):
 
         return column_types
 
+    def __getitem__(self, column_index: int) -> BaseNormalizedArray:
+        """
+        Get a column by index.
+        
+        The returned object may be NumericNormalizedArray or CategoricalNormalizedArray.
+        """
+        return self._columns[column_index]
+
+    def get_numeric_column(self, column_index: int) -> NumericNormalizedArray:
+        """
+        Get a column as a NumericNormalizedArray. Raises TypeError if not numeric.
+        """
+        col = self._columns[column_index]
+        if not isinstance(col, NumericNormalizedArray):
+            raise TypeError(f"Column {column_index} is not numeric.")
+        return col
+
+    def get_categorical_column(self, column_index: int) -> CategoricalNormalizedArray:
+        """
+        Get a column as a CategoricalNormalizedArray. Raises TypeError if not categorical.
+        """
+        col = self._columns[column_index]
+        if not isinstance(col, CategoricalNormalizedArray):
+            raise TypeError(f"Column {column_index} is not categorical.")
+        return col
+
     @property
     def num_columns(self) -> int:
-        """
-        Returns the number of columns in the matrix.
-
-        Returns
-        -------
-        int
-            The number of columns.
-        """
+        """Returns the number of columns in the matrix."""
         return len(self._columns)
 
     @property
     def num_rows(self) -> int:
-        """
-        Returns the number of rows in the matrix.
-
-        Returns
-        -------
-        int
-            The number of rows.
-        """
+        """Returns the number of rows in the matrix."""
         if not self._columns:
             return 0
         return len(self._columns[0].values)
 
-    def get_normalized_array(self, column_index: int) -> NDArray[np.float64]:
-        """
-        Get the normalized array for a specific column.
-
-        Parameters
-        ----------
-        column_index : int
-            The index of the column to retrieve.
-
-        Returns
-        -------
-        NDArray[np.float64]
-            The normalized array for the specified column.
-        """
-        return self._columns[column_index]._normalizer.array_normalized  # pylint: disable=protected-access
-
     def get_column_type(self, column_index: int) -> ColumnType:
         """
         Retrieve the column type for a specified column index.
-
-        Parameters
-        ----------
-        column_index : int
-            The index of the column whose type is to be retrieved.
-
-        Returns
-        -------
-        ColumnType
-            The type of the specified column (numeric or categorical).
         """
         column_instance = self._columns[column_index]
         if isinstance(column_instance, NumericNormalizedArray):
@@ -227,54 +167,6 @@ class NormalizedMatrix(BaseModel):
             return ColumnType.CATEGORICAL
         else:
             raise ValueError("Unknown column type")
-
-    def get_numeric_array(self, column_index: int) -> Sequence[Union[int, float]]:
-        """
-        Get the original numeric array (before normalization) for the specified column.
-
-        Parameters
-        ----------
-        column_index : int
-            The index of the column to retrieve.
-
-        Returns
-        -------
-        Sequence[Union[int, float]]
-            The original numeric values from the column.
-
-        Raises
-        ------
-        TypeError
-            If the column is not of numeric type.
-        """
-        column_instance = self._columns[column_index]
-        if not isinstance(column_instance, NumericNormalizedArray):
-            raise TypeError(f"Column {column_index} is not of numeric type")
-        return column_instance.values
-
-    def get_categorical_array(self, column_index: int) -> Sequence[str]:
-        """
-        Get the original categorical array (before normalization) for the specified column.
-
-        Parameters
-        ----------
-        column_index : int
-            The index of the column to retrieve.
-
-        Returns
-        -------
-        Sequence[str]
-            The original categorical values from the column.
-
-        Raises
-        ------
-        TypeError
-            If the column is not of categorical type.
-        """
-        column_instance = self._columns[column_index]
-        if not isinstance(column_instance, CategoricalNormalizedArray):
-            raise TypeError(f"Column {column_index} is not of categorical type")
-        return column_instance.values
 
     def append_data(self, new_rows: Sequence[Sequence[Union[str, int, float]]]) -> None:
         """
@@ -314,11 +206,6 @@ class NormalizedMatrix(BaseModel):
         """
         Remove rows from the matrix at the specified indices.
 
-        Parameters
-        ----------
-        indices : Sequence[int]
-            A sequence of row indices to remove.
-
         Raises
         ------
         TypeError
@@ -337,47 +224,3 @@ class NormalizedMatrix(BaseModel):
 
         for column in self._columns:
             column.remove_indices(indices)
-
-    def set_custom_bounds(
-        self,
-        column_index: int,
-        min_val: float | None = None,
-        max_val: float | None = None
-    ) -> None:
-        """
-        Set custom min and/or max bounds for the numeric column at column_index.
-
-        Parameters
-        ----------
-        column_index : int
-            Index of the numeric column to set bounds on.
-        min_val : float | None
-            Custom minimum bound for normalization. None to leave unchanged.
-        max_val : float | None
-            Custom maximum bound for normalization. None to leave unchanged.
-
-        Raises
-        ------
-        TypeError
-            If the specified column is not numeric.
-        """
-        column = self._columns[column_index]
-        if not isinstance(column, NumericNormalizedArray):
-            raise TypeError(
-                f"Column {column_index} is not numeric and does not support custom bounds."
-            )
-
-        column.set_custom_bounds(min_val=min_val, max_val=max_val)
-
-    def get_custom_bounds(self, column_index: int) -> tuple[float | None, float | None]:
-        """
-        Return the (custom_min_val, custom_max_val) for the numeric column at column_index.
-
-        Raises
-        ------
-        TypeError if column is not numeric.
-        """
-        column = self._columns[column_index]
-        if not isinstance(column, NumericNormalizedArray):
-            raise TypeError(f"Column {column_index} is not numeric and has no custom bounds.")
-        return (column.custom_min_val, column.custom_max_val)
