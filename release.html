@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Release Notes &#8212; paxplot beta documentation</title>
+    
+    <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  
+    
+    <link rel="stylesheet"
+      href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+    
+      
+  
+    
+    <link rel="stylesheet" href="_static/styles/pydata-sphinx-theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="canonical" href="https://docs.paxplot.org/release.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="API Reference" href="api.html" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1X3E5JT92K"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1X3E5JT92K');
+</script>
+
+<!-- Viewport Setting -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="index.html">
+<p class="title">paxplot</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="getting_started.html">
+  Getting Started
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="advanced_usage.html">
+  Advanced Usage
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="examples.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="api.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
+  Release Notes
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#version-0-1-4-beta">
+   Version 0.1.4 (beta)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#version-0-1-3-beta">
+   Version 0.1.3 (beta)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#version-0-1-2-beta">
+   Version 0.1.2 (beta)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#multiple-plotting-calls">
+     Multiple Plotting Calls
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#handling-string-data">
+     Handling String Data
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#specify-line-keyword-arguments">
+     Specify Line Keyword Arguments
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#backend-improvements">
+     Backend Improvements
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#citation-information">
+     Citation Information
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#website-improvements">
+     Website Improvements
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="release-notes">
+<h1>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="version-0-1-4-beta">
+<h2>Version 0.1.4 (beta)<a class="headerlink" href="#version-0-1-4-beta" title="Permalink to this headline">¶</a></h2>
+<p>Paxplot now includes another testing dataset from contributor <a class="reference external" href="https://github.com/nelerey">Nele Reyniers</a>. Here is how to access it as a Pandas DataFrame:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">paxplot</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">paxplot</span><span class="o">.</span><span class="n">hydroclimate_model_evaluation</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="version-0-1-3-beta">
+<h2>Version 0.1.3 (beta)<a class="headerlink" href="#version-0-1-3-beta" title="Permalink to this headline">¶</a></h2>
+<p>Paxplot’s testing now follows more standard procedures in that it uses an install of paxplot rather than relative imports. Contributors should now use <code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--editable</span> <span class="pre">.</span></code> to ensure they are referencing their development installs rather than a previously downloaded install. See the Paxplot’s <a class="reference external" href="https://github.com/paxplot/paxplot/actions">actions page</a> for the continous integration tests.</p>
+</div>
+<div class="section" id="version-0-1-2-beta">
+<h2>Version 0.1.2 (beta)<a class="headerlink" href="#version-0-1-2-beta" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="multiple-plotting-calls">
+<h3>Multiple Plotting Calls<a class="headerlink" href="#multiple-plotting-calls" title="Permalink to this headline">¶</a></h3>
+<p>Paxplot can now call multiple calls to <code class="code docutils literal notranslate"><span class="pre">plot()</span></code>. This allows users to plot individual lines or sets of lines, opening up the ability to combine functionality. See <a class="reference external" href="examples.html#highlight-solutions">here</a> for an example of combining the ability to plot one set of data with a colorbar and another set in a neutral grey color.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">paxplot</span>
+
+<span class="n">paxfig</span> <span class="o">=</span> <span class="n">paxplot</span><span class="o">.</span><span class="n">pax_parallel</span><span class="p">(</span><span class="n">n_axes</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">paxfig</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">paxfig</span><span class="o">.</span><span class="n">plot</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/multi_call.svg" src="_images/multi_call.svg" /></div>
+<div class="section" id="handling-string-data">
+<h3>Handling String Data<a class="headerlink" href="#handling-string-data" title="Permalink to this headline">¶</a></h3>
+<p>Thanks to your feature requests, Paxplot can now handle string data. Keep the feature requests coming!</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">paxplot</span>
+
+<span class="c1"># Data</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s1">&#39;J&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;K&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+
+<span class="c1"># Create figure</span>
+<span class="n">paxfig</span> <span class="o">=</span> <span class="n">paxplot</span><span class="o">.</span><span class="n">pax_parallel</span><span class="p">(</span><span class="n">n_axes</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+<span class="n">paxfig</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/categorical.svg" src="_images/categorical.svg" /></div>
+<div class="section" id="specify-line-keyword-arguments">
+<h3>Specify Line Keyword Arguments<a class="headerlink" href="#specify-line-keyword-arguments" title="Permalink to this headline">¶</a></h3>
+<p>Line keyword arguments can also be specified with each plot call. This allows users to access much more of Matplotlib functionality.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">paxplot</span>
+
+<span class="n">paxfig</span> <span class="o">=</span> <span class="n">paxplot</span><span class="o">.</span><span class="n">pax_parallel</span><span class="p">(</span><span class="n">n_axes</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">paxfig</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="p">],</span>
+    <span class="n">line_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;green&#39;</span><span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/line_kwargs.svg" src="_images/line_kwargs.svg" /></div>
+<div class="section" id="backend-improvements">
+<h3>Backend Improvements<a class="headerlink" href="#backend-improvements" title="Permalink to this headline">¶</a></h3>
+<p>Much of Paxplot’s backend has been refactored to be both more efficient and readable. Specifically, this release worked to separate the “frontend” rendering commands from the “backend” data conversion processes.</p>
+</div>
+<div class="section" id="citation-information">
+<h3>Citation Information<a class="headerlink" href="#citation-information" title="Permalink to this headline">¶</a></h3>
+<p>Citation information for Paxplot can now be found on the Github <a class="reference external" href="https://github.com/paxplot/paxplot">page</a>.</p>
+</div>
+<div class="section" id="website-improvements">
+<h3>Website Improvements<a class="headerlink" href="#website-improvements" title="Permalink to this headline">¶</a></h3>
+<p>Paxplot’s website has also been expanded. In this release, an “examples” tab encompasses multiple common workflows. As is probably obvious from reading this page, we are now doing release notes.</p>
+<p>Please reach out with your <a class="reference external" href="https://github.com/paxplot/paxplot/issues">issues and feature requests</a>. If you are interested in contributing Paxplot, please contact <a class="reference external" href="https://twitter.com/jacob_kravits">Jacob Kravits</a>.</p>
+</div>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="api.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">API Reference</p>
+        </div>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+    <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, Jacob Kravits.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
