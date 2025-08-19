@@ -16,7 +16,7 @@ identifiers:
   - type: doi
     value: 10.1008/paxplot.v0.1.4-beta
 repository-code: 'https://github.com/paxplot/paxplot'
-url: 'https://paxplot.github.io/paxplot/'
+url: 'https://docs.paxplot.org'
 keywords:
   - high-dimensional-data
   - matplotlib
