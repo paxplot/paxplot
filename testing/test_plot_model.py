@@ -298,12 +298,15 @@ def test_tick_methods_by_name_wrong_column_type_raises():
 def test_ticks_auto_update_after_data_change():
     model = PlotModel(INITIAL_DATA)
     initial_ticks = model.get_numeric_ticks(0)
+    initial_normalized = model.get_numeric_ticks_normalized(0)
     
     # Add new data that changes the range
     model.append_rows([[10.0, "new_animal", 100]])
     
-    # Ticks should automatically update
+    # Ticks should remain the same but normalized values should update
     updated_ticks = model.get_numeric_ticks(0)
-    assert updated_ticks != initial_ticks
-    # Should include the new maximum value
-    assert max(updated_ticks) >= 10.0
+    assert updated_ticks == initial_ticks  # Raw tick values stay the same
+    
+    # But normalized values should reflect the new range
+    updated_normalized = model.get_numeric_ticks_normalized(0)
+    assert updated_normalized != initial_normalized

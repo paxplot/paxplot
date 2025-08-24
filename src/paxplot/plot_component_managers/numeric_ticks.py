@@ -210,7 +210,8 @@ class NumericTicks:
         normalized relative to the same range as the axis data. This ensures
         consistent scaling between axis labels and plotted data.
         """
-        self._ticks.set_custom_bounds(
-            self._axis_data.effective_min_val,
-            self._axis_data.effective_max_val
-        )
+        if self._axis_data is not None:
+            self._ticks.set_custom_bounds(
+                min_val=self._axis_data.effective_min_val,
+                max_val=self._axis_data.effective_max_val
+            )
