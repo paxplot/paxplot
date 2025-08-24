@@ -104,6 +104,12 @@ class MatplotlibRenderer:
             ax.spines['bottom'].set_visible(False)
             ax.spines['right'].set_visible(False)
             
+            # Make the left spine visible and styled as the vertical line
+            ax.spines['left'].set_visible(True)
+            ax.spines['left'].set_color('black')
+            ax.spines['left'].set_linewidth(1)
+            ax.spines['left'].set_alpha(0.8)
+            
             # Hide x-axis ticks
             ax.set_xticks([])
             
@@ -175,12 +181,7 @@ class MatplotlibRenderer:
             y_coords = normalized_data[row_idx, :]
             line, = main_ax.plot(x_coords, y_coords, 'b-', alpha=0.7)
             self._line_objects.append(line)
-        
-        # Draw vertical lines at each x-coordinate on the main axis
-        for i in range(self.plot_model.num_columns):
-            x_coord = i if self.plot_model.num_columns > 1 else 0.0
-            main_ax.axvline(x=x_coord, color='black', linewidth=1, alpha=0.8)
-            
+                    
     def _update_ticks(self) -> None:
         """Update tick marks and labels for each axis."""
         for i, ax in enumerate(self._axes):
