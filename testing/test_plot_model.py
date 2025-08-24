@@ -152,3 +152,158 @@ def test_column_name_not_found_raises():
         model.set_custom_bounds_by_name("nonexistent", min_val=0.0)
 
     # Removed test for non-existent get_custom_bounds_by_name method
+
+# Tests for tick-related methods
+
+def test_get_numeric_ticks():
+    model = PlotModel(INITIAL_DATA)
+    ticks = model.get_numeric_ticks(0)
+    assert isinstance(ticks, list)
+    assert all(isinstance(x, float) for x in ticks)
+    assert len(ticks) > 0
+
+def test_get_numeric_ticks_normalized():
+    model = PlotModel(INITIAL_DATA)
+    ticks = model.get_numeric_ticks_normalized(0)
+    assert isinstance(ticks, list)
+    assert all(isinstance(x, float) for x in ticks)
+    assert len(ticks) > 0
+    # Normalized ticks should be in [-1, 1] range
+    assert all(-1.0 <= x <= 1.0 for x in ticks)
+
+def test_get_categorical_ticks():
+    model = PlotModel(INITIAL_DATA)
+    ticks = model.get_categorical_ticks(1)
+    assert isinstance(ticks, list)
+    assert all(isinstance(x, str) for x in ticks)
+    assert len(ticks) > 0
+    # Should contain the unique categories
+    assert "cat" in ticks
+    assert "dog" in ticks
+
+def test_get_categorical_ticks_normalized():
+    model = PlotModel(INITIAL_DATA)
+    ticks = model.get_categorical_ticks_normalized(1)
+    assert isinstance(ticks, list)
+    assert all(isinstance(x, float) for x in ticks)
+    assert len(ticks) > 0
+    # Normalized ticks should be in [-1, 1] range
+    assert all(-1.0 <= x <= 1.0 for x in ticks)
+
+def test_set_numeric_ticks():
+    model = PlotModel(INITIAL_DATA)
+    custom_ticks = [0.5, 1.5, 2.5, 3.5]
+    model.set_numeric_ticks(0, custom_ticks)
+    ticks = model.get_numeric_ticks(0)
+    assert ticks == custom_ticks
+
+def test_set_categorical_ticks():
+    model = PlotModel(INITIAL_DATA)
+    custom_ticks = ["cat", "dog", "mouse", "bird"]
+    model.set_categorical_ticks(1, custom_ticks)
+    ticks = model.get_categorical_ticks(1)
+    assert ticks == custom_ticks
+
+def test_get_numeric_ticks_wrong_column_type_raises():
+    model = PlotModel(INITIAL_DATA)
+    with pytest.raises(TypeError):
+        model.get_numeric_ticks(1)  # Column 1 is categorical
+
+def test_get_categorical_ticks_wrong_column_type_raises():
+    model = PlotModel(INITIAL_DATA)
+    with pytest.raises(TypeError):
+        model.get_categorical_ticks(0)  # Column 0 is numeric
+
+def test_set_numeric_ticks_wrong_column_type_raises():
+    model = PlotModel(INITIAL_DATA)
+    with pytest.raises(TypeError):
+        model.set_numeric_ticks(1, [1.0, 2.0])  # Column 1 is categorical
+
+def test_set_categorical_ticks_wrong_column_type_raises():
+    model = PlotModel(INITIAL_DATA)
+    with pytest.raises(TypeError):
+        model.set_categorical_ticks(0, ["a", "b"])  # Column 0 is numeric
+
+def test_get_numeric_ticks_by_name():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    ticks = model.get_numeric_ticks_by_name("num1")
+    assert isinstance(ticks, list)
+    assert all(isinstance(x, float) for x in ticks)
+
+def test_get_categorical_ticks_by_name():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    ticks = model.get_categorical_ticks_by_name("animal")
+    assert isinstance(ticks, list)
+    assert all(isinstance(x, str) for x in ticks)
+
+def test_set_numeric_ticks_by_name():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    custom_ticks = [0.5, 1.5, 2.5, 3.5]
+    model.set_numeric_ticks_by_name("num1", custom_ticks)
+    ticks = model.get_numeric_ticks_by_name("num1")
+    assert ticks == custom_ticks
+
+def test_set_categorical_ticks_by_name():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    custom_ticks = ["cat", "dog", "mouse", "bird"]
+    model.set_categorical_ticks_by_name("animal", custom_ticks)
+    ticks = model.get_categorical_ticks_by_name("animal")
+    assert ticks == custom_ticks
+
+def test_tick_methods_by_name_before_set_raises():
+    model = PlotModel(INITIAL_DATA)
+    with pytest.raises(RuntimeError):
+        model.get_numeric_ticks_by_name("num1")
+    with pytest.raises(RuntimeError):
+        model.get_categorical_ticks_by_name("animal")
+    with pytest.raises(RuntimeError):
+        model.set_numeric_ticks_by_name("num1", [1.0, 2.0])
+    with pytest.raises(RuntimeError):
+        model.set_categorical_ticks_by_name("animal", ["a", "b"])
+
+def test_tick_methods_by_name_not_found_raises():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    with pytest.raises(KeyError):
+        model.get_numeric_ticks_by_name("nonexistent")
+    with pytest.raises(KeyError):
+        model.get_categorical_ticks_by_name("nonexistent")
+    with pytest.raises(KeyError):
+        model.set_numeric_ticks_by_name("nonexistent", [1.0, 2.0])
+    with pytest.raises(KeyError):
+        model.set_categorical_ticks_by_name("nonexistent", ["a", "b"])
+
+def test_tick_methods_by_name_wrong_column_type_raises():
+    model = PlotModel(INITIAL_DATA)
+    names = ["num1", "animal", "num2"]
+    model.set_column_names(names)
+    with pytest.raises(TypeError):
+        model.get_numeric_ticks_by_name("animal")  # animal is categorical
+    with pytest.raises(TypeError):
+        model.get_categorical_ticks_by_name("num1")  # num1 is numeric
+    with pytest.raises(TypeError):
+        model.set_numeric_ticks_by_name("animal", [1.0, 2.0])
+    with pytest.raises(TypeError):
+        model.set_categorical_ticks_by_name("num1", ["a", "b"])
+
+def test_ticks_auto_update_after_data_change():
+    model = PlotModel(INITIAL_DATA)
+    initial_ticks = model.get_numeric_ticks(0)
+    
+    # Add new data that changes the range
+    model.append_rows([[10.0, "new_animal", 100]])
+    
+    # Ticks should automatically update
+    updated_ticks = model.get_numeric_ticks(0)
+    assert updated_ticks != initial_ticks
+    # Should include the new maximum value
+    assert max(updated_ticks) >= 10.0

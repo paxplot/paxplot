@@ -24,6 +24,7 @@ from numpy.typing import NDArray
 
 from paxplot.data_managers.normalized_matrix import NormalizedMatrix
 from paxplot.data_managers.named_normalized_matrix_view import NamedNormalizedMatrixView
+from paxplot.plot_component_managers.tick_collection import TickCollection
 
 
 class PlotModel:
@@ -45,6 +46,7 @@ class PlotModel:
         """
         self._matrix = NormalizedMatrix(data=data)
         self._named_view: Optional[NamedNormalizedMatrixView] = None
+        self._tick_collection = TickCollection(self._matrix)
 
     @property
     def num_rows(self) -> int:
@@ -55,6 +57,8 @@ class PlotModel:
     def num_columns(self) -> int:
         """Number of columns in the data."""
         return self._matrix.num_columns
+
+
 
     def get_column_values_normalized(self, column_index: int) -> NDArray[np.float64]:
         """
@@ -369,3 +373,222 @@ class PlotModel:
         if self._named_view is None:
             raise RuntimeError("Column names have not been set.")
         return self._named_view.get_numeric_column(column_name).effective_max_val
+
+
+    def get_numeric_ticks(self, column_index: int) -> List[float]:
+        """
+        Get raw tick values for a numeric column.
+
+        Parameters
+        ----------
+        column_index : int
+            Index of the column.
+
+        Returns
+        -------
+        List[float]
+            Raw tick values for the numeric column.
+
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+        """
+        return self._tick_collection.get_numeric_tick_manager(column_index).get_raw_values()
+
+    def get_numeric_ticks_normalized(self, column_index: int) -> List[float]:
+        """
+        Get normalized tick values for a numeric column.
+
+        Parameters
+        ----------
+        column_index : int
+            Index of the column.
+
+        Returns
+        -------
+        List[float]
+            Normalized tick values for the numeric column.
+
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+        """
+        return self._tick_collection.get_numeric_tick_manager(column_index).get_normalized_values()
+
+    def get_categorical_ticks(self, column_index: int) -> List[str]:
+        """
+        Get tick labels for a categorical column.
+
+        Parameters
+        ----------
+        column_index : int
+            Index of the column.
+
+        Returns
+        -------
+        List[str]
+            Tick labels for the categorical column.
+
+        Raises
+        ------
+        TypeError
+            If the column is not categorical.
+        """
+        return self._tick_collection.get_categorical_tick_manager(column_index).get_raw_values()
+
+    def get_categorical_ticks_normalized(self, column_index: int) -> List[float]:
+        """
+        Get normalized tick positions for a categorical column.
+
+        Parameters
+        ----------
+        column_index : int
+            Index of the column.
+
+        Returns
+        -------
+        List[float]
+            Normalized tick positions for the categorical column.
+
+        Raises
+        ------
+        TypeError
+            If the column is not categorical.
+        """
+        return self._tick_collection.get_categorical_tick_manager(column_index).get_normalized_values()
+
+    def set_numeric_ticks(self, column_index: int, tick_values: List[float]) -> None:
+        """
+        Set custom tick values for a numeric column.
+
+        Parameters
+        ----------
+        column_index : int
+            Index of the column.
+        tick_values : List[float]
+            Custom tick values to set.
+
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+        """
+        self._tick_collection.get_numeric_tick_manager(column_index).set_ticks(tick_values)
+
+    def set_categorical_ticks(self, column_index: int, tick_labels: List[str]) -> None:
+        """
+        Set custom tick labels for a categorical column.
+
+        Parameters
+        ----------
+        column_index : int
+            Index of the column.
+        tick_labels : List[str]
+            Custom tick labels to set.
+
+        Raises
+        ------
+        TypeError
+            If the column is not categorical.
+        """
+        self._tick_collection.get_categorical_tick_manager(column_index).set_ticks(tick_labels)
+
+    def get_numeric_ticks_by_name(self, column_name: str) -> List[float]:
+        """
+        Get raw tick values for a numeric column by name.
+
+        Parameters
+        ----------
+        column_name : str
+            Name of the column.
+
+        Returns
+        -------
+        List[float]
+            Raw tick values for the numeric column.
+
+        Raises
+        ------
+        RuntimeError
+            If column names have not been set.
+        TypeError
+            If the column is not numeric.
+        """
+        if self._named_view is None:
+            raise RuntimeError("Column names have not been set.")
+        column_index = self._named_view.get_column_index(column_name)
+        return self.get_numeric_ticks(column_index)
+
+    def get_categorical_ticks_by_name(self, column_name: str) -> List[str]:
+        """
+        Get tick labels for a categorical column by name.
+
+        Parameters
+        ----------
+        column_name : str
+            Name of the column.
+
+        Returns
+        -------
+        List[str]
+            Tick labels for the categorical column.
+
+        Raises
+        ------
+        RuntimeError
+            If column names have not been set.
+        TypeError
+            If the column is not categorical.
+        """
+        if self._named_view is None:
+            raise RuntimeError("Column names have not been set.")
+        column_index = self._named_view.get_column_index(column_name)
+        return self.get_categorical_ticks(column_index)
+
+    def set_numeric_ticks_by_name(self, column_name: str, tick_values: List[float]) -> None:
+        """
+        Set custom tick values for a numeric column by name.
+
+        Parameters
+        ----------
+        column_name : str
+            Name of the column.
+        tick_values : List[float]
+            Custom tick values to set.
+
+        Raises
+        ------
+        RuntimeError
+            If column names have not been set.
+        TypeError
+            If the column is not numeric.
+        """
+        if self._named_view is None:
+            raise RuntimeError("Column names have not been set.")
+        column_index = self._named_view.get_column_index(column_name)
+        self.set_numeric_ticks(column_index, tick_values)
+
+    def set_categorical_ticks_by_name(self, column_name: str, tick_labels: List[str]) -> None:
+        """
+        Set custom tick labels for a categorical column by name.
+
+        Parameters
+        ----------
+        column_name : str
+            Name of the column.
+        tick_labels : List[str]
+            Custom tick labels to set.
+
+        Raises
+        ------
+        RuntimeError
+            If column names have not been set.
+        TypeError
+            If the column is not categorical.
+        """
+        if self._named_view is None:
+            raise RuntimeError("Column names have not been set.")
+        column_index = self._named_view.get_column_index(column_name)
+        self.set_categorical_ticks(column_index, tick_labels)

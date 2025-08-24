@@ -164,6 +164,27 @@ class NamedNormalizedMatrixView:
             raise IndexError("Column index out of range.")
         return self._index_to_name[column_index]
 
+    def get_column_index(self, column_name: str) -> int:
+        """
+        Get the index of a column by name.
+
+        Parameters
+        ----------
+        column_name : str
+            The name of the column.
+
+        Returns
+        -------
+        int
+            The integer index of the column.
+
+        Raises
+        ------
+        KeyError
+            If the column name does not exist.
+        """
+        return self._get_index(column_name)
+
     def set_column_name(self, column_index: int, new_name: str) -> None:
         """
         Set the name of a column by index.
