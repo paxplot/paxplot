@@ -1,14 +1,14 @@
 # pylint: disable=C0116, W0212
-"""Tests for the CategoricalAxisTickManager"""
+"""Tests for the CategoricalTicks"""
 
 from numpy.testing import assert_almost_equal
 
 from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
-from paxplot.plot_component_managers.categorical_axis_tick_manager import CategoricalAxisTickManager
+from paxplot.plot_component_managers.categorical_ticks import CategoricalTicks
 
 def test_from_categories_creates_with_all_categories():
     axis_data = CategoricalNormalizedArray(values=["X", "Y", "Z"])
-    manager = CategoricalAxisTickManager.from_categories(
+    manager = CategoricalTicks.from_categories(
         categories=["X", "Y", "Z"],
         axis_data=axis_data
     )
@@ -20,7 +20,7 @@ def test_from_categories_creates_with_all_categories():
 
 def test_set_ticks_replaces_existing():
     axis_data = CategoricalNormalizedArray(values=["X", "Y", "Z"])
-    manager = CategoricalAxisTickManager.from_categories(
+    manager = CategoricalTicks.from_categories(
         categories=["X", "Y", "Z"],
         axis_data=axis_data
     )
@@ -34,7 +34,7 @@ def test_set_ticks_replaces_existing():
 
 def test_appending_data_sets_ticks():
     axis_data = CategoricalNormalizedArray(values=["X", "Y", "Z"])
-    manager = CategoricalAxisTickManager.from_categories(
+    manager = CategoricalTicks.from_categories(
         categories=["X", "Y", "Z"],
         axis_data=axis_data
     )

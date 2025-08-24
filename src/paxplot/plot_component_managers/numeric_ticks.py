@@ -1,10 +1,10 @@
 """
-Numeric Axis Tick Management for PaxPlot
+Numeric Ticks for PaxPlot
 
-This module provides the NumericAxisTickManager class which handles the creation,
+This module provides the NumericTicks class which handles the creation,
 normalization, and management of numeric tick marks for plot axes.
 
-The NumericAxisTickManager maintains tick values synchronized with axis data bounds, 
+The NumericTicks maintains tick values synchronized with axis data bounds, 
 ensuring ticks are properly normalized to the [-1, 1] internal coordinate system
 used by PaxPlot. It provides methods for:
 
@@ -24,7 +24,7 @@ import matplotlib.ticker as mticker
 from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
 
 
-class NumericAxisTickManager:
+class NumericTicks:
     """
     Manages numeric axis ticks normalized to [-1, 1],
     storing ticks only inside the internal NumericNormalizedArray.
@@ -93,7 +93,7 @@ class NumericAxisTickManager:
         axis_data: NumericNormalizedArray,
         max_ticks: int = 10,
         integer: bool = False,
-    ) -> "NumericAxisTickManager":
+    ) -> "NumericTicks":
         """
         Create an instance by generating "nice" ticks in [min_val, max_val]
         using matplotlib logic and associating it with an axis_data
@@ -114,7 +114,7 @@ class NumericAxisTickManager:
 
         Returns
         -------
-        NumericAxisTickManager
+        NumericTicks
             New instance initialized with generated ticks and axis data.
         """
         ticks = cls._compute_ticks(min_val, max_val, max_ticks=max_ticks, integer=integer)
@@ -202,7 +202,7 @@ class NumericAxisTickManager:
 
     def _set_tick_bounds_equal_to_axis_bounds(self) -> None:
         """
-        Update the tick manager's normalization bounds to match the linked
+        Update the ticks' normalization bounds to match the linked
         axis_data's normalization bounds.
 
         If `self._axis_data` is set, this method overrides the internal

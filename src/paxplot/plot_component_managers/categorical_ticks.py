@@ -1,10 +1,10 @@
-"""Categorical axis tick manager for handling categorical ticks."""
+"""Categorical ticks for handling categorical tick marks."""
 
 from typing import List, Optional, Sequence
 from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
 
 
-class CategoricalAxisTickManager:
+class CategoricalTicks:
     """
     Manages categorical axis ticks normalized to [-1, 1],
     storing ticks inside the internal CategoricalNormalizedArray.
@@ -38,7 +38,7 @@ class CategoricalAxisTickManager:
         cls,
         categories: Sequence[str],
         axis_data: CategoricalNormalizedArray
-    ) -> "CategoricalAxisTickManager":
+    ) -> "CategoricalTicks":
         """
         Create an instance with ticks based on all provided categories,
         associated with an axis_data CategoricalNormalizedArray.
@@ -52,7 +52,7 @@ class CategoricalAxisTickManager:
 
         Returns
         -------
-        CategoricalAxisTickManager
+        CategoricalTicks
             New instance initialized with all category ticks and axis data.
         """
         return cls(axis_data=axis_data, tick_values=list(categories))
