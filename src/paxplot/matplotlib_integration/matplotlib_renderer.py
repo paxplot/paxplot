@@ -29,7 +29,7 @@ class MatplotlibRenderer:
         """
         self.plot_model = plot_model
         self._figure: Optional[Figure] = None
-        self._axes: list[Axes] = []
+        self._axes: list = []  # Will contain secondary axes
         self._line_objects: list = []
         
     def _ensure_initialized(self, figsize: tuple = (10, 6), **kwargs) -> None:
@@ -48,7 +48,7 @@ class MatplotlibRenderer:
             
     def _initialize_figure(self, figsize: tuple = (10, 6), **kwargs) -> None:
         """
-        Internal method to create figure and axes using positioned axes.
+        Internal method to create figure and main axis.
         
         Parameters
         ----------
@@ -57,9 +57,9 @@ class MatplotlibRenderer:
         **kwargs
             Additional arguments passed to plt.figure.
         """
-        # Create figure with appropriate number of axes
-        n_axes = self.plot_model.num_columns
-        if n_axes == 0:
+        # Create figure with appropriate number of columns
+        n_columns = self.plot_model.num_columns
+        if n_columns == 0:
             raise ValueError("Cannot initialize figure with 0 columns")
             
         # Create figure
@@ -68,67 +68,47 @@ class MatplotlibRenderer:
         # Create the main plotting axis that spans the entire plot area
         self._main_axis = self._figure.add_axes((0.1, 0.1, 0.8, 0.8))
         
-        # Calculate axis positions to align with x-coordinates
-        # If we have n columns, the plot spans x = 0 to n-1
-        # We need tick axes at each x position: 0, 1, 2, ..., n-1
+        # Set up the main axis coordinate system
+        if n_columns == 1:
+            self._main_axis.set_xlim((-0.5, 0.5))
+        else:
+            self._main_axis.set_xlim((0, n_columns - 1))
         
-        plot_left = 0.1
-        plot_right = 0.9
-        plot_width = plot_right - plot_left
-        
-        # Each axis should be positioned at its corresponding x-coordinate
-        axis_width = 0.0  # Zero width axes so they don't block anything
-        
+        # Create secondary axes positioned at each x-coordinate
         self._axes = []
-        
-        for i in range(n_axes):
-            if n_axes == 1:
-                # Special case: single column at center
-                x_position = 0.5
+        for i in range(n_columns):
+            if n_columns == 1:
+                x_coord = 0.0
             else:
-                # Map column index to position in plot area
-                x_position = i / (n_axes - 1)
+                x_coord = i
             
-            # Convert to figure coordinates
-            left = plot_left + x_position * plot_width - axis_width / 2
+            # Use secondary_yaxis with explicit positioning at x-coordinate
+            # For data coordinates, we need to convert x_coord to the right position
+            if n_columns == 1:
+                # Single column case
+                secondary_ax = self._main_axis.secondary_yaxis('right')
+            else:
+                # Multiple columns: position each at its x-coordinate
+                # Convert data coordinate to axis coordinate (0-1 range)
+                axis_pos = x_coord / (n_columns - 1) if n_columns > 1 else 0.5
+                secondary_ax = self._main_axis.secondary_yaxis(axis_pos)
             
-            # [left, bottom, width, height]
-            ax = self._figure.add_axes((left, 0.1, axis_width, 0.8))
-            self._axes.append(ax)
-            
-        self._setup_axes_formatting()
+            self._axes.append(secondary_ax)
         
     def _setup_axes_formatting(self) -> None:
         """Apply default formatting to all axes."""
+        # Format each secondary axis
         for i, ax in enumerate(self._axes):
-            # Remove most spines but keep the left spine for vertical axes
+            # Hide most spines, keep only the left spine for the vertical line
             ax.spines['top'].set_visible(False)
             ax.spines['bottom'].set_visible(False)
             ax.spines['right'].set_visible(False)
-            # Keep left spine visible for vertical axis lines
             
-            # Make the axis background transparent but keep the axis visible
-            ax.set_facecolor('none')
+            # Hide x-axis ticks
+            ax.set_xticks([])
             
-            # Set limits - normalized data ranges from -1 to 1, with padding to prevent cropping
-            ax.set_ylim([-1.1, 1.1])
-            
-            # Set x limits to match the main plot coordinate system
-            if self.plot_model.num_columns == 1:
-                ax.set_xlim([-0.5, 0.5])
-            else:
-                ax.set_xlim([0, self.plot_model.num_columns - 1])
-            
-            # Set x ticks
-            ax.set_xticks([0], [' '])
-            ax.tick_params(axis='x', length=0.0, pad=10)
-            
-            # Set y ticks for normalized data
-            ax.set_yticks([-1, 1])
-            
-        # Move ticks on the last axis to the right side
-        if self._axes:
-            self._axes[-1].yaxis.tick_right()
+            # Set the same y-limits as the main axis
+            ax.set_ylim(self._main_axis.get_ylim())
         
     def update(self, figsize: tuple = (10, 6), **kwargs) -> None:
         """
@@ -148,6 +128,7 @@ class MatplotlibRenderer:
         self._clear_existing_plots()
         self._plot_data()
         self._update_ticks()
+        self._setup_axes_formatting()
         
     def _clear_existing_plots(self) -> None:
         """Clear all existing line plots."""
@@ -160,7 +141,7 @@ class MatplotlibRenderer:
         self._line_objects = []
         
     def _plot_data(self) -> None:
-        """Plot continuous lines across the entire figure."""
+        """Plot continuous lines on the main axis."""
         if self.plot_model.num_rows == 0:
             return
             
@@ -175,13 +156,13 @@ class MatplotlibRenderer:
         
         # Set the plot area to span from 0 to n_columns-1
         if self.plot_model.num_columns == 1:
-            main_ax.set_xlim([-0.5, 0.5])
+            main_ax.set_xlim((-0.5, 0.5))
         else:
-            main_ax.set_xlim([0, self.plot_model.num_columns - 1])
+            main_ax.set_xlim((0, self.plot_model.num_columns - 1))
         # Extend y limits slightly to prevent line cropping
-        main_ax.set_ylim([-1.1, 1.1])
+        main_ax.set_ylim((-1.1, 1.1))
         
-        # Hide the main axis (we only want the tick axes to be visible)
+        # Hide the main axis ticks and spines
         main_ax.set_xticks([])
         main_ax.set_yticks([])
         for spine in main_ax.spines.values():
@@ -194,34 +175,47 @@ class MatplotlibRenderer:
             y_coords = normalized_data[row_idx, :]
             line, = main_ax.plot(x_coords, y_coords, 'b-', alpha=0.7)
             self._line_objects.append(line)
+        
+        # Draw vertical lines at each x-coordinate on the main axis
+        for i in range(self.plot_model.num_columns):
+            x_coord = i if self.plot_model.num_columns > 1 else 0.0
+            main_ax.axvline(x=x_coord, color='black', linewidth=1, alpha=0.8)
             
     def _update_ticks(self) -> None:
-        """Update tick marks and labels for all axes."""
-        for col_idx in range(self.plot_model.num_columns):
+        """Update tick marks and labels for each axis."""
+        for i, ax in enumerate(self._axes):
             try:
                 # Try numeric ticks first
-                tick_values = self.plot_model.get_numeric_ticks(col_idx)
-                tick_positions = self.plot_model.get_numeric_ticks_normalized(col_idx)
-                self._axes[col_idx].set_yticks(tick_positions)
-                self._axes[col_idx].set_yticklabels([str(v) for v in tick_values])
+                tick_values = self.plot_model.get_numeric_ticks(i)
+                tick_positions = self.plot_model.get_numeric_ticks_normalized(i)
             except TypeError:
                 # Fall back to categorical ticks
-                tick_labels = self.plot_model.get_categorical_ticks(col_idx)
-                tick_positions = self.plot_model.get_categorical_ticks_normalized(col_idx)
-                self._axes[col_idx].set_yticks(tick_positions)
-                self._axes[col_idx].set_yticklabels(tick_labels)
+                tick_labels = self.plot_model.get_categorical_ticks(i)
+                tick_positions = self.plot_model.get_categorical_ticks_normalized(i)
+                tick_values = tick_labels
+            
+            # Set the ticks and labels
+            ax.set_yticks(tick_positions)
+            ax.set_yticklabels([str(val) for val in tick_values])
+            
+            # For the rightmost axis, put ticks on the right side
+            if i == self.plot_model.num_columns - 1:
+                ax.yaxis.tick_right()
                 
     def get_figure(self) -> Figure:
         """Get the matplotlib figure."""
         self._ensure_initialized()
+        assert self._figure is not None  # Type guard
         return self._figure
         
     def show(self) -> None:
         """Display the figure."""
         self._ensure_initialized()
+        assert self._figure is not None  # Type guard
         self._figure.show()
         
     def save(self, filename: str, **kwargs) -> None:
         """Save the figure to a file."""
         self._ensure_initialized()
+        assert self._figure is not None  # Type guard
         self._figure.savefig(filename, **kwargs)
