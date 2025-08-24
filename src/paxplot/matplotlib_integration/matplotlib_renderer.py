@@ -1,10 +1,15 @@
-"""Matplotlib renderer for PlotModel visualization."""
+"""Matplotlib renderer for PlotModel visualization.
 
-from typing import Optional
+This module provides a clean, maintainable matplotlib renderer that follows
+industry standards for separation of concerns and error handling.
+"""
+
+from typing import Optional, List, Tuple, Dict, Any
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.lines import Line2D
 import numpy as np
 
 from paxplot.plot_model import PlotModel
@@ -12,11 +17,25 @@ from paxplot.plot_model import PlotModel
 
 class MatplotlibRenderer:
     """
-    Renders a PlotModel using matplotlib.
+    Renders a PlotModel using matplotlib with clean separation of concerns.
     
-    This renderer creates and maintains matplotlib figures and axes,
-    handling the visual representation of the plot model data.
+    This renderer follows industry standards by:
+    - Separating figure management from rendering logic
+    - Using clear, descriptive method names
+    - Implementing proper error handling
+    - Following the single responsibility principle
+    - Providing consistent state management
     """
+    
+    # Default styling constants
+    DEFAULT_FIGSIZE = (10, 6)
+    DEFAULT_LINE_COLOR = 'blue'
+    DEFAULT_LINE_ALPHA = 0.7
+    DEFAULT_LINE_WIDTH = 1.0
+    DEFAULT_SPINE_COLOR = 'black'
+    DEFAULT_SPINE_ALPHA = 0.8
+    DEFAULT_SPINE_WIDTH = 1.0
+    DEFAULT_Y_LIMITS = (-1.1, 1.1)
     
     def __init__(self, plot_model: PlotModel):
         """
@@ -26,129 +45,204 @@ class MatplotlibRenderer:
         ----------
         plot_model : PlotModel
             The plot model to render.
+            
+        Raises
+        ------
+        ValueError
+            If plot_model is None or invalid.
         """
+        if plot_model is None:
+            raise ValueError("plot_model cannot be None")
+        
         self.plot_model = plot_model
         self._figure: Optional[Figure] = None
-        self._axes: list = []  # Will contain secondary axes
-        self._line_objects: list = []
+        self._main_axis: Optional[Axes] = None
+        self._secondary_axes: List[Axes] = []
+        self._line_objects: List[Line2D] = []
+        self._is_initialized = False
         
-    def _ensure_initialized(self, figsize: tuple = (10, 6), **kwargs) -> None:
+    def _validate_plot_model(self) -> None:
         """
-        Ensure figure is initialized, create if needed.
+        Validate that the plot model is in a valid state for rendering.
         
-        Parameters
-        ----------
-        figsize : tuple, optional
-            Figure size (width, height) in inches.
-        **kwargs
-            Additional arguments passed to plt.subplots.
+        Raises
+        ------
+        ValueError
+            If the plot model is not in a valid state.
         """
-        if self._figure is None:
-            self._initialize_figure(figsize, **kwargs)
+        if self.plot_model.num_columns == 0:
+            raise ValueError("Cannot render plot model with zero columns")
+        
+        if self.plot_model.num_rows == 0:
+            # This is valid - just means no data to plot
+            return
             
-    def _initialize_figure(self, figsize: tuple = (10, 6), **kwargs) -> None:
+    def _create_figure(self, figsize: Tuple[float, float], **kwargs) -> Figure:
         """
-        Internal method to create figure and main axis.
+        Create a new matplotlib figure.
         
         Parameters
         ----------
-        figsize : tuple, optional
+        figsize : Tuple[float, float]
             Figure size (width, height) in inches.
         **kwargs
             Additional arguments passed to plt.figure.
-        """
-        # Create figure with appropriate number of columns
-        n_columns = self.plot_model.num_columns
-        if n_columns == 0:
-            raise ValueError("Cannot initialize figure with 0 columns")
             
-        # Create figure
-        self._figure = plt.figure(figsize=figsize, **kwargs)
+        Returns
+        -------
+        Figure
+            The created matplotlib figure.
+        """
+        return plt.figure(figsize=figsize, **kwargs)
         
-        # Create the main plotting axis that spans the entire plot area
-        self._main_axis = self._figure.add_axes((0.1, 0.1, 0.8, 0.8))
+    def _create_main_axis(self, figure: Figure) -> Axes:
+        """
+        Create the main plotting axis.
         
-        # Set up the main axis coordinate system
-        if n_columns == 1:
-            self._main_axis.set_xlim((-0.5, 0.5))
+        Parameters
+        ----------
+        figure : Figure
+            The matplotlib figure to add the axis to.
+            
+        Returns
+        -------
+        Axes
+            The main plotting axis.
+        """
+        # Create main axis that spans the entire plot area
+        main_axis = figure.add_axes((0.1, 0.1, 0.8, 0.8))
+        
+        # Set appropriate x-limits based on number of columns
+        if self.plot_model.num_columns == 1:
+            main_axis.set_xlim((-0.5, 0.5))
         else:
-            self._main_axis.set_xlim((0, n_columns - 1))
+            main_axis.set_xlim((0, self.plot_model.num_columns - 1))
+            
+        # Set y-limits with padding to prevent line cropping
+        main_axis.set_ylim(self.DEFAULT_Y_LIMITS)
         
-        # Create secondary axes positioned at each x-coordinate
-        self._axes = []
+        # Hide main axis ticks and spines
+        main_axis.set_xticks([])
+        main_axis.set_yticks([])
+        for spine in main_axis.spines.values():
+            spine.set_visible(False)
+            
+        return main_axis
+        
+    def _create_secondary_axes(self, main_axis: Axes) -> List[Axes]:
+        """
+        Create secondary axes for each column.
+        
+        Parameters
+        ----------
+        main_axis : Axes
+            The main axis to create secondary axes from.
+            
+        Returns
+        -------
+        List[Axes]
+            List of secondary axes, one for each column.
+        """
+        secondary_axes = []
+        n_columns = self.plot_model.num_columns
+        
         for i in range(n_columns):
             if n_columns == 1:
-                x_coord = 0.0
+                # Single column case - position at center
+                secondary_ax = main_axis.secondary_yaxis('right')
             else:
-                x_coord = i
+                # Multiple columns - position each at its x-coordinate
+                axis_pos = i / (n_columns - 1) if n_columns > 1 else 0.5
+                secondary_ax = main_axis.secondary_yaxis(axis_pos)
+                
+            secondary_axes.append(secondary_ax)
             
-            # Use secondary_yaxis with explicit positioning at x-coordinate
-            # For data coordinates, we need to convert x_coord to the right position
-            if n_columns == 1:
-                # Single column case
-                secondary_ax = self._main_axis.secondary_yaxis('right')
-            else:
-                # Multiple columns: position each at its x-coordinate
-                # Convert data coordinate to axis coordinate (0-1 range)
-                axis_pos = x_coord / (n_columns - 1) if n_columns > 1 else 0.5
-                secondary_ax = self._main_axis.secondary_yaxis(axis_pos)
-            
-            self._axes.append(secondary_ax)
+        return secondary_axes
         
-    def _setup_axes_formatting(self) -> None:
-        """Apply default formatting to all axes."""
-        # Format each secondary axis
-        for i, ax in enumerate(self._axes):
-            # Hide most spines, keep only the left spine for the vertical line
-            ax.spines['top'].set_visible(False)
-            ax.spines['bottom'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            
-            # Make the left spine visible and styled as the vertical line
-            ax.spines['left'].set_visible(True)
-            ax.spines['left'].set_color('black')
-            ax.spines['left'].set_linewidth(1)
-            ax.spines['left'].set_alpha(0.8)
-            
-            # Hide x-axis ticks
-            ax.set_xticks([])
-            
-            # Set the same y-limits as the main axis
-            ax.set_ylim(self._main_axis.get_ylim())
-        
-    def update(self, figsize: tuple = (10, 6), **kwargs) -> None:
+    def _apply_axis_styling(self, axis: Axes) -> None:
         """
-        Update the visualization to reflect the current state of the plot model.
-        
-        This method redraws all data and updates ticks based on the current
-        plot model state.
+        Apply consistent styling to a secondary axis.
         
         Parameters
         ----------
-        figsize : tuple, optional
+        axis : Axes
+            The axis to style.
+        """
+        # Hide most spines, keep only the left spine for the vertical line
+        for spine_name in ['top', 'bottom', 'right']:
+            axis.spines[spine_name].set_visible(False)
+            
+        # Style the left spine as the vertical line
+        left_spine = axis.spines['left']
+        left_spine.set_visible(True)
+        left_spine.set_color(self.DEFAULT_SPINE_COLOR)
+        left_spine.set_linewidth(self.DEFAULT_SPINE_WIDTH)
+        left_spine.set_alpha(self.DEFAULT_SPINE_ALPHA)
+        
+        # Hide x-axis ticks
+        axis.set_xticks([])
+        
+        # Set y-limits to match main axis
+        axis.set_ylim(self.DEFAULT_Y_LIMITS)
+        
+    def _initialize_figure(self, figsize: Tuple[float, float], **kwargs) -> None:
+        """
+        Initialize the matplotlib figure and axes.
+        
+        Parameters
+        ----------
+        figsize : Tuple[float, float]
             Figure size (width, height) in inches.
         **kwargs
             Additional arguments passed to plt.figure.
         """
-        self._ensure_initialized(figsize, **kwargs)
-        self._clear_existing_plots()
-        self._plot_data()
-        self._update_ticks()
-        self._setup_axes_formatting()
+        self._validate_plot_model()
         
+        # Create figure and axes
+        self._figure = self._create_figure(figsize, **kwargs)
+        self._main_axis = self._create_main_axis(self._figure)
+        self._secondary_axes = self._create_secondary_axes(self._main_axis)
+        
+        # Apply styling to secondary axes
+        for axis in self._secondary_axes:
+            self._apply_axis_styling(axis)
+            
+        # Set rightmost axis to have ticks on the right
+        if self._secondary_axes:
+            self._secondary_axes[-1].yaxis.tick_right()
+            
+        self._is_initialized = True
+        
+    def _ensure_initialized(self, figsize: Optional[Tuple[float, float]] = None, **kwargs) -> None:
+        """
+        Ensure the figure is initialized, creating it if needed.
+        
+        Parameters
+        ----------
+        figsize : Tuple[float, float], optional
+            Figure size (width, height) in inches.
+        **kwargs
+            Additional arguments passed to plt.figure.
+        """
+        if not self._is_initialized:
+            figsize = figsize or self.DEFAULT_FIGSIZE
+            self._initialize_figure(figsize, **kwargs)
+            
     def _clear_existing_plots(self) -> None:
-        """Clear all existing line plots."""
-        # Clear the main figure area for continuous lines
-        if self._figure and hasattr(self, '_main_axis'):
+        """Clear all existing line plots from the main axis."""
+        if self._main_axis is not None:
             # Remove existing lines from the main axis
             for artist in self._main_axis.get_children():
-                if hasattr(artist, 'get_data'):
+                if isinstance(artist, Line2D):
                     artist.remove()
-        self._line_objects = []
+        self._line_objects.clear()
         
-    def _plot_data(self) -> None:
+    def _plot_data_lines(self) -> None:
         """Plot continuous lines on the main axis."""
         if self.plot_model.num_rows == 0:
+            return
+            
+        if self._main_axis is None:
             return
             
         # Get normalized data for plotting
@@ -157,57 +251,84 @@ class MatplotlibRenderer:
             for i in range(self.plot_model.num_columns)
         ]).T
         
-        # Use the main plotting axis that spans the entire plot area
-        main_ax = self._main_axis
-        
-        # Set the plot area to span from 0 to n_columns-1
-        if self.plot_model.num_columns == 1:
-            main_ax.set_xlim((-0.5, 0.5))
-        else:
-            main_ax.set_xlim((0, self.plot_model.num_columns - 1))
-        # Extend y limits slightly to prevent line cropping
-        main_ax.set_ylim((-1.1, 1.1))
-        
-        # Hide the main axis ticks and spines
-        main_ax.set_xticks([])
-        main_ax.set_yticks([])
-        for spine in main_ax.spines.values():
-            spine.set_visible(False)
-        
         # Plot continuous lines across the entire figure
-        # This is the key advantage - one line per data row
+        x_coords = list(range(self.plot_model.num_columns))
+        
         for row_idx in range(self.plot_model.num_rows):
-            x_coords = list(range(self.plot_model.num_columns))
             y_coords = normalized_data[row_idx, :]
-            line, = main_ax.plot(x_coords, y_coords, 'b-', alpha=0.7)
+            line, = self._main_axis.plot(
+                x_coords, 
+                y_coords, 
+                color=self.DEFAULT_LINE_COLOR,
+                alpha=self.DEFAULT_LINE_ALPHA,
+                linewidth=self.DEFAULT_LINE_WIDTH
+            )
             self._line_objects.append(line)
-                    
-    def _update_ticks(self) -> None:
-        """Update tick marks and labels for each axis."""
-        for i, ax in enumerate(self._axes):
-            try:
-                # Try numeric ticks first
-                tick_values = self.plot_model.get_numeric_ticks(i)
-                tick_positions = self.plot_model.get_numeric_ticks_normalized(i)
-            except TypeError:
-                # Fall back to categorical ticks
-                tick_labels = self.plot_model.get_categorical_ticks(i)
-                tick_positions = self.plot_model.get_categorical_ticks_normalized(i)
-                tick_values = tick_labels
             
-            # Set the ticks and labels
-            ax.set_yticks(tick_positions)
-            ax.set_yticklabels([str(val) for val in tick_values])
+    def _update_axis_ticks(self, axis: Axes, column_index: int) -> None:
+        """
+        Update tick marks and labels for a specific axis.
+        
+        Parameters
+        ----------
+        axis : Axes
+            The axis to update ticks for.
+        column_index : int
+            The column index corresponding to this axis.
+        """
+        try:
+            # Try numeric ticks first
+            tick_values = self.plot_model.get_numeric_ticks(column_index)
+            tick_positions = self.plot_model.get_numeric_ticks_normalized(column_index)
+        except TypeError:
+            # Fall back to categorical ticks
+            tick_labels = self.plot_model.get_categorical_ticks(column_index)
+            tick_positions = self.plot_model.get_categorical_ticks_normalized(column_index)
+            tick_values = tick_labels
             
-            # For the rightmost axis, put ticks on the right side
-            if i == self.plot_model.num_columns - 1:
-                ax.yaxis.tick_right()
-                
-    def get_figure(self) -> Figure:
-        """Get the matplotlib figure."""
+        # Set the ticks and labels
+        axis.set_yticks(tick_positions)
+        axis.set_yticklabels([str(val) for val in tick_values])
+        
+    def _update_all_ticks(self) -> None:
+        """Update tick marks and labels for all secondary axes."""
+        for i, axis in enumerate(self._secondary_axes):
+            self._update_axis_ticks(axis, i)
+            
+    def update(self, figsize: Optional[Tuple[float, float]] = None, **kwargs) -> None:
+        """
+        Update the visualization to reflect the current state of the plot model.
+        
+        This method redraws all data and updates ticks based on the current
+        plot model state.
+        
+        Parameters
+        ----------
+        figsize : Tuple[float, float], optional
+            Figure size (width, height) in inches.
+        **kwargs
+            Additional arguments passed to plt.figure.
+        """
+        self._ensure_initialized(figsize, **kwargs)
+        self._clear_existing_plots()
+        self._plot_data_lines()
+        self._update_all_ticks()
+        
+    @property
+    def figure(self) -> Figure:
+        """
+        Get the matplotlib figure.
+        
+        Returns
+        -------
+        Figure
+            The matplotlib figure.
+        """
         self._ensure_initialized()
         assert self._figure is not None  # Type guard
         return self._figure
+        
+
         
     def show(self) -> None:
         """Display the figure."""
@@ -216,7 +337,30 @@ class MatplotlibRenderer:
         self._figure.show()
         
     def save(self, filename: str, **kwargs) -> None:
-        """Save the figure to a file."""
+        """
+        Save the figure to a file.
+        
+        Parameters
+        ----------
+        filename : str
+            The filename to save the figure to.
+        **kwargs
+            Additional arguments passed to figure.savefig.
+        """
         self._ensure_initialized()
         assert self._figure is not None  # Type guard
         self._figure.savefig(filename, **kwargs)
+        
+    def close(self) -> None:
+        """Close the figure and clean up resources."""
+        if self._figure is not None:
+            plt.close(self._figure)
+            self._figure = None
+            self._main_axis = None
+            self._secondary_axes.clear()
+            self._line_objects.clear()
+            self._is_initialized = False
+            
+    def __del__(self):
+        """Cleanup when the renderer is destroyed."""
+        self.close()
