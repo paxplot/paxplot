@@ -126,8 +126,9 @@ class MatplotlibRenderer:
             # Set y ticks for normalized data
             ax.set_yticks([-1, 1])
             
-        # Note: We don't need tick_right() anymore since axes are positioned
-        # exactly where the data points appear, not as subplots
+        # Move ticks on the last axis to the right side
+        if self._axes:
+            self._axes[-1].yaxis.tick_right()
         
     def update(self, figsize: tuple = (10, 6), **kwargs) -> None:
         """

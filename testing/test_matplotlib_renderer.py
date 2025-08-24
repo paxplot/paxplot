@@ -3,7 +3,7 @@
 import pytest
 import numpy as np
 import matplotlib
-# matplotlib.use('Agg')  # Use non-interactive backend for testing
+matplotlib.use('Agg')  # Use non-interactive backend for testing
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
@@ -139,11 +139,9 @@ class TestMatplotlibRenderer:
         """Test that last axis has ticks on the right."""
         self.renderer.update()
         
-        # With the new positioning approach, we don't use tick_right()
-        # since axes are positioned exactly where data points appear
+        # Check that last axis has right ticks
         last_ax = self.renderer._axes[-1]
-        # Just verify the axis exists and has ticks
-        assert len(last_ax.get_yticks()) > 0
+        assert last_ax.yaxis.get_ticks_position() == 'right'
         
     def test_line_creation(self):
         """Test that lines are created correctly."""
