@@ -22,9 +22,9 @@ from typing import Sequence, Union, List, Optional
 import numpy as np
 from numpy.typing import NDArray
 
-from paxplot.data_managers.normalized_matrix import NormalizedMatrix
-from paxplot.data_managers.named_normalized_matrix_view import NamedNormalizedMatrixView
-from paxplot.plot_component_managers.tick_collection import TickCollection
+from paxplot.legacy.data_managers.normalized_matrix import NormalizedMatrix
+from paxplot.legacy.data_managers.named_normalized_matrix_view import NamedNormalizedMatrixView
+from paxplot.legacy.plot_component_managers.tick_collection import TickCollection
 
 
 class PlotModel:

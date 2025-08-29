@@ -11,7 +11,7 @@ from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 import numpy as np
 
-from paxplot.plot_model import PlotModel
+from paxplot.legacy.plot_model import PlotModel
 
 
 class MatplotlibRenderer:

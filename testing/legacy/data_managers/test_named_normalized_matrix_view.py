@@ -2,8 +2,8 @@
 """Tests for NamedNormalizedMatrixView"""
 
 import pytest
-from paxplot.data_managers.normalized_matrix import NormalizedMatrix, ColumnType
-from paxplot.data_managers.named_normalized_matrix_view import NamedNormalizedMatrixView
+from paxplot.legacy.data_managers.normalized_matrix import NormalizedMatrix, ColumnType
+from paxplot.legacy.data_managers.named_normalized_matrix_view import NamedNormalizedMatrixView
 
 @pytest.fixture
 def sample_normalized_matrix():

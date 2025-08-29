@@ -3,8 +3,8 @@
 
 from numpy.testing import assert_almost_equal
 
-from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
-from paxplot.plot_component_managers.categorical_ticks import CategoricalTicks
+from paxplot.legacy.data_managers.categorical_normalized_array import CategoricalNormalizedArray
+from paxplot.legacy.plot_component_managers.categorical_ticks import CategoricalTicks
 
 def test_from_categories_creates_with_all_categories():
     axis_data = CategoricalNormalizedArray(values=["X", "Y", "Z"])

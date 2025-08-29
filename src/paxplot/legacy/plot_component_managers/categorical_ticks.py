@@ -1,7 +1,7 @@
 """Categorical ticks for handling categorical tick marks."""
 
 from typing import List, Optional, Sequence
-from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
+from paxplot.legacy.data_managers.categorical_normalized_array import CategoricalNormalizedArray
 
 
 class CategoricalTicks:

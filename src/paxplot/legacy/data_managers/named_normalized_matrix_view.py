@@ -24,13 +24,13 @@ ValueError
 """
 
 from typing import Sequence, Union, List
-from paxplot.data_managers.normalized_matrix import (
+from paxplot.legacy.data_managers.normalized_matrix import (
     NormalizedMatrix,
     ColumnType,
 )
-from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
-from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
-from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
+from paxplot.legacy.data_managers.numeric_normalized_array import NumericNormalizedArray
+from paxplot.legacy.data_managers.categorical_normalized_array import CategoricalNormalizedArray
+from paxplot.legacy.data_managers.base_normalized_array import BaseNormalizedArray
 
 class NamedNormalizedMatrixView:
     """

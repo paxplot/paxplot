@@ -18,8 +18,8 @@ from typing import Sequence
 from pydantic import validate_call
 import numpy as np
 
-from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
-from paxplot.data_managers.array_normalizer import ArrayNormalizer
+from paxplot.legacy.data_managers.base_normalized_array import BaseNormalizedArray
+from paxplot.legacy.data_managers.array_normalizer import ArrayNormalizer
 
 
 class NumericNormalizedArray(BaseNormalizedArray[float | int]):

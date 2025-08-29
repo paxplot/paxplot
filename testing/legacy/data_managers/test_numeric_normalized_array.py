@@ -3,7 +3,7 @@
 
 import numpy as np
 import pytest
-from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
+from paxplot.legacy.data_managers.numeric_normalized_array import NumericNormalizedArray
 
 def test_numeric_normalized_array():
     raw = [1, 2, 3]

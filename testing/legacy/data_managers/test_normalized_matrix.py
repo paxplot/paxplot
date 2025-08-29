@@ -4,9 +4,9 @@
 import pytest
 import numpy as np
 
-from paxplot.data_managers.normalized_matrix import NormalizedMatrix, ColumnType
-from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
-from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
+from paxplot.legacy.data_managers.normalized_matrix import NormalizedMatrix, ColumnType
+from paxplot.legacy.data_managers.numeric_normalized_array import NumericNormalizedArray
+from paxplot.legacy.data_managers.categorical_normalized_array import CategoricalNormalizedArray
 
 def test_normalized_matrix_basic():
     data = [

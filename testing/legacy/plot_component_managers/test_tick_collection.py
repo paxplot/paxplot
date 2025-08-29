@@ -7,16 +7,16 @@ which manages multiple tick collections for a NormalizedMatrix.
 """
 
 import pytest
-from paxplot.plot_component_managers.tick_collection import (
+from paxplot.legacy.plot_component_managers.tick_collection import (
     TickCollection,
 )
-from paxplot.plot_component_managers.numeric_ticks import (
+from paxplot.legacy.plot_component_managers.numeric_ticks import (
     NumericTicks,
 )
-from paxplot.plot_component_managers.categorical_ticks import (
+from paxplot.legacy.plot_component_managers.categorical_ticks import (
     CategoricalTicks,
 )
-from paxplot.data_managers.normalized_matrix import NormalizedMatrix
+from paxplot.legacy.data_managers.normalized_matrix import NormalizedMatrix
 
 
 class TestTickCollection:

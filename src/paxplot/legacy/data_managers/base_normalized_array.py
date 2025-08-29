@@ -17,7 +17,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Sequence, Callable, List, TypeVar, Generic
 import numpy as np
 from numpy.typing import NDArray
-from paxplot.data_managers.array_normalizer import ArrayNormalizer
+from paxplot.legacy.data_managers.array_normalizer import ArrayNormalizer
 
 T = TypeVar("T")
 

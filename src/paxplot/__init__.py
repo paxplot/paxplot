@@ -1,8 +1,8 @@
 """Paxplot modules"""
-from .core import pax_parallel, PaxFigure
-from .controller import PaxController
+from .legacy.core import pax_parallel, PaxFigure
+from .legacy.controller import PaxController
 from .datasets import *
-from . import data_managers
+from .legacy import data_managers
 
 # Main interface - users should use PaxController
 __all__ = [

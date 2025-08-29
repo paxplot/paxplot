@@ -17,9 +17,9 @@ from typing import Sequence, Union, List
 from enum import Enum
 import numpy as np
 
-from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
-from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
-from paxplot.data_managers.base_normalized_array import BaseNormalizedArray
+from paxplot.legacy.data_managers.numeric_normalized_array import NumericNormalizedArray
+from paxplot.legacy.data_managers.categorical_normalized_array import CategoricalNormalizedArray
+from paxplot.legacy.data_managers.base_normalized_array import BaseNormalizedArray
 
 
 class ColumnType(str, Enum):

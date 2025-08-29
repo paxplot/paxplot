@@ -4,8 +4,8 @@
 import pytest
 from numpy.testing import assert_almost_equal
 
-from paxplot.plot_component_managers.numeric_ticks import NumericTicks
-from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
+from paxplot.legacy.plot_component_managers.numeric_ticks import NumericTicks
+from paxplot.legacy.data_managers.numeric_normalized_array import NumericNormalizedArray
 
 
 def test_initialization():

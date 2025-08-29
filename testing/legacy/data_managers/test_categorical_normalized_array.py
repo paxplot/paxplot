@@ -2,7 +2,7 @@
 """Tests for the CategoricalNormalizedArray"""
 
 import numpy as np
-from paxplot.data_managers.categorical_normalized_array import CategoricalNormalizedArray
+from paxplot.legacy.data_managers.categorical_normalized_array import CategoricalNormalizedArray
 
 
 def test_basic_construction():

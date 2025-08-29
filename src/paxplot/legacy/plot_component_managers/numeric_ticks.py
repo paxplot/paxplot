@@ -21,7 +21,7 @@ visual consistency between data and tick marks.
 
 from typing import Optional, Sequence, Union, List
 import matplotlib.ticker as mticker
-from paxplot.data_managers.numeric_normalized_array import NumericNormalizedArray
+from paxplot.legacy.data_managers.numeric_normalized_array import NumericNormalizedArray
 
 
 class NumericTicks:

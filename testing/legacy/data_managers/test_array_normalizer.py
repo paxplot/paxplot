@@ -4,7 +4,7 @@
 import pytest
 import numpy as np
 from pydantic import ValidationError
-from paxplot.data_managers.array_normalizer import ArrayNormalizer
+from paxplot.legacy.data_managers.array_normalizer import ArrayNormalizer
 
 
 def test_accepts_numpy_array_float64():

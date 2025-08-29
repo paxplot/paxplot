@@ -7,8 +7,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from paxplot.plot_model import PlotModel
-from paxplot.matplotlib_integration.matplotlib_renderer import (
+from paxplot.legacy.plot_model import PlotModel
+from paxplot.legacy.matplotlib_integration.matplotlib_renderer import (
     MatplotlibRenderer,
 )
 

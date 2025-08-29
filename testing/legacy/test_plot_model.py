@@ -2,7 +2,7 @@
 """Tests for the PlotModel"""
 
 import pytest
-from paxplot.plot_model import PlotModel
+from paxplot.legacy.plot_model import PlotModel
 
 # Sample initial data: mixed numeric and categorical columns
 INITIAL_DATA = [

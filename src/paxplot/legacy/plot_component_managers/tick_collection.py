@@ -12,13 +12,13 @@ a unified interface for tick management across all axes.
 """
 
 from typing import List, Optional, Union
-from paxplot.plot_component_managers.numeric_ticks import (
+from paxplot.legacy.plot_component_managers.numeric_ticks import (
     NumericTicks,
 )
-from paxplot.plot_component_managers.categorical_ticks import (
+from paxplot.legacy.plot_component_managers.categorical_ticks import (
     CategoricalTicks,
 )
-from paxplot.data_managers.normalized_matrix import (
+from paxplot.legacy.data_managers.normalized_matrix import (
     NormalizedMatrix,
     ColumnType,
 )
