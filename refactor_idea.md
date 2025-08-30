@@ -13,6 +13,39 @@ This document outlines the refactored architecture for PaxPlot, a parallel coord
 
 ## Architecture Components
 
+### Directory Structure
+
+```
+src/paxplot/
+├── __init__.py
+├── structures/
+│   ├── __init__.py
+│   ├── arrays/
+│   │   ├── __init__.py
+│   │   ├── numerical_array.py
+│   │   └── categorical_array.py
+│   ├── matrix.py
+│   └── ticks/
+│       ├── __init__.py
+│       ├── axis_ticks.py
+│       ├── numeric_axis_ticks.py
+│       ├── categorical_axis_ticks.py
+│       └── axis_tick_manager.py
+├── views/
+│   ├── __init__.py
+│   ├── normalized_array_view.py
+│   └── normalized_matrix_view.py
+├── models/
+│   ├── __init__.py
+│   └── plot_model.py
+├── renderers/
+│   ├── __init__.py
+│   ├── base_renderer.py
+│   └── matplotlib_renderer.py
+├── legacy/
+└── datasets.py
+```
+
 ### Core Data Structures
 
 #### `NumericalArray`
@@ -20,15 +53,11 @@ Stores numerical data as an array with basic operations.
 
 ```python
 class NumericalArray:
-    def __init__(self, values: Sequence[float])
-    def append(self, value: float)
-    def remove(self, index: int)
+    def __init__(self, values: Sequence[float or int])
+    def append(self, value: Sequence[float or int])
+    def remove(self, index: Sequence[int])
     @property
     def values(self) -> List[float]
-    @property
-    def custom_min(self) -> float
-    @property
-    def custom_max(self) -> float
 ```
 
 #### `CategoricalArray`
@@ -37,13 +66,12 @@ Stores categorical (string) data as an array.
 ```python
 class CategoricalArray:
     def __init__(self, values: Sequence[str])
-    def append(self, value: str)
-    def remove(self, index: int)
+    def append(self, value: Sequence[str])
+    def remove(self, index: Sequence[int])
     @property
     def values(self) -> List[str]
     @property
     def unique_values(self) -> List[str]
-    # This have a NumericalArray as a backend ent of just ints corresponding to the categorical values
 ```
 
 #### `Matrix`
@@ -52,9 +80,12 @@ Manages collections of arrays, providing a unified interface.
 ```python
 class Matrix:
     def __init__(self, data: Sequence[Sequence[Union[str, int, float]]])
-    def get_column(self, index: int) -> Union[NumericalArray, CategoricalArray]
+    @property
+    def columns # this should be indexable and return either Numerical or Categorical Array
     def append_data(self, row: Sequence[Union[str, int, float]])
-    def remove_data(self, index: int)
+    def remove_data(self, index: Sequence[int])
+    def get_numeric_array(self, int) returns Numerical array or errors
+    def get_categoric_array(self, int) returns Categorical array or errors
 ```
 
 ### Tick Management
