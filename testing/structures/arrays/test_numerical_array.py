@@ -25,7 +25,7 @@ class TestNumericalArray:
     def test_init_with_none_raises_error(self):
         """Test that initialization with None raises ValueError."""
         with pytest.raises(ValueError, match="Values cannot be None"):
-            NumericalArray(None)
+            NumericalArray(None)  # type: ignore
 
     def test_init_with_mixed_types_raises_error(self):
         """Test that initialization with mixed types raises ValueError."""
@@ -37,7 +37,7 @@ class TestNumericalArray:
         array = NumericalArray([1, None, 3])  # type: ignore
         assert array.values[0] == 1.0
         assert array.values[2] == 3.0
-        assert str(array.values[1]) == 'nan'  # NaN doesn't equal itself
+        assert str(array.values[1]) == "nan"  # NaN doesn't equal itself
         assert array.has_nan is True
         assert array.nan_count == 1
         assert array.nan_indices == [1]
@@ -122,7 +122,7 @@ class TestNumericalArray:
         """Test that removing with invalid index type raises ValueError."""
         array = NumericalArray([1, 2, 3])
         with pytest.raises(ValueError, match="must be an integer"):
-            array.remove(["invalid"])
+            array.remove(["invalid"])  # type: ignore
 
     def test_len_operator(self):
         """Test len() operator."""
@@ -190,7 +190,7 @@ class TestNumericalArray:
         assert array_no_nan.nan_indices == []
 
         # Array with NaN at specific indices
-        array_with_nan = NumericalArray([1.0, float('nan'), 3.0, None, 5.0])
+        array_with_nan = NumericalArray([1.0, float("nan"), 3.0, None, 5.0])
         assert array_with_nan.nan_indices == [1, 3]
 
     def test_non_nan_values_property(self):
@@ -200,14 +200,14 @@ class TestNumericalArray:
         assert array_no_nan.non_nan_values == [1.0, 2.0, 3.0]
 
         # Array with NaN values
-        array_with_nan = NumericalArray([1.0, float('nan'), 3.0, None, 5.0])
+        array_with_nan = NumericalArray([1.0, float("nan"), 3.0, None, 5.0])
         assert array_with_nan.non_nan_values == [1.0, 3.0, 5.0]
 
         # Array with all NaN values
-        array_all_nan = NumericalArray([float('nan'), None, float('nan')])
+        array_all_nan = NumericalArray([float("nan"), None, float("nan")])
         assert array_all_nan.non_nan_values == []
 
     def test_min_with_nan_values(self):
         """Test that min on array with NaN values returns the correct value."""
-        array = NumericalArray([1.0, float('nan'), 3.0])
+        array = NumericalArray([1.0, float("nan"), 3.0])
         assert array.min == 1.0

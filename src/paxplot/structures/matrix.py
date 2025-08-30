@@ -7,7 +7,6 @@ NumericalArray and CategoricalArray objects.
 from typing import List, Sequence, Union
 from enum import Enum
 
-from .arrays.base_array import BaseArray
 from .arrays.numerical_array import NumericalArray
 from .arrays.categorical_array import CategoricalArray
 
@@ -307,7 +306,7 @@ class Matrix:
 
         for col_idx in range(num_columns):
             column_data = [row[col_idx] for row in data]
-            column_type = self._infer_column_type(column_data)
+            column_type = self.infer_column_type(column_data)
 
             if column_type == ColumnType.NUMERIC:
                 columns.append(NumericalArray(column_data))  # type: ignore
@@ -316,7 +315,7 @@ class Matrix:
 
         return columns
 
-    def _infer_column_type(
+    def infer_column_type(
         self, column_data: List[Union[str, int, float]]
     ) -> ColumnType:
         """Infer the type of a column based on its data.
@@ -340,10 +339,12 @@ class Matrix:
         has_categorical = False
 
         for value in column_data:
-            if value is None or (isinstance(value, float) and str(value) == 'nan'):
+            if value is None or (
+                isinstance(value, float) and str(value) == "nan"
+            ):
                 # Skip NaN values in type inference
                 continue
-            elif isinstance(value, (int, float)):
+            if isinstance(value, (int, float)):
                 has_numeric = True
             elif isinstance(value, str):
                 has_categorical = True
