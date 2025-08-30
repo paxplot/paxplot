@@ -4,7 +4,7 @@ This module defines the Matrix class for managing collections of
 NumericalArray and CategoricalArray objects.
 """
 
-from typing import List, Sequence, Union, cast
+from typing import List, Sequence, Union
 from enum import Enum
 
 from .arrays.numerical_array import NumericalArray
@@ -233,19 +233,9 @@ class Matrix:
                 f"Row length {len(row)} doesn't match number of columns {self.num_columns}"
             )
 
-        for i, (column, value) in enumerate(zip(self._columns, row)):
-            if isinstance(column, NumericalArray):
-                if not isinstance(value, (int, float)):
-                    raise ValueError(
-                        f"Column {i} is numerical but value {value} is not numerical"
-                    )
-                column.append([value])
-            if isinstance(column, CategoricalArray):
-                if not isinstance(value, str):
-                    raise ValueError(
-                        f"Column {i} is categorical but value {value} is not a string"
-                    )
-                column.append([value])
+        # Let the arrays handle all validation and NaN checking
+        for column, value in zip(self._columns, row):
+            column.append([value])  # type: ignore
 
     def remove_data(self, indices: Sequence[int]) -> None:
         """Remove rows at the specified indices.
@@ -266,7 +256,7 @@ class Matrix:
     def _validate_data(
         self, data: Sequence[Sequence[Union[str, int, float]]]
     ) -> None:
-        """Validate the input data.
+        """Validate the input data structure.
 
         Parameters
         ----------
@@ -276,7 +266,7 @@ class Matrix:
         Raises
         ------
         ValueError
-            If the data is invalid.
+            If the data structure is invalid.
         """
         if not data:
             raise ValueError("Data cannot be empty")
@@ -319,13 +309,9 @@ class Matrix:
             column_type = self._infer_column_type(column_data)
 
             if column_type == ColumnType.NUMERIC:
-                # Type checker doesn't know column_data is all numeric, so we cast it
-                numeric_data = cast(List[Union[int, float]], column_data)
-                columns.append(NumericalArray(numeric_data))
+                columns.append(NumericalArray(column_data))  # type: ignore
             else:
-                # Type checker doesn't know column_data is all strings, so we cast it
-                categorical_data = cast(List[str], column_data)
-                columns.append(CategoricalArray(categorical_data))
+                columns.append(CategoricalArray(column_data))  # type: ignore
 
         return columns
 
@@ -353,7 +339,10 @@ class Matrix:
         has_categorical = False
 
         for value in column_data:
-            if isinstance(value, (int, float)):
+            if value is None or (isinstance(value, float) and str(value) == 'nan'):
+                # Skip NaN values in type inference
+                continue
+            elif isinstance(value, (int, float)):
                 has_numeric = True
             elif isinstance(value, str):
                 has_categorical = True

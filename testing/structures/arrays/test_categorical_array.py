@@ -34,10 +34,13 @@ class TestCategoricalArray:
         with pytest.raises(ValueError, match="must be a string"):
             CategoricalArray(["A", 123, "C"])
 
-    def test_init_with_none_values_raises_error(self):
-        """Test that initialization with None values raises ValueError."""
-        with pytest.raises(ValueError, match="cannot be None"):
-            CategoricalArray(["A", None, "C"])
+    def test_init_with_none_values_converts_to_nan(self):
+        """Test that initialization with None values converts them to NaN."""
+        array = CategoricalArray(["A", None, "C"])  # type: ignore
+        assert array.values == ["A", "<NaN>", "C"]
+        assert array.has_nan is True
+        assert array.nan_count == 1
+        assert array.nan_indices == [1]
 
     def test_unique_values_property(self):
         """Test unique_values property."""
@@ -231,3 +234,33 @@ class TestCategoricalArray:
         array = CategoricalArray(["A", "", "B", ""])
         assert array.unique_values == ["A", "", "B"]
         assert array.get_category_indices() == [0, 1, 2, 1]
+
+    def test_nan_indices_property(self):
+        """Test nan_indices property."""
+        # Array without NaN
+        array_no_nan = CategoricalArray(['A', 'B', 'C'])
+        assert array_no_nan.nan_indices == []
+
+        # Array with NaN at specific indices
+        array_with_nan = CategoricalArray(['A', None, 'B', float('nan'), 'C'])  # type: ignore
+        assert array_with_nan.nan_indices == [1, 3]
+
+    def test_non_nan_values_property(self):
+        """Test non_nan_values property."""
+        # Array without NaN
+        array_no_nan = CategoricalArray(['A', 'B', 'C'])
+        assert array_no_nan.non_nan_values == ['A', 'B', 'C']
+
+        # Array with NaN values
+        array_with_nan = CategoricalArray(['A', None, 'B', float('nan'), 'C'])  # type: ignore
+        assert array_with_nan.non_nan_values == ['A', 'B', 'C']
+
+        # Array with all NaN values
+        array_all_nan = CategoricalArray([None, float('nan'), None])  # type: ignore
+        assert array_all_nan.non_nan_values == []
+
+    def test_unique_values_with_nan(self):
+        """Test that unique_values property handles NaN values correctly."""
+        array = CategoricalArray(["A", None, "B", float('nan'), "A"])  # type: ignore
+        assert array.unique_values == ["A", "<NaN>", "B"]  # NaN is included in unique values
+        assert array.get_category_indices() == [0, 1, 2, 1, 0]

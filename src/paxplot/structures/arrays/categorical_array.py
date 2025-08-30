@@ -4,6 +4,7 @@ This module defines the CategoricalArray class for storing and managing
 sequences of categorical (string) values.
 """
 
+import math
 from typing import List, Sequence
 
 
@@ -13,11 +14,13 @@ class CategoricalArray:
 
     This class provides basic operations for storing and managing
     sequences of categorical (string) values without any normalization logic.
+    Supports NaN values which are stored as "<NaN>" string representation.
 
     Parameters
     ----------
     values : Sequence[str]
-        The initial categorical values to store.
+        The initial categorical values to store. Can include None, float('nan'),
+        or numpy.nan which will be converted to "<NaN>" string.
 
     Attributes
     ----------
@@ -25,6 +28,14 @@ class CategoricalArray:
         The stored categorical values as a list of strings.
     unique_values : List[str]
         The unique categorical values in order of appearance.
+    has_nan : bool
+        Whether the array contains any NaN values.
+    nan_count : int
+        The number of NaN values in the array.
+    nan_indices : List[int]
+        The indices of NaN values in the array.
+    non_nan_values : List[str]
+        All non-NaN values in the array.
 
     Examples
     --------
@@ -36,10 +47,20 @@ class CategoricalArray:
     >>> array.append(['B', 'D'])
     >>> array.values
     ['A', 'B', 'A', 'C', 'B', 'D']
+    
+    >>> array_with_nan = CategoricalArray(['A', None, 'B', float('nan'), 'C'])
+    >>> array_with_nan.has_nan
+    True
+    >>> array_with_nan.nan_count
+    2
+    >>> array_with_nan.nan_indices
+    [1, 3]
+    >>> array_with_nan.unique_values
+    ['A', '<NaN>', 'B', 'C']
     """
 
     def __init__(self, values: Sequence[str]):
-        self._values = self._validate_and_convert(values)
+        self._values, self._has_nan = self._validate_and_convert(values)
         self._update_unique_values()
 
     @property
@@ -65,6 +86,56 @@ class CategoricalArray:
         return self._unique_values.copy()
 
     @property
+    def has_nan(self) -> bool:
+        """Check if the array contains any NaN values.
+
+        Returns
+        -------
+        bool
+            True if the array contains any NaN values, False otherwise.
+        """
+        return self._has_nan
+
+    @property
+    def nan_count(self) -> int:
+        """Get the number of NaN values in the array.
+
+        Returns
+        -------
+        int
+            The number of NaN values.
+        """
+        if not self._has_nan:
+            return 0
+        return self._values.count("<NaN>")
+
+    @property
+    def nan_indices(self) -> List[int]:
+        """Get the indices of NaN values in the array.
+
+        Returns
+        -------
+        List[int]
+            The indices of NaN values.
+        """
+        if not self._has_nan:
+            return []
+        return [i for i, value in enumerate(self._values) if value == "<NaN>"]
+
+    @property
+    def non_nan_values(self) -> List[str]:
+        """Get all non-NaN values in the array.
+
+        Returns
+        -------
+        List[str]
+            All non-NaN values in the array.
+        """
+        if not self._has_nan:
+            return self._values.copy()
+        return [value for value in self._values if value != "<NaN>"]
+
+    @property
     def length(self) -> int:
         """Get the number of values in the array.
 
@@ -81,15 +152,19 @@ class CategoricalArray:
         Parameters
         ----------
         values : Sequence[str]
-            The categorical values to append.
+            The categorical values to append. Can include None, float('nan'),
+            or numpy.nan which will be converted to "<NaN>" string.
 
         Raises
         ------
         ValueError
-            If any value is not a string or is None.
+            If any value is not a string or cannot be converted to string.
         """
-        new_values = self._validate_and_convert(values)
+        new_values, has_new_nans = self._validate_and_convert(values)
         self._values.extend(new_values)
+        # Update NaN state if we don't already have NaNs
+        if not self._has_nan:
+            self._has_nan = has_new_nans
         self._update_unique_values()
 
     def remove(self, indices: Sequence[int]) -> None:
@@ -121,7 +196,17 @@ class CategoricalArray:
                 )
             del self._values[index]
 
+        # After removal, we need to recompute NaN state since indices shifted
+        self._has_nan = self._compute_has_nan()
         self._update_unique_values()
+
+    def reset_nan_state(self) -> None:
+        """Reset the cached NaN state.
+        
+        Call this method if you manually modify the underlying _values list
+        and need to update the NaN state cache.
+        """
+        self._has_nan = self._compute_has_nan()
 
     def get_category_indices(self) -> List[int]:
         """Get the indices of each value in the unique_values list.
@@ -136,40 +221,72 @@ class CategoricalArray:
         """
         return [self._unique_values.index(value) for value in self._values]
 
-    def _validate_and_convert(self, values: Sequence[str]) -> List[str]:
-        """Validate and convert values to a list of strings.
+    def _validate_and_convert(self, values: Sequence[str]) -> tuple[List[str], bool]:
+        """Validate and convert values to a list of strings, also computing NaN state.
 
         Parameters
         ----------
         values : Sequence[str]
-            The values to validate and convert.
+            The values to validate and convert. Can include None, float('nan'),
+            or numpy.nan which will be converted to "<NaN>" string.
 
         Returns
         -------
-        List[str]
-            The validated values as a list of strings.
+        tuple[List[str], bool]
+            The validated values as a list of strings and whether any NaNs were found.
 
         Raises
         ------
         ValueError
-            If any value is not a string or is None.
+            If any value cannot be converted to string.
         """
         if values is None:
             raise ValueError("Values cannot be None")
 
         converted_values = []
+        has_nan = False
+        
         for i, value in enumerate(values):
-            if value is None:
-                raise ValueError(f"Value at index {i} cannot be None")
+            if self._is_nan(value):
+                converted_values.append("<NaN>")
+                has_nan = True
+            else:
+                if not isinstance(value, str):
+                    raise ValueError(
+                        f"Value at index {i} must be a string, got {type(value)}: {value}"
+                    )
+                converted_values.append(value)
 
-            if not isinstance(value, str):
-                raise ValueError(
-                    f"Value at index {i} must be a string, got {type(value)}: {value}"
-                )
+        return converted_values, has_nan
 
-            converted_values.append(value)
+    def _is_nan(self, value) -> bool:
+        """Check if a value is NaN.
 
-        return converted_values
+        Parameters
+        ----------
+        value : Any
+            The value to check.
+
+        Returns
+        -------
+        bool
+            True if the value is NaN, False otherwise.
+        """
+        if value is None:
+            return True
+        if isinstance(value, float) and math.isnan(value):
+            return True
+        return False
+
+    def _compute_has_nan(self) -> bool:
+        """Compute whether the array contains any NaN values.
+
+        Returns
+        -------
+        bool
+            True if the array contains any NaN values, False otherwise.
+        """
+        return "<NaN>" in self._values
 
     def _update_unique_values(self) -> None:
         """Update the list of unique values in order of appearance."""
