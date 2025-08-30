@@ -7,6 +7,7 @@ NumericalArray and CategoricalArray objects.
 from typing import List, Sequence, Union
 from enum import Enum
 
+from .arrays.base_array import BaseArray
 from .arrays.numerical_array import NumericalArray
 from .arrays.categorical_array import CategoricalArray
 
