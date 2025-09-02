@@ -1,9 +1,9 @@
 """Tests for Matrix."""
 
 import pytest
-from src.paxplot.structures.matrix import Matrix, ColumnType
-from src.paxplot.structures.arrays.numerical_array import NumericalArray
-from src.paxplot.structures.arrays.categorical_array import CategoricalArray
+from paxplot.structures.matrix import Matrix, ColumnType
+from paxplot.structures.arrays.numerical_array import NumericalArray
+from paxplot.structures.arrays.categorical_array import CategoricalArray
 
 
 class TestMatrix:
