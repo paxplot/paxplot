@@ -174,6 +174,23 @@ class BaseArray(ABC, Generic[T]):
         # After removal, we need to recompute NaN state since indices shifted
         self._has_nan = self._compute_has_nan()
 
+    def set_values(self, values: Sequence) -> None:
+        """Set new values for the array, replacing all existing values.
+
+        Parameters
+        ----------
+        values : Sequence
+            The new values to set. Type depends on the concrete implementation.
+
+        Raises
+        ------
+        ValueError
+            If any value is invalid for this array type.
+        """
+        new_values, has_new_nans = self._validate_and_convert(values)
+        self._values = new_values
+        self._has_nan = has_new_nans
+
     def reset_nan_state(self) -> None:
         """Reset the cached NaN state.
 

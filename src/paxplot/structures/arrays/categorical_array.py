@@ -89,6 +89,23 @@ class CategoricalArray(BaseArray[str]):
         super().remove(indices)
         self._update_unique_values()
 
+    def set_values(self, values: Sequence[str]) -> None:
+        """Set new categorical values, replacing all existing values.
+
+        Parameters
+        ----------
+        values : Sequence[str]
+            The new categorical values to set. Can include None, float('nan'),
+            or numpy.nan which will be converted to "<NaN>" string.
+
+        Raises
+        ------
+        ValueError
+            If any value is not a string or cannot be converted to string.
+        """
+        super().set_values(values)
+        self._update_unique_values()
+
     def get_category_indices(self) -> List[int]:
         """Get the indices of each value in the unique_values list.
 
