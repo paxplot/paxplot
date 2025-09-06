@@ -3,5 +3,12 @@
 This module contains classes for managing axis ticks and labels.
 """
 
-# Will be populated as we implement the tick classes
-__all__ = []
+from .base_ticks import BaseTicks
+from .numeric_ticks import NumericTicks
+from .categorical_ticks import CategoricalTicks
+
+__all__ = [
+    "BaseTicks",
+    "NumericTicks", 
+    "CategoricalTicks",
+]
