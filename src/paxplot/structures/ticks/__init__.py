@@ -9,6 +9,6 @@ from .categorical_ticks import CategoricalTicks
 
 __all__ = [
     "BaseTicks",
-    "NumericTicks", 
+    "NumericTicks",
     "CategoricalTicks",
 ]

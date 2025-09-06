@@ -54,11 +54,13 @@ class CategoricalTicks(BaseTicks):
         """
         if not categories:
             raise ValueError("Categories cannot be empty")
-        
+
         # Validate categories
         for i, category in enumerate(categories):
             if not isinstance(category, str):
-                raise ValueError(f"Category at index {i} must be a string, got {type(category)}")
+                raise ValueError(
+                    f"Category at index {i} must be a string, got {type(category)}"
+                )
             if category.strip() == "":
                 raise ValueError(f"Category at index {i} cannot be empty")
 
@@ -66,20 +68,21 @@ class CategoricalTicks(BaseTicks):
         seen_categories = set()
         for i, category in enumerate(categories):
             if category in seen_categories:
-                raise ValueError(f"Duplicate category '{category}' found at index {i}. Categories must be unique.")
+                raise ValueError(
+                    f"Duplicate category '{category}' found at index {i}. "
+                    f"Categories must be unique."
+                )
             seen_categories.add(category)
-        
+
         # Use the categories exactly as supplied with sequential indices
         sequential_indices = list(range(len(categories)))
-        
+
         # Update the arrays with the exact categories and sequential indices
         self._labels.set_values(categories)
         self._locations.set_values(sequential_indices)
-        
+
         # Validate the result
         self.validate()
-
-
 
     def __repr__(self) -> str:
         """
@@ -92,11 +95,10 @@ class CategoricalTicks(BaseTicks):
         """
         if len(self._labels) == 0:
             return "CategoricalTicks(empty)"
-        
+
         labels_preview = self._labels.values[:3]
         locations_preview = self._locations.values[:3]
-        
+
         if len(self._labels) <= 3:
             return f"CategoricalTicks(labels={labels_preview}, locations={locations_preview})"
-        else:
-            return f"CategoricalTicks(labels={labels_preview}..., locations={locations_preview}...)"
+        return f"CategoricalTicks(labels={labels_preview}..., locations={locations_preview}...)"

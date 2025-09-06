@@ -41,11 +41,11 @@ class NumericTicks(BaseTicks):
         super().__init__([], [])
 
     def set_ticks_from_range(
-        self, 
-        min_value: Union[float, int], 
-        max_value: Union[float, int], 
-        max_ticks: int = 5, 
-        precision: int = 2
+        self,
+        min_value: Union[float, int],
+        max_value: Union[float, int],
+        max_ticks: int = 5,
+        precision: int = 2,
     ) -> None:
         """
         Set ticks from min/max using MaxNLocator.
@@ -67,39 +67,40 @@ class NumericTicks(BaseTicks):
             If min_value >= max_value or if max_ticks is not positive.
         """
         if min_value >= max_value:
-            raise ValueError(f"min_value ({min_value}) must be less than max_value ({max_value})")
-        
-        
+            raise ValueError(
+                f"min_value ({min_value}) must be less than max_value ({max_value})"
+            )
+
         if max_ticks <= 0:
             raise ValueError(f"max_ticks must be positive, got {max_ticks}")
 
         # Create MaxNLocator instance
         locator = MaxNLocator(nbins=max_ticks)
-        
+
         # Get optimal tick positions
         tick_positions = locator.tick_values(min_value, max_value)
-        
+
         # Convert to lists and ensure we have the right number of ticks
         tick_positions_list = list(tick_positions)
-        
+
         # Filter ticks to be within the specified range
-        filtered_positions = [pos for pos in tick_positions_list if min_value <= pos <= max_value]
-        
+        filtered_positions = [
+            pos for pos in tick_positions_list if min_value <= pos <= max_value
+        ]
+
         # If we have too many ticks, take the first max_ticks
         if len(filtered_positions) > max_ticks:
             filtered_positions = filtered_positions[:max_ticks]
-        
+
         # Generate labels with specified precision
         tick_labels = [f"{pos:.{precision}f}" for pos in filtered_positions]
-        
+
         # Update the arrays
         self._labels.set_values(tick_labels)
         self._locations.set_values(filtered_positions)
-        
+
         # Validate the result
         self.validate()
-
-
 
     def __repr__(self) -> str:
         """
@@ -112,11 +113,10 @@ class NumericTicks(BaseTicks):
         """
         if len(self._labels) == 0:
             return "NumericTicks(empty)"
-        
+
         labels_preview = self._labels.values[:3]
         locations_preview = self._locations.values[:3]
-        
+
         if len(self._labels) <= 3:
             return f"NumericTicks(labels={labels_preview}, locations={locations_preview})"
-        else:
-            return f"NumericTicks(labels={labels_preview}..., locations={locations_preview}...)"
+        return f"NumericTicks(labels={labels_preview}..., locations={locations_preview}...)"

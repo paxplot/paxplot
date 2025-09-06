@@ -5,7 +5,7 @@ functionality for all tick types including validation and basic operations.
 """
 
 import math
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Sequence, Union
 
 from ..arrays.categorical_array import CategoricalArray
@@ -33,7 +33,9 @@ class BaseTicks(ABC):
     >>> # NumericTicks or CategoricalTicks instead
     """
 
-    def __init__(self, labels: Sequence[str], locations: Sequence[Union[float, int]]):
+    def __init__(
+        self, labels: Sequence[str], locations: Sequence[Union[float, int]]
+    ):
         """
         Initialize BaseTicks with labels and locations.
 
@@ -97,18 +99,26 @@ class BaseTicks(ABC):
         # Validate labels
         for i, label in enumerate(self._labels.values):
             if not isinstance(label, str):
-                raise ValueError(f"Label at index {i} must be a string, got {type(label)}")
+                raise ValueError(
+                    f"Label at index {i} must be a string, got {type(label)}"
+                )
             if label.strip() == "":
                 raise ValueError(f"Label at index {i} cannot be empty")
 
         # Validate locations
         for i, location in enumerate(self._locations.values):
             if not isinstance(location, (int, float)):
-                raise ValueError(f"Location at index {i} must be numerical, got {type(location)}")
+                raise ValueError(
+                    f"Location at index {i} must be numerical, got {type(location)}"
+                )
             if math.isnan(location) or math.isinf(location):
-                raise ValueError(f"Location at index {i} must be finite, got {location}")
+                raise ValueError(
+                    f"Location at index {i} must be finite, got {location}"
+                )
 
-    def append(self, labels: Sequence[str], locations: Sequence[Union[float, int]]) -> bool:
+    def append(
+        self, labels: Sequence[str], locations: Sequence[Union[float, int]]
+    ) -> bool:
         """
         Append multiple ticks with validation.
 
@@ -133,16 +143,22 @@ class BaseTicks(ABC):
             # Validate new labels
             for i, label in enumerate(labels):
                 if not isinstance(label, str):
-                    raise ValueError(f"New label at index {i} must be a string, got {type(label)}")
+                    raise ValueError(
+                        f"New label at index {i} must be a string, got {type(label)}"
+                    )
                 if label.strip() == "":
                     raise ValueError(f"New label at index {i} cannot be empty")
 
             # Validate new locations
             for i, location in enumerate(locations):
                 if not isinstance(location, (int, float)):
-                    raise ValueError(f"New location at index {i} must be numerical, got {type(location)}")
+                    raise ValueError(
+                        f"New location at index {i} must be numerical, got {type(location)}"
+                    )
                 if math.isnan(location) or math.isinf(location):
-                    raise ValueError(f"New location at index {i} must be finite, got {location}")
+                    raise ValueError(
+                        f"New location at index {i} must be finite, got {location}"
+                    )
 
             if len(labels) != len(locations):
                 raise ValueError(
@@ -186,9 +202,13 @@ class BaseTicks(ABC):
             # Validate indices
             for index in indices:
                 if not isinstance(index, int):
-                    raise ValueError(f"Index must be an integer, got {type(index)}")
+                    raise ValueError(
+                        f"Index must be an integer, got {type(index)}"
+                    )
                 if index < 0 or index >= len(self._labels):
-                    raise IndexError(f"Index {index} out of bounds for array of length {len(self._labels)}")
+                    raise IndexError(
+                        f"Index {index} out of bounds for array of length {len(self._labels)}"
+                    )
 
             # Remove ticks from both arrays
             self._labels.remove(indices)
@@ -223,13 +243,16 @@ class BaseTicks(ABC):
         """
         if len(self._labels) == 0:
             return f"{self.__class__.__name__}(empty)"
-        
+
         labels_preview = self._labels.values[:3]
         locations_preview = self._locations.values[:3]
-        
+
         if len(self._labels) <= 3:
-            return f"{self.__class__.__name__}(labels={labels_preview}, locations={locations_preview})"
-        else:
-            return f"{self.__class__.__name__}(labels={labels_preview}..., locations={locations_preview}...)"
-
-
+            return (
+                f"{self.__class__.__name__}(labels={labels_preview}, "
+                f"locations={locations_preview})"
+            )
+        return (
+            f"{self.__class__.__name__}(labels={labels_preview}..., "
+            f"locations={locations_preview}...)"
+        )
