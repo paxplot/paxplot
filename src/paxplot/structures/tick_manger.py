@@ -21,7 +21,7 @@ class TickType(str, Enum):
     CATEGORICAL : str
         Collection contains CategoricalTicks.
     """
-    
+
     NUMERIC = "numeric"
     CATEGORICAL = "categorical"
 
@@ -29,7 +29,7 @@ class TickType(str, Enum):
 class TickManager:
     """
     A manager for collections of tick objects.
-    
+
     This class provides a unified interface for managing multiple tick collections,
     where each collection can be either NumericTicks or CategoricalTicks.
     The manager ensures consistency across tick collections and provides
@@ -39,7 +39,7 @@ class TickManager:
     ----------
     tick_types : Sequence[TickType]
         The types of tick collections to create and manage.
-    
+
     Attributes
     ----------
     tick_collections : List[Union[NumericTicks, CategoricalTicks]]
@@ -59,7 +59,7 @@ class TickManager:
     >>> # Get and configure tick collections
     >>> numeric_ticks = manager.get_numeric_ticks(0)
     >>> numeric_ticks.set_ticks_from_range(0, 100)
-    >>> 
+    >>>
     >>> categorical_ticks = manager.get_categorical_ticks(1)
     >>> categorical_ticks.set_ticks_from_categories(['A', 'B', 'C'])
     >>>
@@ -74,7 +74,7 @@ class TickManager:
         ----------
         tick_types : Sequence[TickType]
             The types of tick collections to create and manage.
-        
+
         Raises
         ------
         ValueError
@@ -93,7 +93,9 @@ class TickManager:
                 )
 
         # Create tick collections based on types
-        self._tick_collections: List[Union[NumericTicks, CategoricalTicks]] = []
+        self._tick_collections: List[Union[NumericTicks, CategoricalTicks]] = (
+            []
+        )
         for tick_type in tick_types:
             if tick_type == TickType.NUMERIC:
                 self._tick_collections.append(NumericTicks())
@@ -109,7 +111,7 @@ class TickManager:
         ----------
         index : int
             The index of the collection to remove.
-        
+
         Raises
         ------
         IndexError
@@ -123,19 +125,21 @@ class TickManager:
 
         del self._tick_collections[index]
 
-    def get_tick_collection(self, index: int) -> Union[NumericTicks, CategoricalTicks]:
+    def get_tick_collection(
+        self, index: int
+    ) -> Union[NumericTicks, CategoricalTicks]:
         """Get a tick collection at the specified index.
 
         Parameters
         ----------
         index : int
             The index of the collection to get.
-        
+
         Returns
         -------
         Union[NumericTicks, CategoricalTicks]
             The tick collection at the specified index.
-        
+
         Raises
         ------
         IndexError
@@ -170,8 +174,9 @@ class TickManager:
             If the collection at the specified index is not NumericTicks.
         """
         if self.get_tick_type(index) != TickType.NUMERIC:
+            collection_type = type(self._tick_collections[index]).__name__
             raise TypeError(
-                f"Collection {index} is not numeric, it is {type(self._tick_collections[index]).__name__}"
+                f"Collection {index} is not numeric, it is {collection_type}"
             )
         collection = self.get_tick_collection(index)
         assert isinstance(collection, NumericTicks)
@@ -198,8 +203,9 @@ class TickManager:
             If the collection at the specified index is not CategoricalTicks.
         """
         if self.get_tick_type(index) != TickType.CATEGORICAL:
+            collection_type = type(self._tick_collections[index]).__name__
             raise TypeError(
-                f"Collection {index} is not categorical, it is {type(self._tick_collections[index]).__name__}"
+                f"Collection {index} is not categorical, it is {collection_type}"
             )
         collection = self.get_tick_collection(index)
         assert isinstance(collection, CategoricalTicks)
@@ -212,12 +218,12 @@ class TickManager:
         ----------
         index : int
             The index of the collection to get.
-        
+
         Returns
         -------
         TickType
             The type of the tick collection.
-        
+
         Raises
         ------
         IndexError
@@ -248,7 +254,7 @@ class TickManager:
         ----------
         index : int
             The index of the collection to get.
-        
+
         Returns
         -------
         Union[NumericTicks, CategoricalTicks]
@@ -275,7 +281,7 @@ class TickManager:
                 type_info.append(f"{i}:CATEGORICAL")
             else:
                 type_info.append(f"{i}:UNKNOWN")
-        
+
         return f"TickManager({len(self._tick_collections)} collections: {', '.join(type_info)})"
 
     @property
