@@ -202,6 +202,9 @@ class BaseArray(ABC, Generic[T]):
     def _is_nan(self, value: Any) -> bool:
         """Check if a value is NaN (before conversion).
 
+        This method handles all common NaN representations that can be
+        passed as input to the array classes.
+
         Parameters
         ----------
         value : Any
@@ -216,10 +219,17 @@ class BaseArray(ABC, Generic[T]):
             return True
         if isinstance(value, float) and math.isnan(value):
             return True
+        # For categorical arrays, also recognize the string representation
+        if isinstance(value, str) and value == "<NaN>":
+            return True
         return False
 
+    @abstractmethod
     def _is_nan_value(self, value: T) -> bool:
         """Check if a converted value is NaN.
+
+        This method should be implemented by subclasses to check
+        if a value in the array's internal representation is NaN.
 
         Parameters
         ----------
@@ -231,7 +241,6 @@ class BaseArray(ABC, Generic[T]):
         bool
             True if the value is NaN, False otherwise.
         """
-        return self._is_nan(value)
 
     def _compute_has_nan(self) -> bool:
         """Compute whether the array contains any NaN values.
