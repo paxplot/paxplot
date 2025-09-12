@@ -51,11 +51,11 @@ class PlotModel:
     >>> print(plot_model.matrix.num_rows)     # 3
     >>>
     >>> # Append new data
-    >>> plot_model.append([4, 'C', 2.0])
+    >>> plot_model.append_data([4, 'C', 2.0])
     >>> print(plot_model.matrix.num_rows)     # 4
     >>>
     >>> # Remove data by indices
-    >>> plot_model.remove([0, 2])
+    >>> plot_model.remove_data([0, 2])
     >>> print(plot_model.matrix.num_rows)     # 2
     >>>
     >>> # Access structures
@@ -81,6 +81,14 @@ class PlotModel:
         ValueError
             If the data structure is invalid (empty or inconsistent row lengths).
         """
+        # Initialize with empty structures first, then use set_data method
+        self._matrix = Matrix([])
+        self._tick_manager = TickManager([])
+        self._axis_labels = []
+        self._custom_limits = []
+        
+        if data is not None:
+            self.set_data(data)
 
     @property
     def matrix(self) -> Matrix:
@@ -126,7 +134,7 @@ class PlotModel:
             List of custom axis limits, one for each column. Initially all limits are None.
         """
 
-    def append(self, row: Sequence[Union[str, int, float]]) -> None:
+    def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
         """
         Append a new row of data to the matrix and update all structures.
 
@@ -146,7 +154,7 @@ class PlotModel:
             If the row length doesn't match the number of columns.
         """
 
-    def remove(self, indices: Sequence[int]) -> None:
+    def remove_data(self, indices: Sequence[int]) -> None:
         """
         Remove rows at the specified indices and update all structures.
 
@@ -168,6 +176,28 @@ class PlotModel:
             If indices are not valid integers.
         """
 
+    def set_data(self, data: Sequence[Sequence[Union[str, int, float]]]) -> None:
+        """
+        Set new data for the plot model, replacing all existing data and updating all structures.
+
+        This method replaces all existing data in the underlying matrix
+        and automatically updates the tick manager, axis labels, and custom
+        limits to maintain consistency. The tick manager will regenerate
+        ticks based on the new data, and all associated structures will
+        be reset to their initial state.
+
+        Parameters
+        ----------
+        data : Sequence[Sequence[Union[str, int, float]]]
+            The new data as a 2D sequence where each row is a sequence
+            of values and each column should be consistently typed.
+
+        Raises
+        ------
+        ValueError
+            If the data structure is invalid (empty or inconsistent row lengths).
+        """
+
 
     def set_axis_label(self, index: int, label: str) -> None:
         """
@@ -186,6 +216,21 @@ class PlotModel:
             If the index is out of bounds.
         ValueError
             If the label is empty or invalid.
+        """
+
+    def clear_axis_label(self, index: int) -> None:
+        """
+        Clear the axis label for a specific column.
+
+        Parameters
+        ----------
+        index : int
+            The index of the column to clear the label for.
+
+        Raises
+        ------
+        IndexError
+            If the index is out of bounds.
         """
 
     def set_custom_limit(
@@ -251,16 +296,6 @@ class PlotModel:
             The number of rows.
         """
 
-    def is_empty(self) -> bool:
-        """
-        Check if the model contains any data.
-
-        Returns
-        -------
-        bool
-            True if the model has no columns or no rows, False otherwise.
-        """
-
     def __len__(self) -> int:
         """
         Get the number of columns in the model.
@@ -312,8 +347,9 @@ class PlotModel:
 plot_model = PlotModel(data)
 
 # Modify data
-plot_model.append(more_data)
-plot_model.remove(indices)
+plot_model.append_data(more_data)
+plot_model.remove_data(indices)
+plot_model.set_data(new_data)  # Replace all data
 
 # Access structures (automatically maintained)
 matrix = plot_model.matrix  # Direct access to underlying Matrix
@@ -325,8 +361,10 @@ limits = plot_model.custom_limits
 ## Implementation Notes
 
 - The underlying data management happens through the Matrix class
+- Initialization follows the established pattern: create empty structures first, then use `set_data()` method
 - Every time data is modified, the PlotModel calls internal methods to update:
   - TickManager (regenerates ticks based on current data)
   - AxisLabels (maintains list structure)
   - CustomAxisLimits (maintains list structure)
-- All structures are initially created as None/empty and populated as needed
+- All structures are initially created as empty and populated as needed
+- The `set_data()` method provides a consistent interface for both initialization and data replacement
