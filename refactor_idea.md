@@ -22,15 +22,22 @@ src/paxplot/
 │   ├── __init__.py
 │   ├── arrays/
 │   │   ├── __init__.py
+│   │   ├── base_array.py
 │   │   ├── numerical_array.py
 │   │   └── categorical_array.py
 │   ├── matrix.py
+│   ├── tick_manger.py
+│   ├── limits/
+│   │   ├── __init__.py
+│   │   └── custom_axis_limit.py
+│   ├── labels/
+│   │   ├── __init__.py
+│   │   └── axis_label.py
 │   └── ticks/
 │       ├── __init__.py
-│       ├── axis_ticks.py
-│       ├── numeric_axis_ticks.py
-│       ├── categorical_axis_ticks.py
-│       └── axis_tick_manager.py
+│       ├── base_ticks.py
+│       ├── numeric_ticks.py
+│       └── categorical_ticks.py
 ├── views/
 │   ├── __init__.py
 │   ├── normalized_array_view.py
@@ -41,7 +48,8 @@ src/paxplot/
 ├── renderers/
 │   ├── __init__.py
 │   ├── base_renderer.py
-│   └── matplotlib_renderer.py
+│   ├── matplotlib_renderer.py
+│   └── render_data.py
 ├── legacy/
 └── datasets.py
 ```
@@ -49,88 +57,253 @@ src/paxplot/
 ### Core Data Structures
 
 #### `NumericalArray`
-Stores numerical data as an array with basic operations.
+Stores numerical data as an array with basic operations and NaN handling.
 
 ```python
-class NumericalArray:
-    def __init__(self, values: Sequence[float or int])
-    def append(self, value: Sequence[float or int])
-    def remove(self, index: Sequence[int])
+class NumericalArray(BaseArray[float]):
+    """Array for storing numerical data with validation and NaN handling."""
+    
+    def __init__(self, values: Sequence[Union[float, int]]):
+        """Initialize with numerical values."""
+        pass
+    
+    def append(self, values: Sequence[Union[float, int]]) -> None:
+        """Append numerical values to the array."""
+        pass
+    
+    def remove(self, indices: Sequence[int]) -> None:
+        """Remove values at specified indices."""
+        pass
+    
     @property
-    def values(self) -> List[float]
+    def values(self) -> List[float]:
+        """Get the stored numerical values."""
+        pass
+    
+    @property
+    def min(self) -> float:
+        """Get the minimum value."""
+        pass
+    
+    @property
+    def max(self) -> float:
+        """Get the maximum value."""
+        pass
 ```
 
 #### `CategoricalArray`
-Stores categorical (string) data as an array.
+Stores categorical (string) data as an array with unique value tracking.
 
 ```python
-class CategoricalArray:
-    def __init__(self, values: Sequence[str])
-    def append(self, value: Sequence[str])
-    def remove(self, index: Sequence[int])
+class CategoricalArray(BaseArray[str]):
+    """Array for storing categorical data with unique value tracking."""
+    
+    def __init__(self, values: Sequence[str]):
+        """Initialize with categorical values."""
+        pass
+    
+    def append(self, values: Sequence[str]) -> None:
+        """Append categorical values to the array."""
+        pass
+    
+    def remove(self, indices: Sequence[int]) -> None:
+        """Remove values at specified indices."""
+        pass
+    
     @property
-    def values(self) -> List[str]
+    def values(self) -> List[str]:
+        """Get the stored categorical values."""
+        pass
+    
     @property
-    def unique_values(self) -> List[str]
+    def unique_values(self) -> List[str]:
+        """Get unique values in the array."""
+        pass
 ```
 
 #### `Matrix`
-Manages collections of arrays, providing a unified interface.
+Manages collections of arrays, providing a unified interface for data management.
 
 ```python
 class Matrix:
-    def __init__(self, data: Sequence[Sequence[Union[str, int, float]]])
+    """Matrix for managing collections of numerical and categorical arrays."""
+    
+    def __init__(self, data: Sequence[Sequence[Union[str, int, float]]]):
+        """Initialize matrix with 2D data."""
+        pass
+    
     @property
-    def columns # this should be indexable and return either Numerical or Categorical Array
-    def append_data(self, row: Sequence[Union[str, int, float]])
-    def remove_data(self, index: Sequence[int])
-    def get_numeric_array(self, int) returns Numerical array or errors
-    def get_categoric_array(self, int) returns Categorical array or errors
+    def columns(self) -> List[Union[NumericalArray, CategoricalArray]]:
+        """Get the columns as a list of arrays."""
+        pass
+    
+    @property
+    def num_columns(self) -> int:
+        """Get the number of columns."""
+        pass
+    
+    @property
+    def num_rows(self) -> int:
+        """Get the number of rows."""
+        pass
+    
+    def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
+        """Append a row of data."""
+        pass
+    
+    def remove_data(self, indices: Sequence[int]) -> None:
+        """Remove rows at specified indices."""
+        pass
+    
+    def get_numeric_array(self, index: int) -> NumericalArray:
+        """Get numerical array at index, raises error if not numerical."""
+        pass
+    
+    def get_categorical_array(self, index: int) -> CategoricalArray:
+        """Get categorical array at index, raises error if not categorical."""
+        pass
 ```
 
 ### Tick Management
 
-#### `AxisTicks`
+#### `BaseTicks`
 Base tick information containing positions and labels.
 
 ```python
-class AxisTicks:
-    def __init__(self, positions: List[float], labels: List[str])
+class BaseTicks(ABC):
+    """Abstract base class for tick management."""
+    
+    def __init__(self, labels: Sequence[str], locations: Sequence[Union[float, int]]):
+        """Initialize with labels and locations."""
+        pass
+    
     @property
-    def positions(self) -> List[float]
+    def labels(self) -> CategoricalArray:
+        """Get the tick labels."""
+        pass
+    
     @property
-    def labels(self) -> List[str]
+    def locations(self) -> NumericalArray:
+        """Get the tick positions."""
+        pass
+    
+    @property
+    def positions(self) -> List[float]:
+        """Get tick positions as a list."""
+        pass
 ```
 
-#### `NumericAxisTicks`
+#### `NumericTicks`
 Manages numeric tick generation and customization.
 
 ```python
-class NumericAxisTicks:
-    def __init__(self, array: NumericalArray)
-    def generate_ticks(self, num_ticks: int = 5) -> AxisTicks
-    def set_custom_ticks(self, tick_values: List[float]) -> AxisTicks
+class NumericTicks(BaseTicks):
+    """Tick management for numerical data."""
+    
+    def __init__(self, array: NumericalArray):
+        """Initialize with numerical array."""
+        pass
+    
+    def generate_ticks(self, num_ticks: int = 5) -> 'NumericTicks':
+        """Generate evenly spaced ticks."""
+        pass
+    
+    def set_custom_ticks(self, tick_values: List[float]) -> 'NumericTicks':
+        """Set custom tick values."""
+        pass
 ```
 
-#### `CategoricalAxisTicks`
+#### `CategoricalTicks`
 Manages categorical tick generation and customization.
 
 ```python
-class CategoricalAxisTicks:
-    def __init__(self, array: CategoricalArray)
-    def generate_ticks(self) -> AxisTicks
-    def set_custom_ticks(self, tick_labels: List[str]) -> AxisTicks
-    # This will use the numeric array backend of the categorical array to set the ticks
+class CategoricalTicks(BaseTicks):
+    """Tick management for categorical data."""
+    
+    def __init__(self, array: CategoricalArray):
+        """Initialize with categorical array."""
+        pass
+    
+    def generate_ticks(self) -> 'CategoricalTicks':
+        """Generate ticks for all unique values."""
+        pass
+    
+    def set_custom_ticks(self, tick_labels: List[str]) -> 'CategoricalTicks':
+        """Set custom tick labels."""
+        pass
 ```
 
-#### `AxisTickManager`
+#### `TickManager`
 Coordinates tick management across all columns.
 
 ```python
-class AxisTickManager:
-    def __init__(self, matrix: Matrix)
-    def get_ticks(self, column_index: int) -> AxisTicks
-    def set_custom_ticks(self, column_index: int, ticks: AxisTicks)
+class TickManager:
+    """Manager for tick collections across all columns."""
+    
+    def __init__(self, matrix: Matrix):
+        """Initialize with matrix."""
+        pass
+    
+    def get_ticks(self, column_index: int) -> BaseTicks:
+        """Get ticks for a specific column."""
+        pass
+    
+    def get_numeric_ticks(self, column_index: int) -> NumericTicks:
+        """Get numeric ticks for a column."""
+        pass
+    
+    def get_categorical_ticks(self, column_index: int) -> CategoricalTicks:
+        """Get categorical ticks for a column."""
+        pass
+```
+
+### Additional Structures
+
+#### `AxisLabel`
+Manages axis label text and styling.
+
+```python
+class AxisLabel:
+    """Axis label with text and optional styling."""
+    
+    def __init__(self, text: str):
+        """Initialize with label text."""
+        pass
+    
+    @property
+    def text(self) -> str:
+        """Get the label text."""
+        pass
+    
+    def set_text(self, text: str) -> None:
+        """Set the label text."""
+        pass
+```
+
+#### `CustomAxisLimit`
+Manages custom axis limits for display.
+
+```python
+class CustomAxisLimit:
+    """Custom axis limits for display configuration."""
+    
+    def __init__(self, min_val: Optional[float] = None, max_val: Optional[float] = None):
+        """Initialize with optional min/max values."""
+        pass
+    
+    @property
+    def min_val(self) -> Optional[float]:
+        """Get the minimum value."""
+        pass
+    
+    @property
+    def max_val(self) -> Optional[float]:
+        """Get the maximum value."""
+        pass
+    
+    def set_limits(self, min_val: Optional[float], max_val: Optional[float]) -> None:
+        """Set custom limits."""
+        pass
 ```
 
 ### Plot Model
@@ -140,13 +313,48 @@ User-friendly interface that coordinates all components.
 
 ```python
 class PlotModel:
-    def __init__(self, data: Sequence[Sequence[Union[str, int, float]]])
+    """Main interface for creating and managing plot structures."""
+    
+    def __init__(self, data: Optional[Sequence[Sequence[Union[str, int, float]]]] = None):
+        """Initialize with optional data."""
+        pass
+    
     @property
-    def matrix(self) -> Matrix
+    def matrix(self) -> Matrix:
+        """Get the underlying data matrix."""
+        pass
+    
     @property
-    def tick_manager(self) -> AxisTickManager
-    def append_data(self, row: Sequence[Union[str, int, float]])
-    def remove_data(self, index: int)
+    def tick_manager(self) -> TickManager:
+        """Get the tick manager."""
+        pass
+    
+    @property
+    def axis_labels(self) -> List[AxisLabel]:
+        """Get the list of axis labels."""
+        pass
+    
+    @property
+    def custom_limits(self) -> List[CustomAxisLimit]:
+        """Get the list of custom axis limits."""
+        pass
+    
+    def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
+        """Append a row of data."""
+        pass
+    
+    def remove_data(self, indices: Sequence[int]) -> None:
+        """Remove rows at specified indices."""
+        pass
+    
+    def set_axis_label(self, index: int, label: str) -> None:
+        """Set axis label for a column."""
+        pass
+    
+    def set_custom_limit(self, index: int, min_val: Optional[float] = None, 
+                        max_val: Optional[float] = None) -> None:
+        """Set custom axis limits for a column."""
+        pass
 ```
 
 ## Normalization Strategy
@@ -191,46 +399,189 @@ class NormalizedMatrixView:
 
 ```python
 class BaseRenderer(ABC):
-    def __init__(self):
+    """Abstract base class for all renderers."""
         
     @abstractmethod
-    def show
+    def render(self, render_data: Any) -> Any:
+        """Render a figure from render data.
+        
+        Parameters
+        ----------
+        render_data : Any
+            Renderer-specific data containing all information needed for rendering.
+            
+        Returns
+        -------
+        Any
+            The rendered figure/plot object.
+        """
+        pass
 ```
 
+### Render Data Classes
+
+Each renderer defines its own immutable data contract:
+
+```python
+@dataclass(frozen=True)
+class MatplotlibRenderData:
+    """Immutable data snapshot for matplotlib rendering.
+    
+    Contains all data needed to render a matplotlib figure, including
+    normalized values, tick information, axis labels, and styling options.
+    This data is a snapshot at a point in time and does not stay in sync
+    with the original plot model.
+    
+    Attributes
+    ----------
+    normalized_values : List[NDArray[float]]
+        Normalized data values for each column.
+    tick_positions : List[List[float]]
+        Tick positions for each column.
+    tick_labels : List[List[str]]
+        Tick labels for each column.
+    axis_labels : List[str]
+        Axis labels for each column.
+    figure_size : Tuple[float, float]
+        Figure size in inches (width, height).
+    customizations : Dict[str, Any]
+        Rendering customizations (colors, linewidth, etc.).
+    """
+    normalized_values: List[NDArray[float]]
+    tick_positions: List[List[float]]
+    tick_labels: List[List[str]]
+    axis_labels: List[str]
+    figure_size: Tuple[float, float]
+    customizations: Dict[str, Any]
+    
+    @classmethod
+    def from_plot_model(cls, plot_model: PlotModel, 
+                       customizations: Dict[str, Any] = None) -> 'MatplotlibRenderData':
+        """Create render data from plot model.
+        
+        Parameters
+        ----------
+        plot_model : PlotModel
+            The plot model containing data and structures.
+        customizations : Dict[str, Any], optional
+            Rendering customizations to apply.
+            
+        Returns
+        -------
+        MatplotlibRenderData
+            Immutable data snapshot for matplotlib rendering.
+        """
+        pass
+
+@dataclass(frozen=True)
+class PlotlyRenderData:
+    """Immutable data snapshot for plotly rendering.
+    
+    Contains all data needed to render a plotly figure, including
+    normalized values, tick information, and plotly-specific configuration.
+    
+    Attributes
+    ----------
+    normalized_values : List[NDArray[float]]
+        Normalized data values for each column.
+    tick_positions : List[List[float]]
+        Tick positions for each column.
+    tick_labels : List[List[str]]
+        Tick labels for each column.
+    axis_labels : List[str]
+        Axis labels for each column.
+    trace_config : Dict[str, Any]
+        Plotly trace configuration options.
+    layout_config : Dict[str, Any]
+        Plotly layout configuration options.
+    """
+    normalized_values: List[NDArray[float]]
+    tick_positions: List[List[float]]
+    tick_labels: List[List[str]]
+    axis_labels: List[str]
+    trace_config: Dict[str, Any]
+    layout_config: Dict[str, Any]
+    
+    @classmethod
+    def from_plot_model(cls, plot_model: PlotModel, 
+                       customizations: Dict[str, Any] = None) -> 'PlotlyRenderData':
+        """Create render data from plot model.
+        
+        Parameters
+        ----------
+        plot_model : PlotModel
+            The plot model containing data and structures.
+        customizations : Dict[str, Any], optional
+            Rendering customizations to apply.
+            
+        Returns
+        -------
+        PlotlyRenderData
+            Immutable data snapshot for plotly rendering.
+        """
+        pass
+```
 
 ### Matplotlib Renderer
 
 ```python
 class MatplotlibRenderer(BaseRenderer):
-    def __init__(self):
-        super().__init__()
+    """Renders static matplotlib figures from render data.
     
-    def render(self, normalized_view: NormalizedMatrixView):
-        """Render the plot with fresh normalization data"""
-        self._figure, self._axes = plt.subplots()
-        self._draw_plot(normalized_view)
-        return self._figure
+    This renderer creates matplotlib figures that do not stay in sync with
+    the original data. Users must call render() again to get updated figures
+    when the underlying data changes.
+    """
     
-    def _draw_plot(self, normalized_view: NormalizedMatrixView):
-        """Draw the plot using the provided normalized data"""
-        # Get normalized data as needed during rendering
-        for col_idx in range(normalized_view.num_columns):
-            normalized_col = normalized_view.get_normalized_column(col_idx)
-            values = normalized_col.normalized_values
-            
-            # Apply customizations
-            color = self._customizations.get('color', 'blue')
-            linewidth = self._customizations.get('linewidth', 1.0)
-            
-            # Draw the lines
-            self._axes.plot([col_idx] * len(values), values, 
-                          color=color, linewidth=linewidth)
+    def render(self, render_data: MatplotlibRenderData) -> Figure:
+        """Render a static matplotlib figure from render data.
         
-        # Apply tick customizations
-        if 'ticks' in self._customizations:
-            for col_idx, ticks in self._customizations['ticks'].items():
-                self._axes.set_xticks([col_idx])
-                self._axes.set_xticklabels([str(t) for t in ticks])
+        Creates a matplotlib figure using the provided render data. The
+        figure is a static snapshot and will not update if the original
+        data changes.
+        
+        Parameters
+        ----------
+        render_data : MatplotlibRenderData
+            Immutable data snapshot containing all rendering information.
+            
+        Returns
+        -------
+        Figure
+            The rendered matplotlib figure.
+        """
+        pass
+```
+
+### Plotly Renderer
+
+```python
+class PlotlyRenderer(BaseRenderer):
+    """Renders static plotly figures from render data.
+    
+    This renderer creates plotly figures that do not stay in sync with
+    the original data. Users must call render() again to get updated figures
+    when the underlying data changes.
+    """
+    
+    def render(self, render_data: PlotlyRenderData) -> 'plotly.graph_objects.Figure':
+        """Render a static plotly figure from render data.
+        
+        Creates a plotly figure using the provided render data. The
+        figure is a static snapshot and will not update if the original
+        data changes.
+        
+        Parameters
+        ----------
+        render_data : PlotlyRenderData
+            Immutable data snapshot containing all rendering information.
+            
+        Returns
+        -------
+        plotly.graph_objects.Figure
+            The rendered plotly figure.
+        """
+        pass
 ```
 
 ## Main Interface
@@ -241,64 +592,185 @@ The main user interface that coordinates everything:
 
 ```python
 class PaxPlot:
+    """Main interface for creating and rendering parallel coordinate plots.
+    
+    This class provides a high-level interface for creating parallel coordinate
+    plots with multiple renderers. It manages data through a PlotModel and
+    coordinates rendering through various renderer backends.
+    
+    Attributes
+    ----------
+    _plot_model : Optional[PlotModel]
+        The underlying plot model containing data and structures.
+    _renderers : Dict[str, BaseRenderer]
+        Dictionary of registered renderers by name.
+    _customizations : Dict[str, Any]
+        Global customization settings applied to all renderers.
+    """
+    
     def __init__(self):
-        self._plot_model: Optional[PlotModel] = None
-        self._renderers: Dict[str, BaseRenderer] = {}
-        self._customizations = {}  # Store customization settings
+        """Initialize the PaxPlot interface."""
+        pass
     
-    def plot(self, data: Sequence[Sequence[Union[str, int, float]]]):
-        """Set up plot data"""
-        self._plot_model = PlotModel(data)
-        return self
-    
-    def remove_row(self, index: int):
-        """Remove a row from the plot data"""
-        if self._plot_model:
-            self._plot_model.remove_row(index)
-        return self
-    
-    def add_renderer(self, name: str, renderer: BaseRenderer):
-        """Add a renderer"""
-        self._renderers[name] = renderer
-        return self
-    
-    def set_color(self, color: str):
-        """Customize plot color"""
-        self._customizations['color'] = color
-        return self
-    
-    def set_linewidth(self, width: float):
-        """Customize line width"""
-        self._customizations['linewidth'] = width
-        return self
-    
-    def set_ticks(self, column: int, ticks: List[Union[float, str]]):
-        """Customize ticks for a column"""
-        if 'ticks' not in self._customizations:
-            self._customizations['ticks'] = {}
-        self._customizations['ticks'][column] = ticks
-        return self
-    
-    def show(self):
-        """Render and display all plots"""
-        if not self._plot_model:
-            raise ValueError("No data to plot. Call plot() first.")
+    def plot(self, data: Sequence[Sequence[Union[str, int, float]]]) -> 'PaxPlot':
+        """Set up plot data.
         
-        results = {}
-        for name, renderer in self._renderers.items():
-            # Create normalization views as needed during rendering
-            normalized_view = NormalizedMatrixView(
-                self._plot_model.matrix,
-                normalization_ranges={i: (0, 1) for i in range(self._plot_model.num_columns)}
-            )
+        Parameters
+        ----------
+        data : Sequence[Sequence[Union[str, int, float]]]
+            The data to plot as a 2D sequence.
             
-            # Apply customizations
-            renderer.apply_customizations(self._customizations)
-            
-            # Render with fresh normalization
-            results[name] = renderer.render(normalized_view)
+        Returns
+        -------
+        PaxPlot
+            Self for method chaining.
+        """
+        pass
+    
+    def remove_data(self, indices: Sequence[int]) -> 'PaxPlot':
+        """Remove rows from the plot data.
         
-        return results
+        Parameters
+        ----------
+        indices : Sequence[int]
+            The indices of rows to remove.
+            
+        Returns
+        -------
+        PaxPlot
+            Self for method chaining.
+        """
+        pass
+    
+    def append_data(self, row: Sequence[Union[str, int, float]]) -> 'PaxPlot':
+        """Append a row to the plot data.
+        
+        Parameters
+        ----------
+        row : Sequence[Union[str, int, float]]
+            The row of data to append.
+            
+        Returns
+        -------
+        PaxPlot
+            Self for method chaining.
+        """
+        pass
+    
+    def add_renderer(self, name: str, renderer: BaseRenderer) -> 'PaxPlot':
+        """Add a renderer.
+        
+        Parameters
+        ----------
+        name : str
+            Name to register the renderer under.
+        renderer : BaseRenderer
+            The renderer to add.
+            
+        Returns
+        -------
+        PaxPlot
+            Self for method chaining.
+        """
+        pass
+    
+    def set_color(self, color: str) -> 'PaxPlot':
+        """Customize plot color.
+        
+        Parameters
+        ----------
+        color : str
+            Color to use for plot lines.
+            
+        Returns
+        -------
+        PaxPlot
+            Self for method chaining.
+        """
+        pass
+    
+    def set_linewidth(self, width: float) -> 'PaxPlot':
+        """Customize line width.
+        
+        Parameters
+        ----------
+        width : float
+            Width of plot lines.
+            
+        Returns
+        -------
+        PaxPlot
+            Self for method chaining.
+        """
+        pass
+    
+    def set_figsize(self, size: Tuple[float, float]) -> 'PaxPlot':
+        """Customize figure size.
+        
+        Parameters
+        ----------
+        size : Tuple[float, float]
+            Figure size as (width, height) in inches.
+            
+        Returns
+        -------
+        PaxPlot
+            Self for method chaining.
+        """
+        pass
+    
+    def set_axis_label(self, column: int, label: str) -> 'PaxPlot':
+        """Set axis label for a column.
+        
+        Parameters
+        ----------
+        column : int
+            The column index to set the label for.
+        label : str
+            The label text.
+            
+        Returns
+        -------
+        PaxPlot
+            Self for method chaining.
+        """
+        pass
+    
+    def set_custom_ticks(self, column: int, ticks: List[Union[float, str]]) -> 'PaxPlot':
+        """Set custom ticks for a column.
+        
+        Parameters
+        ----------
+        column : int
+            The column index to set ticks for.
+        ticks : List[Union[float, str]]
+            The custom tick values.
+            
+        Returns
+        -------
+        PaxPlot
+            Self for method chaining.
+        """
+        pass
+    
+    def show(self) -> Dict[str, Any]:
+        """Render and display all plots.
+        
+        Creates render data from the current plot model and renders
+        using all registered renderers. Returns a dictionary of
+        rendered figures keyed by renderer name.
+        
+        Returns
+        -------
+        Dict[str, Any]
+            Dictionary of rendered figures by renderer name.
+            
+        Raises
+        ------
+        ValueError
+            If no data has been set via plot().
+        """
+        pass
 ```
 
 ## Usage Examples
@@ -333,46 +805,86 @@ plot = PaxPlot()
 plot.plot(data)
 plot.set_color('red')
 plot.set_linewidth(2.0)
-plot.set_ticks(column=0, ticks=[1, 2, 3, 4])
+plot.set_figsize((12, 8))
+plot.set_axis_label(0, 'Temperature')
 plot.show()  # Renders with all customizations
 ```
 
-### Simple Normalization
+### Data Modification
 
 ```python
-# Normalization happens during show()
+# Modify data and re-render
 plot = PaxPlot()
 plot.plot(data)
+plot.show()  # Initial render
 
-# No normalization computed yet
-# ... customize plot ...
+# Add more data
+plot.append_data([4, 'D', 2.5])
+plot.show()  # Re-render with updated data
 
-plot.show()  # Normalization computed during rendering
-# All renderers get fresh normalized data
+# Remove some data
+plot.remove_data([0, 2])
+plot.show()  # Re-render with modified data
+```
+
+### Static Rendering
+
+```python
+# Figures are static snapshots
+plot = PaxPlot()
+plot.plot(data)
+figures = plot.show()  # Returns dict of figures
+
+# Data changes don't affect existing figures
+plot.append_data([5, 'E', 3.0])
+# figures['matplotlib'] is still the old figure
+
+# Must call show() again to get updated figures
+new_figures = plot.show()  # Fresh figures with new data
 ```
 
 ## Benefits
 
-1. **Separation of Concerns**: Data, normalization, and rendering are independent
-2. **Simple and Predictable**: No automatic re-rendering, users control when to plot
-3. **Renderer Agnostic**: Easy to add new rendering backends
-4. **Simple Architecture**: No complex caching or notification systems
-5. **Maintainability**: Clear boundaries between components
-6. **Testability**: Each component can be tested independently
-7. **Extensibility**: Easy to add new features without affecting existing code
-8. **Memory Efficient**: No observer or caching overhead
-9. **Industry Standard**: Similar to matplotlib's approach
-10. **Easy to Understand**: Straightforward data flow and rendering
+1. **Separation of Concerns**: Data structures, normalization views, and renderers are independent
+2. **Static Rendering**: Figures are snapshots that don't stay in sync - users control when to re-render
+3. **Renderer Agnostic**: Easy to add new rendering backends with their own data contracts
+4. **Immutable Data**: Render data is immutable, preventing accidental modifications
+5. **Clear Contracts**: Each renderer defines exactly what data it needs
+6. **Simple Architecture**: No complex caching, observers, or notification systems
+7. **Maintainability**: Clear boundaries between components with well-defined interfaces
+8. **Testability**: Each component can be tested independently with mock data
+9. **Extensibility**: Easy to add new features without affecting existing code
+10. **Memory Efficient**: No observer or caching overhead, data computed on-demand
+11. **Industry Standard**: Similar to matplotlib's static rendering approach
+12. **Easy to Understand**: Straightforward data flow from plot model to render data to figures
 
 ## Migration Strategy
 
-1. Implement core data structures (`NumericalArray`, `CategoricalArray`, `Matrix`)
-2. Create tick and limit management classes
-3. Implement normalization views
-4. Build `PlotModel` and `PaxPlot` interfaces
-5. Create renderer system with base interface
-6. Migrate existing matplotlib functionality to new renderer
-7. Add tests for all components
-8. Update documentation and examples
+1. **Core Data Structures** ✅ (Already implemented)
+   - `NumericalArray`, `CategoricalArray`, `Matrix`
+   - `TickManager`, `CustomAxisLimit`, `AxisLabel`
 
-This architecture provides a solid foundation for PaxPlot's future development while maintaining clean separation between data management, normalization, and rendering concerns.
+2. **Normalization Views** (Next)
+   - `NormalizedMatrixView`
+   - `NormalizedNumericalArrayView`
+   - `NormalizedCategoricalArrayView`
+
+3. **Plot Model** (Next)
+   - `PlotModel` class coordinating all structures
+   - Automatic structure updates on data changes
+
+4. **Renderer System** (Next)
+   - `BaseRenderer` interface
+   - `MatplotlibRenderData` and `MatplotlibRenderer`
+   - `PlotlyRenderData` and `PlotlyRenderer` (future)
+
+5. **Main Interface** (Next)
+   - `PaxPlot` class with method chaining
+   - Integration with existing structures and new renderers
+
+6. **Testing and Documentation** (Final)
+   - Unit tests for all components
+   - Integration tests for full workflow
+   - Update examples and documentation
+
+This architecture provides a solid foundation for PaxPlot's future development while maintaining clean separation between data management, normalization, and rendering concerns. The design aligns with the existing implemented structures and provides a clear path forward for the remaining components.
