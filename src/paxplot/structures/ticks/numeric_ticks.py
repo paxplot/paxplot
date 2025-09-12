@@ -95,12 +95,8 @@ class NumericTicks(BaseTicks):
         # Generate labels with specified precision
         tick_labels = [f"{pos:.{precision}f}" for pos in filtered_positions]
 
-        # Update the arrays
-        self._labels.set_values(tick_labels)
-        self._locations.set_values(filtered_positions)
-
-        # Validate the result
-        self.validate()
+        # Use the base class set_ticks method
+        self.set_ticks(tick_labels, filtered_positions)
 
     def __repr__(self) -> str:
         """

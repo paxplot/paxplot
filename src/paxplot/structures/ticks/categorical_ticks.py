@@ -77,12 +77,8 @@ class CategoricalTicks(BaseTicks):
         # Use the categories exactly as supplied with sequential indices
         sequential_indices = list(range(len(categories)))
 
-        # Update the arrays with the exact categories and sequential indices
-        self._labels.set_values(categories)
-        self._locations.set_values(sequential_indices)
-
-        # Validate the result
-        self.validate()
+        # Use the base class set_ticks method
+        self.set_ticks(categories, sequential_indices)
 
     def __repr__(self) -> str:
         """

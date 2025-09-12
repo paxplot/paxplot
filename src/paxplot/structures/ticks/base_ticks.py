@@ -51,9 +51,10 @@ class BaseTicks(ABC):
         ValueError
             If labels and locations have different lengths or contain invalid values.
         """
-        self._labels = CategoricalArray(labels)
-        self._locations = NumericalArray(locations)
-        self.validate()
+        # Initialize with empty arrays first, then use set_ticks method
+        self._labels = CategoricalArray([])
+        self._locations = NumericalArray([])
+        self.set_ticks(labels, locations)
 
     @property
     def labels(self) -> CategoricalArray:
@@ -115,6 +116,30 @@ class BaseTicks(ABC):
                 raise ValueError(
                     f"Location at index {i} must be finite, got {location}"
                 )
+
+    def set_ticks(
+        self, labels: Sequence[str], locations: Sequence[Union[float, int]]
+    ) -> None:
+        """
+        Set new tick labels and locations, replacing all existing ticks.
+
+        Parameters
+        ----------
+        labels : Sequence[str]
+            The new tick labels as strings.
+        locations : Sequence[Union[float, int]]
+            The new tick positions on the axis.
+
+        Raises
+        ------
+        ValueError
+            If labels and locations have different lengths or contain invalid values.
+        """
+        # Set new values using the array's set_values method
+        self._labels.set_values(labels)
+        self._locations.set_values(locations)
+        # Validate the new values
+        self.validate()
 
     def append(
         self, labels: Sequence[str], locations: Sequence[Union[float, int]]
