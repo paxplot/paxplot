@@ -68,8 +68,9 @@ class Matrix:
     """
 
     def __init__(self, data: Sequence[Sequence[Union[str, int, float]]]):
-        self._validate_data(data)
-        self._columns = self._create_columns(data)
+        # Initialize with empty columns first, then use set_data method
+        self._columns = []
+        self.set_data(data)
 
     @property
     def columns(self) -> List[Union[NumericalArray, CategoricalArray]]:
@@ -252,6 +253,23 @@ class Matrix:
         """
         for column in self._columns:
             column.remove(indices)
+
+    def set_data(self, data: Sequence[Sequence[Union[str, int, float]]]) -> None:
+        """Set new data for the matrix, replacing all existing data.
+
+        Parameters
+        ----------
+        data : Sequence[Sequence[Union[str, int, float]]]
+            The new data as a 2D sequence where each row is a sequence
+            of values and each column should be consistently typed.
+
+        Raises
+        ------
+        ValueError
+            If the data structure is invalid.
+        """
+        self._validate_data(data)
+        self._columns = self._create_columns(data)
 
     def _validate_data(
         self, data: Sequence[Sequence[Union[str, int, float]]]
