@@ -43,7 +43,10 @@ class BaseArray(ABC, Generic[T]):
 
     def __init__(self, values: Sequence):
         """Initialize the array with validated and converted values."""
-        self._values, self._has_nan = self._validate_and_convert(values)
+        # Initialize with empty values first, then use set_values method
+        self._values = []
+        self._has_nan = False
+        self.set_values(values)
 
     @property
     def values(self) -> List[T]:
