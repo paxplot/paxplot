@@ -38,10 +38,6 @@ src/paxplot/
 │       ├── base_ticks.py
 │       ├── numeric_ticks.py
 │       └── categorical_ticks.py
-├── views/
-│   ├── __init__.py
-│   ├── normalized_array_view.py
-│   └── normalized_matrix_view.py
 ├── models/
 │   ├── __init__.py
 │   └── plot_model.py
@@ -359,39 +355,14 @@ class PlotModel:
 
 ## Normalization Strategy
 
-### Data Views
+Normalization logic is embedded directly in the render data classes. This approach provides:
 
-Normalization is provided through lightweight views:
+1. **Simplicity**: No additional abstraction layers
+2. **Performance**: Direct computation without extra object creation
+3. **Clarity**: All rendering logic in one place
+4. **Flexibility**: Each renderer can implement its own normalization strategy
 
-```python
-class NormalizedNumericalArrayView:
-    def __init__(self, array: NumericalArray, min_val: float = 0, max_val: float = 1):
-        self._array = array
-    
-    @property
-    def normalized_values(self) -> NDArray[float]:
-        """Compute normalized values using numpy for performance"""
-        # Cast to numpy array for efficient computation
-        values = np.array(self._array.values, dtype=np.float64)
-        return (values - self._array.min) / (self._array.max - self._array.min)
-```
-
-### Matrix Views
-
-```python
-class NormalizedMatrixView:
-    def __init__(self, matrix: Matrix, normalization_ranges: Optional[Dict[int, Tuple[float, float]]] = None):
-        self._matrix = matrix
-        self._normalization_ranges = normalization_ranges or {}
-        self._column_views = {}
-    
-    def get_normalized_column(self, index: int) -> NormalizedArrayView:
-        if index not in self._column_views:
-            array = self._matrix.get_column(index)
-            min_val, max_val = self._normalization_ranges.get(index, (0, 1))
-            self._column_views[index] = NormalizedArrayView(array, min_val, max_val)
-        return self._column_views[index]
-```
+The normalization happens during render data creation, converting raw data to the format needed for rendering.
 
 ## Renderer System
 
@@ -457,7 +428,7 @@ class MatplotlibRenderData:
     @classmethod
     def from_plot_model(cls, plot_model: PlotModel, 
                        customizations: Dict[str, Any] = None) -> 'MatplotlibRenderData':
-        """Create render data from plot model.
+        """Create render data from plot model with embedded normalization.
         
         Parameters
         ----------
@@ -470,6 +441,12 @@ class MatplotlibRenderData:
         -------
         MatplotlibRenderData
             Immutable data snapshot for matplotlib rendering.
+            
+        Notes
+        -----
+        Normalization logic is embedded in this method. Numerical data is
+        normalized to 0-1 range using min-max scaling. Categorical data is
+        mapped to evenly spaced positions in the 0-1 range.
         """
         pass
 
@@ -505,7 +482,7 @@ class PlotlyRenderData:
     @classmethod
     def from_plot_model(cls, plot_model: PlotModel, 
                        customizations: Dict[str, Any] = None) -> 'PlotlyRenderData':
-        """Create render data from plot model.
+        """Create render data from plot model with embedded normalization.
         
         Parameters
         ----------
@@ -518,6 +495,11 @@ class PlotlyRenderData:
         -------
         PlotlyRenderData
             Immutable data snapshot for plotly rendering.
+            
+        Notes
+        -----
+        Normalization logic is embedded in this method. Each renderer can
+        implement its own normalization strategy as needed.
         """
         pass
 ```
@@ -864,27 +846,22 @@ new_figures = plot.show()  # Fresh figures with new data
    - `NumericalArray`, `CategoricalArray`, `Matrix`
    - `TickManager`, `CustomAxisLimit`, `AxisLabel`
 
-2. **Normalization Views** (Next)
-   - `NormalizedMatrixView`
-   - `NormalizedNumericalArrayView`
-   - `NormalizedCategoricalArrayView`
-
-3. **Plot Model** (Next)
+2. **Plot Model** (Next)
    - `PlotModel` class coordinating all structures
    - Automatic structure updates on data changes
 
-4. **Renderer System** (Next)
+3. **Renderer System** (Next)
    - `BaseRenderer` interface
    - `MatplotlibRenderData` and `MatplotlibRenderer`
    - `PlotlyRenderData` and `PlotlyRenderer` (future)
 
-5. **Main Interface** (Next)
+4. **Main Interface** (Next)
    - `PaxPlot` class with method chaining
    - Integration with existing structures and new renderers
 
-6. **Testing and Documentation** (Final)
+5. **Testing and Documentation** (Final)
    - Unit tests for all components
    - Integration tests for full workflow
    - Update examples and documentation
 
-This architecture provides a solid foundation for PaxPlot's future development while maintaining clean separation between data management, normalization, and rendering concerns. The design aligns with the existing implemented structures and provides a clear path forward for the remaining components.
+This architecture provides a solid foundation for PaxPlot's future development while maintaining clean separation between data management and rendering concerns. The design uses embedded normalization logic for simplicity and aligns with the existing implemented structures, providing a clear path forward for the remaining components.
