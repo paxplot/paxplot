@@ -65,6 +65,10 @@ class PlotModel:
     >>> numeric_values = plot_model.get_numeric_values(0)  # [1.0, 2.0, 3.0]
     >>> categorical_values = plot_model.get_categorical_values(1)  # ['A', 'B', 'A']
     >>> unique_vals = plot_model.get_unique_values(1)  # ['A', 'B']
+    >>>
+    >>> # Access tick information
+    >>> tick_labels = plot_model.get_tick_labels(0)  # ['1.0', '2.0', '3.0']
+    >>> tick_locations = plot_model.get_tick_locations(0)  # [1.0, 2.0, 3.0]
     """
 
     def __init__(
@@ -262,6 +266,60 @@ class PlotModel:
         
         categorical_array = self._matrix.get_categorical_array(index)
         return categorical_array.unique_values
+
+    def get_tick_labels(self, index: int) -> List[str]:
+        """
+        Get tick labels for a column.
+
+        Parameters
+        ----------
+        index : int
+            The index of the column to get tick labels for.
+
+        Returns
+        -------
+        List[str]
+            The tick labels for the column.
+
+        Raises
+        ------
+        IndexError
+            If the index is out of bounds.
+        """
+        if index < 0 or index >= self._matrix.num_columns:
+            raise IndexError(
+                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+            )
+        
+        tick_collection = self._tick_manager.get_tick_collection(index)
+        return tick_collection.labels.values
+
+    def get_tick_locations(self, index: int) -> List[float]:
+        """
+        Get tick locations for a column.
+
+        Parameters
+        ----------
+        index : int
+            The index of the column to get tick locations for.
+
+        Returns
+        -------
+        List[float]
+            The tick locations for the column.
+
+        Raises
+        ------
+        IndexError
+            If the index is out of bounds.
+        """
+        if index < 0 or index >= self._matrix.num_columns:
+            raise IndexError(
+                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+            )
+        
+        tick_collection = self._tick_manager.get_tick_collection(index)
+        return tick_collection.locations.values
 
     def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
         """
@@ -520,8 +578,50 @@ class PlotModel:
         # Create new tick manager with appropriate types
         self._tick_manager = TickManager(tick_types)
         
+        # Generate ticks for each column based on data
+        self._generate_ticks_from_data()
+        
         # Update axis labels list to match column count
         self._axis_labels = [AxisLabel() for _ in range(self._matrix.num_columns)]
         
         # Update custom limits list to match column count
         self._custom_limits = [CustomAxisLimit() for _ in range(self._matrix.num_columns)]
+
+    def _generate_ticks_from_data(self) -> None:
+        """
+        Generate ticks for each column based on the current data.
+        
+        This method populates the tick collections with appropriate tick data
+        based on the column types and values.
+        """
+        for i in range(self._matrix.num_columns):
+            column_type = self._matrix.get_column_type(i)
+            
+            if column_type == ColumnType.NUMERIC:
+                # Generate numeric ticks
+                numeric_array = self._matrix.get_numeric_array(i)
+                if numeric_array.length > 0:
+                    # Get non-NaN values for range calculation
+                    non_nan_values = numeric_array.non_nan_values
+                    if non_nan_values:
+                        min_val = min(non_nan_values)
+                        max_val = max(non_nan_values)
+                        
+                        # Only generate ticks if we have a valid range
+                        if min_val != max_val:
+                            numeric_ticks = self._tick_manager.get_numeric_ticks(i)
+                            numeric_ticks.set_ticks_from_range(min_val, max_val)
+                        else:
+                            # Single value case - create a simple tick
+                            numeric_ticks = self._tick_manager.get_numeric_ticks(i)
+                            numeric_ticks.set_ticks([f"{min_val:.2f}"], [min_val])
+            
+            elif column_type == ColumnType.CATEGORICAL:
+                # Generate categorical ticks
+                categorical_array = self._matrix.get_categorical_array(i)
+                if categorical_array.length > 0:
+                    # Get unique categories (excluding NaN)
+                    unique_categories = [cat for cat in categorical_array.unique_values if cat != "<NaN>"]
+                    if unique_categories:
+                        categorical_ticks = self._tick_manager.get_categorical_ticks(i)
+                        categorical_ticks.set_ticks_from_categories(unique_categories)

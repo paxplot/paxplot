@@ -426,6 +426,116 @@ class TestPlotModel:
         assert plot_model.get_numeric_values(0) == [10.0, 20.0, 30.0]
         assert plot_model.get_categorical_values(1) == ["X", "Y", "Z"]
 
+    def test_get_tick_labels_valid(self):
+        """Test get_tick_labels method with valid index."""
+        data = [[1, "A", 2.5], [2, "B", 3.0], [3, "C", 1.5]]
+        plot_model = PlotModel(data)
+        
+        # Test numeric column tick labels
+        tick_labels = plot_model.get_tick_labels(0)
+        assert isinstance(tick_labels, list)
+        assert all(isinstance(label, str) for label in tick_labels)
+        assert len(tick_labels) > 0  # Should have some ticks generated
+        
+        # Test categorical column tick labels
+        tick_labels = plot_model.get_tick_labels(1)
+        assert isinstance(tick_labels, list)
+        assert all(isinstance(label, str) for label in tick_labels)
+        assert len(tick_labels) > 0  # Should have some ticks generated
+
+    def test_get_tick_labels_invalid_index_raises_error(self):
+        """Test get_tick_labels with invalid index raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(IndexError, match="Index 10 out of bounds"):
+            plot_model.get_tick_labels(10)
+
+    def test_get_tick_locations_valid(self):
+        """Test get_tick_locations method with valid index."""
+        data = [[1, "A", 2.5], [2, "B", 3.0], [3, "C", 1.5]]
+        plot_model = PlotModel(data)
+        
+        # Test numeric column tick locations
+        tick_locations = plot_model.get_tick_locations(0)
+        assert isinstance(tick_locations, list)
+        assert all(isinstance(loc, float) for loc in tick_locations)
+        assert len(tick_locations) > 0  # Should have some ticks generated
+        
+        # Test categorical column tick locations
+        tick_locations = plot_model.get_tick_locations(1)
+        assert isinstance(tick_locations, list)
+        assert all(isinstance(loc, float) for loc in tick_locations)
+        assert len(tick_locations) > 0  # Should have some ticks generated
+
+    def test_get_tick_locations_invalid_index_raises_error(self):
+        """Test get_tick_locations with invalid index raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(IndexError, match="Index 10 out of bounds"):
+            plot_model.get_tick_locations(10)
+
+    def test_tick_labels_and_locations_consistency(self):
+        """Test that tick labels and locations have consistent lengths."""
+        data = [[1, "A", 2.5], [2, "B", 3.0], [3, "C", 1.5]]
+        plot_model = PlotModel(data)
+        
+        for i in range(plot_model.get_column_count()):
+            tick_labels = plot_model.get_tick_labels(i)
+            tick_locations = plot_model.get_tick_locations(i)
+            
+            # Labels and locations should have the same length
+            assert len(tick_labels) == len(tick_locations)
+            assert len(tick_labels) > 0  # Should have at least one tick
+
+    def test_tick_access_after_data_modification(self):
+        """Test tick access methods after data modification."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        # Store initial tick info
+        initial_labels_0 = plot_model.get_tick_labels(0)
+        initial_locations_0 = plot_model.get_tick_locations(0)
+        
+        # Append data
+        plot_model.append_data([3, "C"])
+        
+        # Ticks should be updated (may have different values due to range changes)
+        new_labels_0 = plot_model.get_tick_labels(0)
+        new_locations_0 = plot_model.get_tick_locations(0)
+        
+        # Should still have valid tick data
+        assert len(new_labels_0) > 0
+        assert len(new_locations_0) > 0
+        assert len(new_labels_0) == len(new_locations_0)
+        
+        # Set new data
+        new_data = [[10, "X"], [20, "Y"], [30, "Z"]]
+        plot_model.set_data(new_data)
+        
+        # Ticks should be updated for new data
+        final_labels_0 = plot_model.get_tick_labels(0)
+        final_locations_0 = plot_model.get_tick_locations(0)
+        
+        assert len(final_labels_0) > 0
+        assert len(final_locations_0) > 0
+        assert len(final_labels_0) == len(final_locations_0)
+
+    def test_tick_access_with_nan_values(self):
+        """Test tick access methods with NaN values in data."""
+        data = [[1, "A", 2.5], [None, "B", None], [3, None, 1.5]]
+        plot_model = PlotModel(data)
+        
+        # Should still be able to get tick information even with NaN values
+        for i in range(plot_model.get_column_count()):
+            tick_labels = plot_model.get_tick_labels(i)
+            tick_locations = plot_model.get_tick_locations(i)
+            
+            assert len(tick_labels) > 0
+            assert len(tick_locations) > 0
+            assert len(tick_labels) == len(tick_locations)
+
     def test_len_dunder(self):
         """Test __len__ method."""
         data = [[1, "A", 2.5], [2, "B", 3.0]]
