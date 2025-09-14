@@ -271,6 +271,161 @@ class TestPlotModel:
         with pytest.raises(IndexError, match="Index 10 out of bounds"):
             plot_model.get_custom_limit(10)
 
+    def test_get_column_type_valid(self):
+        """Test get_column_type method with valid index."""
+        data = [[1, "A", 2.5], [2, "B", 3.0]]
+        plot_model = PlotModel(data)
+        
+        assert plot_model.get_column_type(0) == "numeric"
+        assert plot_model.get_column_type(1) == "categorical"
+        assert plot_model.get_column_type(2) == "numeric"
+
+    def test_get_column_type_invalid_index_raises_error(self):
+        """Test get_column_type with invalid index raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(IndexError, match="Index 10 out of bounds"):
+            plot_model.get_column_type(10)
+
+    def test_get_numeric_values_valid(self):
+        """Test get_numeric_values method with valid numeric column."""
+        data = [[1, "A", 2.5], [2, "B", 3.0], [3, "C", 1.5]]
+        plot_model = PlotModel(data)
+        
+        values = plot_model.get_numeric_values(0)
+        assert values == [1.0, 2.0, 3.0]
+        assert isinstance(values, list)
+        assert all(isinstance(v, float) for v in values)
+        
+        values = plot_model.get_numeric_values(2)
+        assert values == [2.5, 3.0, 1.5]
+
+    def test_get_numeric_values_categorical_column_raises_error(self):
+        """Test get_numeric_values with categorical column raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(TypeError, match="Column 1 is not numeric, it is categorical"):
+            plot_model.get_numeric_values(1)
+
+    def test_get_numeric_values_invalid_index_raises_error(self):
+        """Test get_numeric_values with invalid index raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(IndexError, match="Index 10 out of bounds"):
+            plot_model.get_numeric_values(10)
+
+    def test_get_categorical_values_valid(self):
+        """Test get_categorical_values method with valid categorical column."""
+        data = [[1, "A", 2.5], [2, "B", 3.0], [3, "A", 1.5]]
+        plot_model = PlotModel(data)
+        
+        values = plot_model.get_categorical_values(1)
+        assert values == ["A", "B", "A"]
+        assert isinstance(values, list)
+        assert all(isinstance(v, str) for v in values)
+
+    def test_get_categorical_values_numeric_column_raises_error(self):
+        """Test get_categorical_values with numeric column raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(TypeError, match="Column 0 is not categorical, it is numeric"):
+            plot_model.get_categorical_values(0)
+
+    def test_get_categorical_values_invalid_index_raises_error(self):
+        """Test get_categorical_values with invalid index raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(IndexError, match="Index 10 out of bounds"):
+            plot_model.get_categorical_values(10)
+
+
+    def test_get_unique_values_valid(self):
+        """Test get_unique_values method with valid categorical column."""
+        data = [[1, "A", 2.5], [2, "B", 3.0], [3, "A", 1.5], [4, "C", 2.0]]
+        plot_model = PlotModel(data)
+        
+        unique_vals = plot_model.get_unique_values(1)
+        assert unique_vals == ["A", "B", "C"]
+        assert isinstance(unique_vals, list)
+        assert all(isinstance(v, str) for v in unique_vals)
+
+    def test_get_unique_values_numeric_column_raises_error(self):
+        """Test get_unique_values with numeric column raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(TypeError, match="Column 0 is not categorical, it is numeric"):
+            plot_model.get_unique_values(0)
+
+    def test_get_unique_values_invalid_index_raises_error(self):
+        """Test get_unique_values with invalid index raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(IndexError, match="Index 10 out of bounds"):
+            plot_model.get_unique_values(10)
+
+    def test_data_access_with_nan_values(self):
+        """Test data access methods with NaN values."""
+        data = [[1, "A", 2.5], [None, "B", None], [3, None, 1.5]]
+        plot_model = PlotModel(data)
+        
+        # Test numeric values with NaN
+        values = plot_model.get_numeric_values(0)
+        assert len(values) == 3
+        assert values[0] == 1.0
+        assert str(values[1]) == "nan"  # NaN value
+        assert values[2] == 3.0
+        
+        # Test categorical values with NaN
+        values = plot_model.get_categorical_values(1)
+        assert len(values) == 3
+        assert values[0] == "A"
+        assert values[1] == "B"
+        assert values[2] == "<NaN>"  # NaN representation
+        
+        # Test that numeric values can be used to compute range (ignoring NaN values)
+        numeric_values = plot_model.get_numeric_values(0)
+        non_nan_values = [v for v in numeric_values if str(v) != "nan"]
+        assert min(non_nan_values) == 1.0
+        assert max(non_nan_values) == 3.0
+        
+        # Test unique values with NaN
+        unique_vals = plot_model.get_unique_values(1)
+        assert "<NaN>" in unique_vals
+        assert "A" in unique_vals
+        assert "B" in unique_vals
+
+    def test_data_access_after_data_modification(self):
+        """Test data access methods after data modification."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        # Initial values
+        assert plot_model.get_numeric_values(0) == [1.0, 2.0]
+        assert plot_model.get_categorical_values(1) == ["A", "B"]
+        
+        # Append data
+        plot_model.append_data([3, "C"])
+        assert plot_model.get_numeric_values(0) == [1.0, 2.0, 3.0]
+        assert plot_model.get_categorical_values(1) == ["A", "B", "C"]
+        
+        # Remove data
+        plot_model.remove_data([0])
+        assert plot_model.get_numeric_values(0) == [2.0, 3.0]
+        assert plot_model.get_categorical_values(1) == ["B", "C"]
+        
+        # Set new data
+        new_data = [[10, "X"], [20, "Y"], [30, "Z"]]
+        plot_model.set_data(new_data)
+        assert plot_model.get_numeric_values(0) == [10.0, 20.0, 30.0]
+        assert plot_model.get_categorical_values(1) == ["X", "Y", "Z"]
+
     def test_len_dunder(self):
         """Test __len__ method."""
         data = [[1, "A", 2.5], [2, "B", 3.0]]
@@ -303,9 +458,6 @@ class TestPlotModel:
         """Test that structures are updated after data modification."""
         data = [[1, "A"], [2, "B"]]
         plot_model = PlotModel(data)
-        
-        # Store initial structure counts
-        initial_columns = plot_model.get_column_count()
         
         # Modify data
         new_data = [[10, "X", 1.1], [20, "Y", 2.2]]
@@ -344,11 +496,9 @@ class TestPlotModel:
 
     def test_tick_types_correctly_mapped(self):
         """Test that tick types are correctly mapped from matrix column types."""
-        data = [[1, "A", 2.5], [2, "B", 3.0]]  # numeric, categorical, numeric
-        plot_model = PlotModel(data)
-        
         # This test is no longer relevant since we don't expose tick_manager
         # The tick manager is still created internally but not exposed
+        pass
 
     def test_axis_labels_initialized_with_defaults(self):
         """Test that axis labels are initialized with default values."""

@@ -4,7 +4,7 @@ This module defines the PlotModel class that serves as the main interface
 for creating and managing plot structures in PaxPlot.
 """
 
-from typing import Optional, Sequence, Union
+from typing import List, Optional, Sequence, Union
 
 from ..structures.matrix import Matrix, ColumnType
 from ..structures.tick_manger import TickManager, TickType
@@ -59,6 +59,12 @@ class PlotModel:
     >>> plot_model.clear_custom_limit(0)
     >>> min_val, max_val = plot_model.get_custom_limit(0)
     >>> print(f"Limits: {min_val} to {max_val}")  # Limits: None to None
+    >>>
+    >>> # Access data values
+    >>> column_type = plot_model.get_column_type(0)  # "numeric"
+    >>> numeric_values = plot_model.get_numeric_values(0)  # [1.0, 2.0, 3.0]
+    >>> categorical_values = plot_model.get_categorical_values(1)  # ['A', 'B', 'A']
+    >>> unique_vals = plot_model.get_unique_values(1)  # ['A', 'B']
     """
 
     def __init__(
@@ -136,6 +142,126 @@ class PlotModel:
         
         limit = self._custom_limits[index]
         return limit.min_val, limit.max_val
+
+    def get_column_type(self, index: int) -> str:
+        """
+        Get the type of a column.
+
+        Parameters
+        ----------
+        index : int
+            The index of the column to get the type for.
+
+        Returns
+        -------
+        str
+            The column type: "numeric" or "categorical".
+
+        Raises
+        ------
+        IndexError
+            If the index is out of bounds.
+        """
+        if index < 0 or index >= self._matrix.num_columns:
+            raise IndexError(
+                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+            )
+        
+        return self._matrix.get_column_type(index).value
+
+    def get_numeric_values(self, index: int) -> List[float]:
+        """
+        Get numeric values from a column.
+
+        Parameters
+        ----------
+        index : int
+            The index of the column to get values from.
+
+        Returns
+        -------
+        List[float]
+            The numeric values from the column.
+
+        Raises
+        ------
+        IndexError
+            If the index is out of bounds.
+        TypeError
+            If the column is not numeric.
+        """
+        if index < 0 or index >= self._matrix.num_columns:
+            raise IndexError(
+                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+            )
+        
+        if self._matrix.get_column_type(index) != ColumnType.NUMERIC:
+            raise TypeError(f"Column {index} is not numeric, it is {self._matrix.get_column_type(index).value}")
+        
+        return self._matrix.get_numeric_array(index).values
+
+    def get_categorical_values(self, index: int) -> List[str]:
+        """
+        Get categorical values from a column.
+
+        Parameters
+        ----------
+        index : int
+            The index of the column to get values from.
+
+        Returns
+        -------
+        List[str]
+            The categorical values from the column.
+
+        Raises
+        ------
+        IndexError
+            If the index is out of bounds.
+        TypeError
+            If the column is not categorical.
+        """
+        if index < 0 or index >= self._matrix.num_columns:
+            raise IndexError(
+                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+            )
+        
+        if self._matrix.get_column_type(index) != ColumnType.CATEGORICAL:
+            raise TypeError(f"Column {index} is not categorical, it is {self._matrix.get_column_type(index).value}")
+        
+        return self._matrix.get_categorical_array(index).values
+
+    def get_unique_values(self, index: int) -> Optional[List[str]]:
+        """
+        Get the unique values for a categorical column.
+
+        Parameters
+        ----------
+        index : int
+            The index of the column to get unique values for.
+
+        Returns
+        -------
+        Optional[List[str]]
+            The unique values for categorical columns, None for numeric columns.
+
+        Raises
+        ------
+        IndexError
+            If the index is out of bounds.
+        TypeError
+            If the column is not categorical.
+        """
+        if index < 0 or index >= self._matrix.num_columns:
+            raise IndexError(
+                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+            )
+        
+        if self._matrix.get_column_type(index) != ColumnType.CATEGORICAL:
+            raise TypeError(f"Column {index} is not categorical, it is {self._matrix.get_column_type(index).value}")
+        
+        categorical_array = self._matrix.get_categorical_array(index)
+        return categorical_array.unique_values
 
     def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
         """
