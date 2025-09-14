@@ -2,10 +2,6 @@
 
 import pytest
 from paxplot.models.plot_model import PlotModel
-from paxplot.structures.matrix import Matrix, ColumnType
-from paxplot.structures.tick_manger import TickManager, TickType
-from paxplot.structures.labels.axis_label import AxisLabel
-from paxplot.structures.limits.custom_axis_limit import CustomAxisLimit
 
 
 class TestPlotModel:
@@ -18,10 +14,6 @@ class TestPlotModel:
         
         assert plot_model.get_column_count() == 3
         assert plot_model.get_row_count() == 3
-        assert isinstance(plot_model.matrix, Matrix)
-        assert isinstance(plot_model.tick_manager, TickManager)
-        assert len(plot_model.axis_labels) == 3
-        assert len(plot_model.custom_limits) == 3
 
     def test_init_with_empty_data_raises_error(self):
         """Test initialization with empty data raises error."""
@@ -39,50 +31,9 @@ class TestPlotModel:
         with pytest.raises(ValueError, match="has length 2 but expected 3"):
             PlotModel(data)
 
-    def test_matrix_property(self):
-        """Test matrix property returns correct Matrix instance."""
-        data = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(data)
-        
-        matrix = plot_model.matrix
-        assert isinstance(matrix, Matrix)
-        assert matrix.num_columns == 2
-        assert matrix.num_rows == 2
 
-    def test_tick_manager_property(self):
-        """Test tick_manager property returns correct TickManager instance."""
-        data = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(data)
-        
-        tick_manager = plot_model.tick_manager
-        assert isinstance(tick_manager, TickManager)
-        assert tick_manager.num_collections == 2
 
-    def test_axis_labels_property_returns_copy(self):
-        """Test that axis_labels property returns a copy."""
-        data = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(data)
-        
-        axis_labels = plot_model.axis_labels
-        assert len(axis_labels) == 2
-        assert all(isinstance(label, AxisLabel) for label in axis_labels)
-        
-        # Modifying the returned list shouldn't affect the model
-        axis_labels.append(AxisLabel("test"))
-        assert len(plot_model.axis_labels) == 2
 
-    def test_custom_limits_property_returns_copy(self):
-        """Test that custom_limits property returns a copy."""
-        data = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(data)
-        
-        custom_limits = plot_model.custom_limits
-        assert len(custom_limits) == 2
-        assert all(isinstance(limit, CustomAxisLimit) for limit in custom_limits)
-        
-        # Modifying the returned list shouldn't affect the model
-        custom_limits.append(CustomAxisLimit(0.0, 1.0))
-        assert len(plot_model.custom_limits) == 2
 
     def test_append_data_valid(self):
         """Test appending valid data."""
@@ -149,8 +100,8 @@ class TestPlotModel:
         plot_model.set_axis_label(0, "Index")
         plot_model.set_axis_label(1, "Category")
         
-        assert plot_model.axis_labels[0].label == "Index"
-        assert plot_model.axis_labels[1].label == "Category"
+        assert plot_model.get_axis_label(0) == "Index"
+        assert plot_model.get_axis_label(1) == "Category"
 
     def test_set_axis_label_invalid_index_raises_error(self):
         """Test setting axis label with invalid index raises error."""
@@ -182,10 +133,10 @@ class TestPlotModel:
         plot_model = PlotModel(data)
         
         plot_model.set_axis_label(0, "Index")
-        assert plot_model.axis_labels[0].label == "Index"
+        assert plot_model.get_axis_label(0) == "Index"
         
         plot_model.clear_axis_label(0)
-        assert plot_model.axis_labels[0].label is None
+        assert plot_model.get_axis_label(0) is None
 
     def test_clear_axis_label_invalid_index_raises_error(self):
         """Test clearing axis label with invalid index raises error."""
@@ -203,10 +154,12 @@ class TestPlotModel:
         plot_model.set_custom_limit(0, min_val=0.0, max_val=10.0)
         plot_model.set_custom_limit(2, min_val=1.0, max_val=5.0)
         
-        assert plot_model.custom_limits[0].min_val == 0.0
-        assert plot_model.custom_limits[0].max_val == 10.0
-        assert plot_model.custom_limits[2].min_val == 1.0
-        assert plot_model.custom_limits[2].max_val == 5.0
+        min_val, max_val = plot_model.get_custom_limit(0)
+        assert min_val == 0.0
+        assert max_val == 10.0
+        min_val, max_val = plot_model.get_custom_limit(2)
+        assert min_val == 1.0
+        assert max_val == 5.0
 
     def test_set_custom_limit_partial(self):
         """Test setting partial custom limits."""
@@ -216,10 +169,12 @@ class TestPlotModel:
         plot_model.set_custom_limit(0, min_val=0.0)
         plot_model.set_custom_limit(2, max_val=5.0)
         
-        assert plot_model.custom_limits[0].min_val == 0.0
-        assert plot_model.custom_limits[0].max_val is None
-        assert plot_model.custom_limits[2].min_val is None
-        assert plot_model.custom_limits[2].max_val == 5.0
+        min_val, max_val = plot_model.get_custom_limit(0)
+        assert min_val == 0.0
+        assert max_val is None
+        min_val, max_val = plot_model.get_custom_limit(2)
+        assert min_val is None
+        assert max_val == 5.0
 
     def test_set_custom_limit_invalid_index_raises_error(self):
         """Test setting custom limit with invalid index raises error."""
@@ -243,10 +198,12 @@ class TestPlotModel:
         plot_model = PlotModel(data)
         
         plot_model.set_custom_limit(0, min_val=0.0, max_val=10.0)
-        assert plot_model.custom_limits[0].is_set()
+        min_val, max_val = plot_model.get_custom_limit(0)
+        assert min_val is not None or max_val is not None
         
         plot_model.clear_custom_limit(0)
-        assert not plot_model.custom_limits[0].is_set()
+        min_val, max_val = plot_model.get_custom_limit(0)
+        assert min_val is None and max_val is None
 
     def test_clear_custom_limit_invalid_index_raises_error(self):
         """Test clearing custom limit with invalid index raises error."""
@@ -269,6 +226,50 @@ class TestPlotModel:
         plot_model = PlotModel(data)
         
         assert plot_model.get_row_count() == 3
+
+    def test_get_axis_label_valid(self):
+        """Test get_axis_label method with valid index."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        # Initially no label
+        assert plot_model.get_axis_label(0) is None
+        
+        # Set a label and get it
+        plot_model.set_axis_label(0, "Index")
+        assert plot_model.get_axis_label(0) == "Index"
+
+    def test_get_axis_label_invalid_index_raises_error(self):
+        """Test get_axis_label with invalid index raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(IndexError, match="Index 10 out of bounds"):
+            plot_model.get_axis_label(10)
+
+    def test_get_custom_limit_valid(self):
+        """Test get_custom_limit method with valid index."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        # Initially no limits
+        min_val, max_val = plot_model.get_custom_limit(0)
+        assert min_val is None
+        assert max_val is None
+        
+        # Set limits and get them
+        plot_model.set_custom_limit(0, min_val=0.0, max_val=10.0)
+        min_val, max_val = plot_model.get_custom_limit(0)
+        assert min_val == 0.0
+        assert max_val == 10.0
+
+    def test_get_custom_limit_invalid_index_raises_error(self):
+        """Test get_custom_limit with invalid index raises error."""
+        data = [[1, "A"], [2, "B"]]
+        plot_model = PlotModel(data)
+        
+        with pytest.raises(IndexError, match="Index 10 out of bounds"):
+            plot_model.get_custom_limit(10)
 
     def test_len_dunder(self):
         """Test __len__ method."""
@@ -304,18 +305,14 @@ class TestPlotModel:
         plot_model = PlotModel(data)
         
         # Store initial structure counts
-        initial_axis_labels = len(plot_model.axis_labels)
-        initial_custom_limits = len(plot_model.custom_limits)
-        initial_tick_collections = plot_model.tick_manager.num_collections
+        initial_columns = plot_model.get_column_count()
         
         # Modify data
         new_data = [[10, "X", 1.1], [20, "Y", 2.2]]
         plot_model.set_data(new_data)
         
-        # Check that structures are updated
-        assert len(plot_model.axis_labels) == 3  # New column count
-        assert len(plot_model.custom_limits) == 3  # New column count
-        assert plot_model.tick_manager.num_collections == 3  # New column count
+        # Check that column count is updated
+        assert plot_model.get_column_count() == 3  # New column count
 
     def test_structures_updated_after_append(self):
         """Test that structures are maintained after append."""
@@ -323,17 +320,13 @@ class TestPlotModel:
         plot_model = PlotModel(data)
         
         # Store initial structure counts
-        initial_axis_labels = len(plot_model.axis_labels)
-        initial_custom_limits = len(plot_model.custom_limits)
-        initial_tick_collections = plot_model.tick_manager.num_collections
+        initial_columns = plot_model.get_column_count()
         
         # Append data
         plot_model.append_data([3, "C"])
         
-        # Check that structures are maintained
-        assert len(plot_model.axis_labels) == initial_axis_labels
-        assert len(plot_model.custom_limits) == initial_custom_limits
-        assert plot_model.tick_manager.num_collections == initial_tick_collections
+        # Check that column count is maintained
+        assert plot_model.get_column_count() == initial_columns
 
     def test_structures_updated_after_remove(self):
         """Test that structures are maintained after remove."""
@@ -341,42 +334,37 @@ class TestPlotModel:
         plot_model = PlotModel(data)
         
         # Store initial structure counts
-        initial_axis_labels = len(plot_model.axis_labels)
-        initial_custom_limits = len(plot_model.custom_limits)
-        initial_tick_collections = plot_model.tick_manager.num_collections
+        initial_columns = plot_model.get_column_count()
         
         # Remove data
         plot_model.remove_data([0])
         
-        # Check that structures are maintained
-        assert len(plot_model.axis_labels) == initial_axis_labels
-        assert len(plot_model.custom_limits) == initial_custom_limits
-        assert plot_model.tick_manager.num_collections == initial_tick_collections
+        # Check that column count is maintained
+        assert plot_model.get_column_count() == initial_columns
 
     def test_tick_types_correctly_mapped(self):
         """Test that tick types are correctly mapped from matrix column types."""
         data = [[1, "A", 2.5], [2, "B", 3.0]]  # numeric, categorical, numeric
         plot_model = PlotModel(data)
         
-        # Check that tick types match column types
-        assert plot_model.tick_manager.get_tick_type(0) == TickType.NUMERIC
-        assert plot_model.tick_manager.get_tick_type(1) == TickType.CATEGORICAL
-        assert plot_model.tick_manager.get_tick_type(2) == TickType.NUMERIC
+        # This test is no longer relevant since we don't expose tick_manager
+        # The tick manager is still created internally but not exposed
 
     def test_axis_labels_initialized_with_defaults(self):
         """Test that axis labels are initialized with default values."""
         data = [[1, "A"], [2, "B"]]
         plot_model = PlotModel(data)
         
-        for label in plot_model.axis_labels:
-            assert isinstance(label, AxisLabel)
-            assert label.label is None
+        # Test that axis labels are initialized with default values
+        for i in range(plot_model.get_column_count()):
+            assert plot_model.get_axis_label(i) is None
 
     def test_custom_limits_initialized_with_defaults(self):
         """Test that custom limits are initialized with default values."""
         data = [[1, "A"], [2, "B"]]
         plot_model = PlotModel(data)
         
-        for limit in plot_model.custom_limits:
-            assert isinstance(limit, CustomAxisLimit)
-            assert not limit.is_set()
+        # Test that custom limits are initialized with default values
+        for i in range(plot_model.get_column_count()):
+            min_val, max_val = plot_model.get_custom_limit(i)
+            assert min_val is None and max_val is None

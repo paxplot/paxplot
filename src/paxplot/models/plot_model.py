@@ -4,7 +4,7 @@ This module defines the PlotModel class that serves as the main interface
 for creating and managing plot structures in PaxPlot.
 """
 
-from typing import List, Optional, Sequence, Union
+from typing import Optional, Sequence, Union
 
 from ..structures.matrix import Matrix, ColumnType
 from ..structures.tick_manger import TickManager, TickType
@@ -17,26 +17,14 @@ class PlotModel:
     Main interface for creating and managing plot structures.
 
     The PlotModel serves as the primary interface for users to interact with
-    PaxPlot data. It manages a Matrix for data storage and automatically
-    creates and maintains associated structures including TickManager,
-    AxisLabels, and CustomAxisLimits.
+    PaxPlot data. It provides a clean API for managing data, axis labels,
+    and custom limits without exposing internal implementation details.
 
     Parameters
     ----------
     data : Sequence[Sequence[Union[str, int, float]]]
         Initial data as a 2D sequence where each row is a sequence of values
         and each column should be consistently typed.
-
-    Attributes
-    ----------
-    matrix : Matrix
-        The underlying data matrix managing all columns of data.
-    tick_manager : TickManager
-        Manager for tick collections corresponding to each column.
-    axis_labels : List[AxisLabel]
-        List of axis labels, one for each column (initially with default values).
-    custom_limits : List[CustomAxisLimit]
-        List of custom axis limits, one for each column (initially with default values).
 
     Examples
     --------
@@ -47,22 +35,30 @@ class PlotModel:
     ...     [3, 'A', 1.5]
     ... ]
     >>> plot_model = PlotModel(data)
-    >>> print(plot_model.matrix.num_columns)  # 3
-    >>> print(plot_model.matrix.num_rows)     # 3
+    >>> print(plot_model.get_column_count())  # 3
+    >>> print(plot_model.get_row_count())     # 3
     >>>
     >>> # Append new data
     >>> plot_model.append_data([4, 'C', 2.0])
-    >>> print(plot_model.matrix.num_rows)     # 4
+    >>> print(plot_model.get_row_count())     # 4
     >>>
     >>> # Remove data by indices
     >>> plot_model.remove_data([0, 2])
-    >>> print(plot_model.matrix.num_rows)     # 2
+    >>> print(plot_model.get_row_count())     # 2
     >>>
-    >>> # Access structures
-    >>> matrix = plot_model.matrix
-    >>> numeric_ticks = plot_model.tick_manager.get_numeric_ticks(0)
-    >>> axis_label = plot_model.axis_labels[0]
-    >>> custom_limit = plot_model.custom_limits[0]
+    >>> # Manage axis labels
+    >>> plot_model.set_axis_label(0, "X Values")
+    >>> print(plot_model.get_axis_label(0))   # "X Values"
+    >>> plot_model.clear_axis_label(0)
+    >>> print(plot_model.get_axis_label(0))   # None
+    >>>
+    >>> # Manage custom limits
+    >>> plot_model.set_custom_limit(0, min_val=0.0, max_val=10.0)
+    >>> min_val, max_val = plot_model.get_custom_limit(0)
+    >>> print(f"Limits: {min_val} to {max_val}")  # Limits: 0.0 to 10.0
+    >>> plot_model.clear_custom_limit(0)
+    >>> min_val, max_val = plot_model.get_custom_limit(0)
+    >>> print(f"Limits: {min_val} to {max_val}")  # Limits: None to None
     """
 
     def __init__(
@@ -88,53 +84,58 @@ class PlotModel:
         # Initialize other structures based on the matrix
         self._initialize_structures()
 
-    @property
-    def matrix(self) -> Matrix:
+    def get_axis_label(self, index: int) -> Optional[str]:
         """
-        Get the underlying data matrix.
+        Get the axis label for a specific column.
+
+        Parameters
+        ----------
+        index : int
+            The index of the column to get the label for.
 
         Returns
         -------
-        Matrix
-            The matrix containing all data columns.
-        """
-        return self._matrix
+        Optional[str]
+            The axis label text, or None if no label is set.
 
-    @property
-    def tick_manager(self) -> TickManager:
+        Raises
+        ------
+        IndexError
+            If the index is out of bounds.
         """
-        Get the tick manager for all columns.
+        if index < 0 or index >= len(self._axis_labels):
+            raise IndexError(
+                f"Index {index} out of bounds for model with {len(self._axis_labels)} columns"
+            )
+        
+        return self._axis_labels[index].label
 
-        Returns
-        -------
-        TickManager
-            The tick manager containing tick collections for each column.
+    def get_custom_limit(self, index: int) -> tuple[Optional[float], Optional[float]]:
         """
-        return self._tick_manager
+        Get the custom axis limits for a specific column.
 
-    @property
-    def axis_labels(self) -> List[AxisLabel]:
-        """
-        Get the list of axis labels.
-
-        Returns
-        -------
-        List[AxisLabel]
-            List of axis labels, one for each column. Initially all labels have default values.
-        """
-        return self._axis_labels.copy()
-
-    @property
-    def custom_limits(self) -> List[CustomAxisLimit]:
-        """
-        Get the list of custom axis limits.
+        Parameters
+        ----------
+        index : int
+            The index of the column to get limits for.
 
         Returns
         -------
-        List[CustomAxisLimit]
-            List of custom axis limits, one for each column. Initially all limits have default values.
+        tuple[Optional[float], Optional[float]]
+            A tuple of (min_value, max_value), where either can be None if not set.
+
+        Raises
+        ------
+        IndexError
+            If the index is out of bounds.
         """
-        return self._custom_limits.copy()
+        if index < 0 or index >= len(self._custom_limits):
+            raise IndexError(
+                f"Index {index} out of bounds for model with {len(self._custom_limits)} columns"
+            )
+        
+        limit = self._custom_limits[index]
+        return limit.min_val, limit.max_val
 
     def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
         """
