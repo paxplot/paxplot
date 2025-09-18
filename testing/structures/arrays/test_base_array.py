@@ -23,9 +23,11 @@ class TestBaseArray:
         assert hasattr(array, "nan_indices")
         assert hasattr(array, "non_nan_values")
         assert hasattr(array, "length")
-        assert hasattr(array, "append")
-        assert hasattr(array, "remove")
+        assert hasattr(array, "append_values")
+        assert hasattr(array, "remove_values")
         assert hasattr(array, "set_values")
+        assert hasattr(array, "get_values")
+        assert hasattr(array, "clear_values")
         assert hasattr(array, "reset_nan_state")
 
     def test_categorical_array_inherits_base_functionality(self):
@@ -36,9 +38,11 @@ class TestBaseArray:
         assert hasattr(array, "nan_indices")
         assert hasattr(array, "non_nan_values")
         assert hasattr(array, "length")
-        assert hasattr(array, "append")
-        assert hasattr(array, "remove")
+        assert hasattr(array, "append_values")
+        assert hasattr(array, "remove_values")
         assert hasattr(array, "set_values")
+        assert hasattr(array, "get_values")
+        assert hasattr(array, "clear_values")
         assert hasattr(array, "reset_nan_state")
 
     def test_shared_nan_handling_works_consistently(self):
@@ -64,16 +68,16 @@ class TestBaseArray:
         categorical_array = CategoricalArray(["A", "B"])
 
         # Append values
-        numeric_array.append([3, 4])
-        categorical_array.append(["C", "D"])
+        numeric_array.append_values([3, 4])
+        categorical_array.append_values(["C", "D"])
 
         # Check lengths
         assert numeric_array.length == 4
         assert categorical_array.length == 4
 
         # Check values
-        assert numeric_array.values == [1.0, 2.0, 3.0, 4.0]
-        assert categorical_array.values == ["A", "B", "C", "D"]
+        assert numeric_array.get_values() == [1.0, 2.0, 3.0, 4.0]
+        assert categorical_array.get_values() == ["A", "B", "C", "D"]
 
     def test_shared_remove_functionality(self):
         """Test that remove functionality works consistently across array types."""
@@ -81,16 +85,16 @@ class TestBaseArray:
         categorical_array = CategoricalArray(["A", "B", "C", "D"])
 
         # Remove values
-        numeric_array.remove([1, 3])
-        categorical_array.remove([1, 3])
+        numeric_array.remove_values([1, 3])
+        categorical_array.remove_values([1, 3])
 
         # Check lengths
         assert numeric_array.length == 2
         assert categorical_array.length == 2
 
         # Check values (removed in reverse order)
-        assert numeric_array.values == [1.0, 3.0]
-        assert categorical_array.values == ["A", "C"]
+        assert numeric_array.get_values() == [1.0, 3.0]
+        assert categorical_array.get_values() == ["A", "C"]
 
     def test_shared_length_property(self):
         """Test that length property works consistently across array types."""
@@ -118,15 +122,15 @@ class TestBaseArray:
         categorical_array = CategoricalArray(["A", "B", "C"])
 
         # Get values and modify them
-        numeric_values = numeric_array.values
-        categorical_values = categorical_array.values
+        numeric_values = numeric_array.get_values()
+        categorical_values = categorical_array.get_values()
 
         numeric_values.append(4)
         categorical_values.append("D")
 
         # Original arrays should be unchanged
-        assert numeric_array.values == [1.0, 2.0, 3.0]
-        assert categorical_array.values == ["A", "B", "C"]
+        assert numeric_array.get_values() == [1.0, 2.0, 3.0]
+        assert categorical_array.get_values() == ["A", "B", "C"]
 
     def test_shared_nan_handling_with_different_nan_types(self):
         """Test that different NaN representations are handled consistently."""
@@ -169,17 +173,17 @@ class TestBaseArray:
     def test_set_values_numerical_array(self):
         """Test set_values method for NumericalArray."""
         array = NumericalArray([1, 2, 3])
-        assert array.values == [1.0, 2.0, 3.0]
+        assert array.get_values() == [1.0, 2.0, 3.0]
         assert array.length == 3
 
         # Set new values
         array.set_values([10, 20, 30, 40])
-        assert array.values == [10.0, 20.0, 30.0, 40.0]
+        assert array.get_values() == [10.0, 20.0, 30.0, 40.0]
         assert array.length == 4
 
         # Set values with NaN
         array.set_values([1, None, 3])
-        values = array.values
+        values = array.get_values()
         assert values[0] == 1.0
         assert math.isnan(values[1])
         assert values[2] == 3.0
@@ -189,25 +193,25 @@ class TestBaseArray:
     def test_set_values_categorical_array(self):
         """Test set_values method for CategoricalArray."""
         array = CategoricalArray(["A", "B", "C"])
-        assert array.values == ["A", "B", "C"]
+        assert array.get_values() == ["A", "B", "C"]
         assert array.unique_values == ["A", "B", "C"]
         assert array.length == 3
 
         # Set new values
         array.set_values(["X", "Y", "Z", "W"])
-        assert array.values == ["X", "Y", "Z", "W"]
+        assert array.get_values() == ["X", "Y", "Z", "W"]
         assert array.unique_values == ["X", "Y", "Z", "W"]
         assert array.length == 4
 
         # Set values with duplicates
         array.set_values(["A", "B", "A", "C", "B"])
-        assert array.values == ["A", "B", "A", "C", "B"]
+        assert array.get_values() == ["A", "B", "A", "C", "B"]
         assert array.unique_values == ["A", "B", "C"]
         assert array.length == 5
 
         # Set values with NaN
         array.set_values(["A", None, "B"])
-        assert array.values == ["A", "<NaN>", "B"]
+        assert array.get_values() == ["A", "<NaN>", "B"]
         assert array.unique_values == ["A", "<NaN>", "B"]
         assert array.has_nan is True
         assert array.nan_count == 1
@@ -239,11 +243,11 @@ class TestBaseArray:
         numeric_array.set_values([])
         categorical_array.set_values([])
 
-        assert not numeric_array.values
+        assert not numeric_array.get_values()
         assert numeric_array.length == 0
         assert numeric_array.has_nan is False
 
-        assert not categorical_array.values
+        assert not categorical_array.get_values()
         assert not categorical_array.unique_values
         assert categorical_array.length == 0
         assert categorical_array.has_nan is False
@@ -257,10 +261,10 @@ class TestBaseArray:
         numeric_array.set_values([10, 20])
         categorical_array.set_values(["X", "Y"])
 
-        assert numeric_array.values == [10.0, 20.0]
+        assert numeric_array.get_values() == [10.0, 20.0]
         assert numeric_array.length == 2
 
-        assert categorical_array.values == ["X", "Y"]
+        assert categorical_array.get_values() == ["X", "Y"]
         assert categorical_array.unique_values == ["X", "Y"]
         assert categorical_array.length == 2
 
@@ -268,7 +272,7 @@ class TestBaseArray:
         numeric_array.set_values([100, 200, 300, 400, 500, 600])
         categorical_array.set_values(["P", "Q", "R", "S", "T", "U", "V"])
 
-        assert numeric_array.values == [
+        assert numeric_array.get_values() == [
             100.0,
             200.0,
             300.0,
@@ -278,7 +282,7 @@ class TestBaseArray:
         ]
         assert numeric_array.length == 6
 
-        assert categorical_array.values == ["P", "Q", "R", "S", "T", "U", "V"]
+        assert categorical_array.get_values() == ["P", "Q", "R", "S", "T", "U", "V"]
         assert categorical_array.unique_values == [
             "P",
             "Q",

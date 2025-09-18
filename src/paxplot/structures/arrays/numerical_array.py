@@ -35,7 +35,7 @@ class NumericalArray(BaseArray[float]):
     Examples
     --------
     >>> array = NumericalArray([1, 2, 3, 4, 5])
-    >>> array.values
+    >>> array.get_values()
     [1.0, 2.0, 3.0, 4.0, 5.0]
     >>> array.min
     1.0
@@ -44,15 +44,15 @@ class NumericalArray(BaseArray[float]):
     """
 
     def _validate_and_convert(
-        self, values: Sequence[Union[float, int]]
+        self, values: Union[Sequence[Union[float, int]], None] = None
     ) -> tuple[List[float], bool]:
         """Validate and convert values to a list of floats, also computing NaN state.
 
         Parameters
         ----------
-        values : Sequence[Union[float, int]]
+        values : Sequence[Union[float, int]], optional
             The values to validate and convert. Can include None, float('nan'),
-            or numpy.nan which will be converted to float('nan').
+            or numpy.nan which will be converted to float('nan'). If None, returns empty list.
 
         Returns
         -------
@@ -65,7 +65,7 @@ class NumericalArray(BaseArray[float]):
             If any value cannot be converted to float.
         """
         if values is None:
-            raise ValueError("Values cannot be None")
+            return [], False
 
         converted_values = []
         has_nan = False

@@ -7,7 +7,7 @@ and core operations.
 
 import math
 from abc import ABC, abstractmethod
-from typing import List, Sequence, TypeVar, Generic, Any
+from typing import List, Sequence, TypeVar, Generic, Any, Union
 
 T = TypeVar("T")  # Type variable for the stored values
 
@@ -27,8 +27,6 @@ class BaseArray(ABC, Generic[T]):
 
     Attributes
     ----------
-    values : List[T]
-        The stored values as a list of type T.
     has_nan : bool
         Whether the array contains any NaN values.
     nan_count : int
@@ -41,23 +39,14 @@ class BaseArray(ABC, Generic[T]):
         The number of values in the array.
     """
 
-    def __init__(self, values: Sequence):
+    def __init__(self, values: Union[Sequence, None] = None):
         """Initialize the array with validated and converted values."""
-        # Initialize with empty values first, then use set_values method
+        # Initialize with empty values first, then use set method
         self._values = []
         self._has_nan = False
+        if values is None:
+            values = []
         self.set_values(values)
-
-    @property
-    def values(self) -> List[T]:
-        """Get the stored values.
-
-        Returns
-        -------
-        List[T]
-            The values as a list of type T.
-        """
-        return self._values.copy()
 
     @property
     def has_nan(self) -> bool:
@@ -126,7 +115,7 @@ class BaseArray(ABC, Generic[T]):
         """
         return len(self._values)
 
-    def append(self, values: Sequence) -> None:
+    def append_values(self, values: Sequence) -> None:
         """Append new values to the array.
 
         Parameters
@@ -145,7 +134,7 @@ class BaseArray(ABC, Generic[T]):
         if not self._has_nan:
             self._has_nan = has_new_nans
 
-    def remove(self, indices: Sequence[int]) -> None:
+    def remove_values(self, indices: Sequence[int]) -> None:
         """Remove values at the specified indices.
 
         Parameters
@@ -177,22 +166,39 @@ class BaseArray(ABC, Generic[T]):
         # After removal, we need to recompute NaN state since indices shifted
         self._has_nan = self._compute_has_nan()
 
-    def set_values(self, values: Sequence) -> None:
+    def set_values(self, values: Union[Sequence, None] = None) -> None:
         """Set new values for the array, replacing all existing values.
 
         Parameters
         ----------
-        values : Sequence
+        values : Sequence, optional
             The new values to set. Type depends on the concrete implementation.
+            If None, creates an empty array.
 
         Raises
         ------
         ValueError
             If any value is invalid for this array type.
         """
+        if values is None:
+            values = []
         new_values, has_new_nans = self._validate_and_convert(values)
         self._values = new_values
         self._has_nan = has_new_nans
+
+    def get_values(self) -> List[T]:
+        """Get all values in the array.
+
+        Returns
+        -------
+        List[T]
+            A copy of all values in the array.
+        """
+        return self._values.copy()
+
+    def clear_values(self) -> None:
+        """Clear all values from the array."""
+        self.set_values([])
 
     def reset_nan_state(self) -> None:
         """Reset the cached NaN state.
@@ -256,13 +262,13 @@ class BaseArray(ABC, Generic[T]):
         return any(self._is_nan_value(value) for value in self._values)
 
     @abstractmethod
-    def _validate_and_convert(self, values: Sequence) -> tuple[List[T], bool]:
+    def _validate_and_convert(self, values: Union[Sequence, None] = None) -> tuple[List[T], bool]:
         """Validate and convert values to the appropriate type, also computing NaN state.
 
         Parameters
         ----------
-        values : Sequence
-            The values to validate and convert.
+        values : Sequence, optional
+            The values to validate and convert. If None, returns empty list.
 
         Returns
         -------

@@ -4,7 +4,7 @@ This module defines the CategoricalArray class for storing and managing
 sequences of categorical (string) values.
 """
 
-from typing import List, Sequence
+from typing import List, Sequence, Union
 from .base_array import BaseArray
 
 
@@ -24,21 +24,19 @@ class CategoricalArray(BaseArray[str]):
 
     Attributes
     ----------
-    values : List[str]
-        The stored categorical values as a list of strings.
     unique_values : List[str]
         The unique categorical values in order of appearance.
 
     Examples
     --------
     >>> array = CategoricalArray(['A', 'B', 'A', 'C'])
-    >>> array.values
+    >>> array.get_values()
     ['A', 'B', 'A', 'C']
     >>> array.unique_values
     ['A', 'B', 'C']
     """
 
-    def __init__(self, values: Sequence[str]):
+    def __init__(self, values: Union[Sequence[str], None] = None):
         """Initialize the categorical array."""
         super().__init__(values)
         self._update_unique_values()
@@ -54,7 +52,7 @@ class CategoricalArray(BaseArray[str]):
         """
         return self._unique_values.copy()
 
-    def append(self, values: Sequence[str]) -> None:
+    def append_values(self, values: Sequence[str]) -> None:
         """Append new categorical values to the array.
 
         Parameters
@@ -68,10 +66,10 @@ class CategoricalArray(BaseArray[str]):
         ValueError
             If any value is not a string or cannot be converted to string.
         """
-        super().append(values)
+        super().append_values(values)
         self._update_unique_values()
 
-    def remove(self, indices: Sequence[int]) -> None:
+    def remove_values(self, indices: Sequence[int]) -> None:
         """Remove values at the specified indices.
 
         Parameters
@@ -86,17 +84,17 @@ class CategoricalArray(BaseArray[str]):
         ValueError
             If indices are not valid integers.
         """
-        super().remove(indices)
+        super().remove_values(indices)
         self._update_unique_values()
 
-    def set_values(self, values: Sequence[str]) -> None:
+    def set_values(self, values: Union[Sequence[str], None] = None) -> None:
         """Set new categorical values, replacing all existing values.
 
         Parameters
         ----------
-        values : Sequence[str]
+        values : Sequence[str], optional
             The new categorical values to set. Can include None, float('nan'),
-            or numpy.nan which will be converted to "<NaN>" string.
+            or numpy.nan which will be converted to "<NaN>" string. If None, creates empty array.
 
         Raises
         ------
@@ -120,15 +118,15 @@ class CategoricalArray(BaseArray[str]):
         return [self._unique_values.index(value) for value in self._values]
 
     def _validate_and_convert(
-        self, values: Sequence[str]
+        self, values: Union[Sequence[str], None] = None
     ) -> tuple[List[str], bool]:
         """Validate and convert values to a list of strings, also computing NaN state.
 
         Parameters
         ----------
-        values : Sequence[str]
+        values : Sequence[str], optional
             The values to validate and convert. Can include None, float('nan'),
-            or numpy.nan which will be converted to "<NaN>" string.
+            or numpy.nan which will be converted to "<NaN>" string. If None, returns empty list.
 
         Returns
         -------
@@ -141,7 +139,7 @@ class CategoricalArray(BaseArray[str]):
             If any value cannot be converted to string.
         """
         if values is None:
-            raise ValueError("Values cannot be None")
+            return [], False
 
         converted_values = []
         has_nan = False

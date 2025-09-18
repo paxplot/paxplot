@@ -12,20 +12,21 @@ class TestNumericalArray:
         values = [1, 2.5, 3, 4.0, 5]
         array = NumericalArray(values)
 
-        assert array.values == [1.0, 2.5, 3.0, 4.0, 5.0]
+        assert array.get_values() == [1.0, 2.5, 3.0, 4.0, 5.0]
         assert array.length == 5
 
     def test_init_with_empty_list(self):
         """Test initialization with empty list."""
         array = NumericalArray([])
 
-        assert not array.values
+        assert not array.get_values()
         assert array.length == 0
 
-    def test_init_with_none_raises_error(self):
-        """Test that initialization with None raises ValueError."""
-        with pytest.raises(ValueError, match="Values cannot be None"):
-            NumericalArray(None)  # type: ignore
+    def test_init_with_none_creates_empty_array(self):
+        """Test that initialization with None creates an empty array."""
+        array = NumericalArray(None)  # type: ignore
+        assert not array.get_values()
+        assert array.length == 0
 
     def test_init_with_mixed_types_raises_error(self):
         """Test that initialization with mixed types raises ValueError."""
@@ -35,9 +36,9 @@ class TestNumericalArray:
     def test_init_with_none_values_converts_to_nan(self):
         """Test that initialization with None values converts them to NaN."""
         array = NumericalArray([1, None, 3])  # type: ignore
-        assert array.values[0] == 1.0
-        assert array.values[2] == 3.0
-        assert str(array.values[1]) == "nan"  # NaN doesn't equal itself
+        assert array.get_values()[0] == 1.0
+        assert array.get_values()[2] == 3.0
+        assert str(array.get_values()[1]) == "nan"  # NaN doesn't equal itself
         assert array.has_nan is True
         assert array.nan_count == 1
         assert array.nan_indices == [1]
@@ -71,58 +72,58 @@ class TestNumericalArray:
     def test_append_valid_values(self):
         """Test appending valid numerical values."""
         array = NumericalArray([1, 2, 3])
-        array.append([4, 5])
+        array.append_values([4, 5])
 
-        assert array.values == [1.0, 2.0, 3.0, 4.0, 5.0]
+        assert array.get_values() == [1.0, 2.0, 3.0, 4.0, 5.0]
         assert array.length == 5
 
     def test_append_empty_list(self):
         """Test appending empty list."""
         array = NumericalArray([1, 2, 3])
-        array.append([])
+        array.append_values([])
 
-        assert array.values == [1.0, 2.0, 3.0]
+        assert array.get_values() == [1.0, 2.0, 3.0]
         assert array.length == 3
 
     def test_append_invalid_values_raises_error(self):
         """Test that appending invalid values raises ValueError."""
         array = NumericalArray([1, 2, 3])
         with pytest.raises(ValueError, match="must be numerical"):
-            array.append([4, "string", 6])
+            array.append_values([4, "string", 6])
 
     def test_remove_valid_indices(self):
         """Test removing values at valid indices."""
         array = NumericalArray([1, 2, 3, 4, 5])
-        array.remove([1, 3])
+        array.remove_values([1, 3])
 
-        assert array.values == [1.0, 3.0, 5.0]
+        assert array.get_values() == [1.0, 3.0, 5.0]
         assert array.length == 3
 
     def test_remove_empty_indices(self):
         """Test removing with empty indices list."""
         array = NumericalArray([1, 2, 3])
-        array.remove([])
+        array.remove_values([])
 
-        assert array.values == [1.0, 2.0, 3.0]
+        assert array.get_values() == [1.0, 2.0, 3.0]
         assert array.length == 3
 
     def test_remove_out_of_bounds_index_raises_error(self):
         """Test that removing out of bounds index raises IndexError."""
         array = NumericalArray([1, 2, 3])
         with pytest.raises(IndexError, match="out of bounds"):
-            array.remove([5])
+            array.remove_values([5])
 
     def test_remove_negative_index_raises_error(self):
         """Test that removing negative index raises IndexError."""
         array = NumericalArray([1, 2, 3])
         with pytest.raises(IndexError, match="out of bounds"):
-            array.remove([-1])
+            array.remove_values([-1])
 
     def test_remove_invalid_index_type_raises_error(self):
         """Test that removing with invalid index type raises ValueError."""
         array = NumericalArray([1, 2, 3])
         with pytest.raises(ValueError, match="must be an integer"):
-            array.remove(["invalid"])  # type: ignore
+            array.remove_values(["invalid"])  # type: ignore
 
     def test_len_operator(self):
         """Test len() operator."""
@@ -159,28 +160,28 @@ class TestNumericalArray:
         """Test that values property returns a copy, not the original list."""
         original_values = [1, 2, 3]
         array = NumericalArray(original_values)
-        returned_values = array.values
+        returned_values = array.get_values()
 
         # Modify the returned list
         returned_values.append(4)
 
         # Original array should be unchanged
-        assert array.values == [1.0, 2.0, 3.0]
+        assert array.get_values() == [1.0, 2.0, 3.0]
         assert array.length == 3
 
     def test_float_conversion(self):
         """Test that integers are properly converted to floats."""
         array = NumericalArray([1, 2, 3])
-        assert all(isinstance(x, float) for x in array.values)
-        assert array.values == [1.0, 2.0, 3.0]
+        assert all(isinstance(x, float) for x in array.get_values())
+        assert array.get_values() == [1.0, 2.0, 3.0]
 
     def test_remove_multiple_indices_in_reverse_order(self):
         """Test that removing multiple indices works correctly in reverse order."""
         array = NumericalArray([0, 1, 2, 3, 4, 5])
-        array.remove([1, 3, 5])  # Remove indices 1, 3, 5
+        array.remove_values([1, 3, 5])  # Remove indices 1, 3, 5
 
         # Should remove in reverse order to avoid index shifting
-        assert array.values == [0.0, 2.0, 4.0]
+        assert array.get_values() == [0.0, 2.0, 4.0]
         assert array.length == 3
 
     def test_nan_indices_property(self):

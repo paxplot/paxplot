@@ -12,7 +12,7 @@ class TestCategoricalArray:
         values = ["A", "B", "A", "C"]
         array = CategoricalArray(values)
 
-        assert array.values == ["A", "B", "A", "C"]
+        assert array.get_values() == ["A", "B", "A", "C"]
         assert array.unique_values == ["A", "B", "C"]
         assert array.length == 4
 
@@ -20,14 +20,15 @@ class TestCategoricalArray:
         """Test initialization with empty list."""
         array = CategoricalArray([])
 
-        assert not array.values
+        assert not array.get_values()
         assert not array.unique_values
         assert array.length == 0
 
-    def test_init_with_none_raises_error(self):
-        """Test that initialization with None raises ValueError."""
-        with pytest.raises(ValueError, match="Values cannot be None"):
-            CategoricalArray(None)  # type: ignore
+    def test_init_with_none_creates_empty_array(self):
+        """Test that initialization with None creates an empty array."""
+        array = CategoricalArray(None)  # type: ignore
+        assert not array.get_values()
+        assert array.length == 0
 
     def test_init_with_non_string_values_raises_error(self):
         """Test that initialization with non-string values raises ValueError."""
@@ -37,7 +38,7 @@ class TestCategoricalArray:
     def test_init_with_none_values_converts_to_nan(self):
         """Test that initialization with None values converts them to NaN."""
         array = CategoricalArray(["A", None, "C"])  # type: ignore
-        assert array.values == ["A", "<NaN>", "C"]
+        assert array.get_values() == ["A", "<NaN>", "C"]
         assert array.has_nan is True
         assert array.nan_count == 1
         assert array.nan_indices == [1]
@@ -55,18 +56,18 @@ class TestCategoricalArray:
     def test_append_valid_values(self):
         """Test appending valid string values."""
         array = CategoricalArray(["A", "B"])
-        array.append(["C", "A"])
+        array.append_values(["C", "A"])
 
-        assert array.values == ["A", "B", "C", "A"]
+        assert array.get_values() == ["A", "B", "C", "A"]
         assert array.unique_values == ["A", "B", "C"]
         assert array.length == 4
 
     def test_append_empty_list(self):
         """Test appending empty list."""
         array = CategoricalArray(["A", "B"])
-        array.append([])
+        array.append_values([])
 
-        assert array.values == ["A", "B"]
+        assert array.get_values() == ["A", "B"]
         assert array.unique_values == ["A", "B"]
         assert array.length == 2
 
@@ -74,30 +75,30 @@ class TestCategoricalArray:
         """Test that appending invalid values raises ValueError."""
         array = CategoricalArray(["A", "B"])
         with pytest.raises(ValueError, match="must be a string"):
-            array.append(["C", 123])  # type: ignore
+            array.append_values(["C", 123])  # type: ignore
 
     def test_append_new_unique_values(self):
         """Test that appending new unique values updates unique_values."""
         array = CategoricalArray(["A", "B"])
-        array.append(["C", "D"])
+        array.append_values(["C", "D"])
 
         assert array.unique_values == ["A", "B", "C", "D"]
 
     def test_remove_valid_indices(self):
         """Test removing values at valid indices."""
         array = CategoricalArray(["A", "B", "C", "D"])
-        array.remove([1, 3])
+        array.remove_values([1, 3])
 
-        assert array.values == ["A", "C"]
+        assert array.get_values() == ["A", "C"]
         assert array.unique_values == ["A", "C"]
         assert array.length == 2
 
     def test_remove_empty_indices(self):
         """Test removing with empty indices list."""
         array = CategoricalArray(["A", "B", "C"])
-        array.remove([])
+        array.remove_values([])
 
-        assert array.values == ["A", "B", "C"]
+        assert array.get_values() == ["A", "B", "C"]
         assert array.unique_values == ["A", "B", "C"]
         assert array.length == 3
 
@@ -105,19 +106,19 @@ class TestCategoricalArray:
         """Test that removing out of bounds index raises IndexError."""
         array = CategoricalArray(["A", "B", "C"])
         with pytest.raises(IndexError, match="out of bounds"):
-            array.remove([5])
+            array.remove_values([5])
 
     def test_remove_negative_index_raises_error(self):
         """Test that removing negative index raises IndexError."""
         array = CategoricalArray(["A", "B", "C"])
         with pytest.raises(IndexError, match="out of bounds"):
-            array.remove([-1])
+            array.remove_values([-1])
 
     def test_remove_invalid_index_type_raises_error(self):
         """Test that removing with invalid index type raises ValueError."""
         array = CategoricalArray(["A", "B", "C"])
         with pytest.raises(ValueError, match="must be an integer"):
-            array.remove(["invalid"])  # type: ignore
+            array.remove_values(["invalid"])  # type: ignore
 
     def test_get_category_indices(self):
         """Test get_category_indices method."""
@@ -178,13 +179,13 @@ class TestCategoricalArray:
         """Test that values property returns a copy, not the original list."""
         original_values = ["A", "B", "C"]
         array = CategoricalArray(original_values)
-        returned_values = array.values
+        returned_values = array.get_values()
 
         # Modify the returned list
         returned_values.append("D")
 
         # Original array should be unchanged
-        assert array.values == ["A", "B", "C"]
+        assert array.get_values() == ["A", "B", "C"]
         assert array.length == 3
 
     def test_unique_values_property_returns_copy(self):
@@ -201,26 +202,26 @@ class TestCategoricalArray:
     def test_remove_updates_unique_values(self):
         """Test that removing values updates unique_values correctly."""
         array = CategoricalArray(["A", "B", "A", "C", "B"])
-        array.remove([1, 3])  # Remove 'B' at index 1 and 'C' at index 3
+        array.remove_values([1, 3])  # Remove 'B' at index 1 and 'C' at index 3
 
-        assert array.values == ["A", "A", "B"]
+        assert array.get_values() == ["A", "A", "B"]
         assert array.unique_values == ["A", "B"]
 
     def test_remove_all_instances_of_category(self):
         """Test removing all instances of a category."""
         array = CategoricalArray(["A", "B", "A", "C", "A"])
-        array.remove([0, 2, 4])  # Remove all 'A's
+        array.remove_values([0, 2, 4])  # Remove all 'A's
 
-        assert array.values == ["B", "C"]
+        assert array.get_values() == ["B", "C"]
         assert array.unique_values == ["B", "C"]
 
     def test_remove_multiple_indices_in_reverse_order(self):
         """Test that removing multiple indices works correctly in reverse order."""
         array = CategoricalArray(["A", "B", "C", "D", "E", "F"])
-        array.remove([1, 3, 5])  # Remove indices 1, 3, 5
+        array.remove_values([1, 3, 5])  # Remove indices 1, 3, 5
 
         # Should remove in reverse order to avoid index shifting
-        assert array.values == ["A", "C", "E"]
+        assert array.get_values() == ["A", "C", "E"]
         assert array.length == 3
 
     def test_case_sensitive_categories(self):
