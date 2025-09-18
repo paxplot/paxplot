@@ -559,8 +559,8 @@ class TestPlotModel:
         plot_model = PlotModel(data)
 
         column = plot_model[0]
-        assert hasattr(column, "values")
-        assert column.values == [1.0, 2.0]
+        assert hasattr(column, "get_values")
+        assert column.get_values() == [1.0, 2.0]
 
     def test_repr_dunder(self):
         """Test __repr__ method."""

@@ -206,7 +206,7 @@ class PlotModel:
                 f"Column {index} is not numeric, it is {self._matrix.get_column_type(index).value}"
             )
 
-        return self._matrix.get_numeric_array(index).values
+        return self._matrix.get_numeric_array(index).get_values()
 
     def get_categorical_values(self, index: int) -> List[str]:
         """
@@ -240,7 +240,7 @@ class PlotModel:
                 f"Column {index} is not categorical, it is {column_type}"
             )
 
-        return self._matrix.get_categorical_array(index).values
+        return self._matrix.get_categorical_array(index).get_values()
 
     def get_unique_values(self, index: int) -> Optional[List[str]]:
         """
@@ -302,7 +302,7 @@ class PlotModel:
             )
 
         tick_collection = self._tick_manager.get_tick_collection(index)
-        return tick_collection.labels.values
+        return tick_collection.labels.get_values()
 
     def get_tick_locations(self, index: int) -> List[float]:
         """
@@ -329,7 +329,7 @@ class PlotModel:
             )
 
         tick_collection = self._tick_manager.get_tick_collection(index)
-        return tick_collection.locations.values
+        return tick_collection.locations.get_values()
 
     def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
         """
