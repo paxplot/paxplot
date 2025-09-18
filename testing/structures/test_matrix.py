@@ -68,7 +68,7 @@ class TestMatrix:
         matrix = Matrix(data)
         column = matrix.get_column(0)
         assert isinstance(column, NumericalArray)
-        assert column.values == [1.0, 2.0]
+        assert column.get_values() == [1.0, 2.0]
 
     def test_get_column_out_of_bounds_raises_error(self):
         """Test get_column with out of bounds index raises error."""
@@ -83,7 +83,7 @@ class TestMatrix:
         matrix = Matrix(data)
         numeric_array = matrix.get_numeric_array(0)
         assert isinstance(numeric_array, NumericalArray)
-        assert numeric_array.values == [1.0, 2.0]
+        assert numeric_array.get_values() == [1.0, 2.0]
 
     def test_get_numeric_array_wrong_type_raises_error(self):
         """Test get_numeric_array with wrong column type raises error."""
@@ -98,7 +98,7 @@ class TestMatrix:
         matrix = Matrix(data)
         categorical_array = matrix.get_categorical_array(1)
         assert isinstance(categorical_array, CategoricalArray)
-        assert categorical_array.values == ["A", "B"]
+        assert categorical_array.get_values() == ["A", "B"]
 
     def test_get_categorical_array_wrong_type_raises_error(self):
         """Test get_categorical_array with wrong column type raises error."""
@@ -127,8 +127,8 @@ class TestMatrix:
         matrix = Matrix(data)
         matrix.append_data([3, "C"])
         assert matrix.num_rows == 3
-        assert matrix.get_column(0).values == [1.0, 2.0, 3.0]
-        assert matrix.get_column(1).values == ["A", "B", "C"]
+        assert matrix.get_column(0).get_values() == [1.0, 2.0, 3.0]
+        assert matrix.get_column(1).get_values() == ["A", "B", "C"]
 
     def test_append_data_wrong_length_raises_error(self):
         """Test append_data with wrong row length raises error."""
@@ -143,8 +143,8 @@ class TestMatrix:
         matrix = Matrix(data)
         matrix.remove_data([1])  # Remove second row
         assert matrix.num_rows == 2
-        assert matrix.get_column(0).values == [1.0, 3.0]
-        assert matrix.get_column(1).values == ["A", "C"]
+        assert matrix.get_column(0).get_values() == [1.0, 3.0]
+        assert matrix.get_column(1).get_values() == ["A", "C"]
 
     def test_remove_data_multiple_indices(self):
         """Test remove_data with multiple indices."""
@@ -152,8 +152,8 @@ class TestMatrix:
         matrix = Matrix(data)
         matrix.remove_data([1, 3])  # Remove second and fourth rows
         assert matrix.num_rows == 2
-        assert matrix.get_column(0).values == [1.0, 3.0]
-        assert matrix.get_column(1).values == ["A", "C"]
+        assert matrix.get_column(0).get_values() == [1.0, 3.0]
+        assert matrix.get_column(1).get_values() == ["A", "C"]
 
     def test_len_operator(self):
         """Test len() operator."""
@@ -167,7 +167,7 @@ class TestMatrix:
         matrix = Matrix(data)
         column = matrix[0]
         assert isinstance(column, NumericalArray)
-        assert column.values == [1.0, 2.0]
+        assert column.get_values() == [1.0, 2.0]
 
     def test_repr(self):
         """Test string representation."""

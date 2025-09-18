@@ -24,10 +24,10 @@ class TestCategoricalTicks:
         assert len(ticks.locations) == 4
 
         # Check that labels match input categories
-        assert ticks.labels.values == ["Red", "Blue", "Green", "Yellow"]
+        assert ticks.labels.get_values() == ["Red", "Blue", "Green", "Yellow"]
 
         # Check that locations are sequential indices
-        assert ticks.locations.values == [0, 1, 2, 3]
+        assert ticks.locations.get_values() == [0, 1, 2, 3]
 
     def test_generate_ticks_from_categories_with_duplicates(self):
         """Test tick generation with duplicate categories raises error."""
@@ -46,8 +46,8 @@ class TestCategoricalTicks:
         ticks.set_ticks_from_categories(categories)
 
         # Should preserve exact input
-        assert ticks.labels.values == ["First", "Second", "Third"]
-        assert ticks.locations.values == [0, 1, 2]
+        assert ticks.labels.get_values() == ["First", "Second", "Third"]
+        assert ticks.locations.get_values() == [0, 1, 2]
 
     def test_generate_ticks_from_categories_empty_input(self):
         """Test tick generation with empty categories."""
@@ -78,13 +78,13 @@ class TestCategoricalTicks:
 
         # First generation
         ticks.set_ticks_from_categories(["A", "B", "C"])
-        first_labels = ticks.labels.values.copy()
-        first_locations = ticks.locations.values.copy()
+        first_labels = ticks.labels.get_values().copy()
+        first_locations = ticks.locations.get_values().copy()
 
         # Second generation with different categories
         ticks.set_ticks_from_categories(["X", "Y", "Z", "W"])
-        second_labels = ticks.labels.values
-        second_locations = ticks.locations.values
+        second_labels = ticks.labels.get_values()
+        second_locations = ticks.locations.get_values()
 
         # Should be different
         assert first_labels != second_labels
@@ -99,8 +99,8 @@ class TestCategoricalTicks:
         ticks.set_ticks_from_categories(categories)
 
         assert len(ticks.labels) == 1
-        assert ticks.labels.values == ["Single"]
-        assert ticks.locations.values == [0]
+        assert ticks.labels.get_values() == ["Single"]
+        assert ticks.locations.get_values() == [0]
 
     def test_generate_ticks_from_categories_many_categories(self):
         """Test tick generation with many categories."""
@@ -113,7 +113,7 @@ class TestCategoricalTicks:
 
         # Check that locations are sequential
         expected_locations = list(range(20))
-        assert ticks.locations.values == expected_locations
+        assert ticks.locations.get_values() == expected_locations
 
     def test_generate_ticks_from_categories_special_characters(self):
         """Test tick generation with special characters in categories."""
@@ -122,8 +122,8 @@ class TestCategoricalTicks:
         ticks.set_ticks_from_categories(categories)
 
         assert len(ticks.labels) == 4
-        assert ticks.labels.values == categories
-        assert ticks.locations.values == [0, 1, 2, 3]
+        assert ticks.labels.get_values() == categories
+        assert ticks.locations.get_values() == [0, 1, 2, 3]
 
     def test_generate_ticks_from_categories_unicode(self):
         """Test tick generation with unicode characters."""
@@ -132,8 +132,8 @@ class TestCategoricalTicks:
         ticks.set_ticks_from_categories(categories)
 
         assert len(ticks.labels) == 4
-        assert ticks.labels.values == categories
-        assert ticks.locations.values == [0, 1, 2, 3]
+        assert ticks.labels.get_values() == categories
+        assert ticks.locations.get_values() == [0, 1, 2, 3]
 
     def test_repr_empty(self):
         """Test string representation of empty ticks."""
@@ -171,8 +171,8 @@ class TestCategoricalTicks:
         ticks.set_ticks_from_categories(categories)
 
         # Should use categories exactly as supplied
-        assert ticks.labels.values == ["A", "B", "C"]
-        assert ticks.locations.values == [0, 1, 2]
+        assert ticks.labels.get_values() == ["A", "B", "C"]
+        assert ticks.locations.get_values() == [0, 1, 2]
 
         # Test that we can access the underlying CategoricalArray methods
         assert hasattr(ticks.labels, "unique_values")
@@ -209,16 +209,16 @@ class TestCategoricalTicks:
         ticks.set_ticks_from_categories(categories)
 
         # Test direct access for lookups
-        blue_index = ticks.locations.values[ticks.labels.values.index("Blue")]
+        blue_index = ticks.locations.get_values()[ticks.labels.get_values().index("Blue")]
         assert blue_index == 1
 
-        green_category = ticks.labels.values[2]
+        green_category = ticks.labels.get_values()[2]
         assert green_category == "Green"
 
         # Test that arrays are properly synchronized
-        assert len(ticks.labels.values) == len(ticks.locations.values)
+        assert len(ticks.labels.get_values()) == len(ticks.locations.get_values())
         for i, (_, location) in enumerate(
-            zip(ticks.labels.values, ticks.locations.values)
+            zip(ticks.labels.get_values(), ticks.locations.get_values())
         ):
             assert location == i
 
@@ -233,5 +233,5 @@ class TestCategoricalTicks:
 
         # Check that arrays are properly synchronized
         assert len(ticks.labels) == len(ticks.locations)
-        assert ticks.labels.values == ["Red", "Blue", "Green"]
-        assert ticks.locations.values == [0, 1, 2]
+        assert ticks.labels.get_values() == ["Red", "Blue", "Green"]
+        assert ticks.locations.get_values() == [0, 1, 2]

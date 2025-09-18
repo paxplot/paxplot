@@ -24,8 +24,8 @@ class TestBaseTicks:
 
         assert len(ticks.labels) == 3
         assert len(ticks.locations) == 3
-        assert ticks.labels.values == ["A", "B", "C"]
-        assert ticks.locations.values == [0.0, 1.0, 2.0]
+        assert ticks.labels.get_values() == ["A", "B", "C"]
+        assert ticks.locations.get_values() == [0.0, 1.0, 2.0]
 
     def test_init_with_mismatched_lengths(self):
         """Test initialization with mismatched label and location lengths."""
@@ -88,8 +88,8 @@ class TestBaseTicks:
         result = ticks.append(new_labels, new_locations)
         assert result is True
         assert len(ticks.labels) == 4
-        assert ticks.labels.values == ["A", "B", "C", "D"]
-        assert ticks.locations.values == [0.0, 1.0, 2.0, 3.0]
+        assert ticks.labels.get_values() == ["A", "B", "C", "D"]
+        assert ticks.locations.get_values() == [0.0, 1.0, 2.0, 3.0]
 
     def test_append_with_invalid_data(self):
         """Test appending ticks with invalid data."""
@@ -104,7 +104,7 @@ class TestBaseTicks:
         assert result is False
         # Original data should be unchanged
         assert len(ticks.labels) == 2
-        assert ticks.labels.values == ["A", "B"]
+        assert ticks.labels.get_values() == ["A", "B"]
 
     def test_append_with_mismatched_lengths(self):
         """Test appending ticks with mismatched lengths."""
@@ -129,8 +129,8 @@ class TestBaseTicks:
         result = ticks.remove([1, 3])  # Remove B and D
         assert result is True
         assert len(ticks.labels) == 2
-        assert ticks.labels.values == ["A", "C"]
-        assert ticks.locations.values == [0.0, 2.0]
+        assert ticks.labels.get_values() == ["A", "C"]
+        assert ticks.locations.get_values() == [0.0, 2.0]
 
     def test_remove_with_invalid_indices(self):
         """Test removing ticks with invalid indices."""

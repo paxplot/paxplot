@@ -98,7 +98,7 @@ class BaseTicks(ABC):
             )
 
         # Validate labels
-        for i, label in enumerate(self._labels.values):
+        for i, label in enumerate(self._labels.get_values()):
             if not isinstance(label, str):
                 raise ValueError(
                     f"Label at index {i} must be a string, got {type(label)}"
@@ -107,7 +107,7 @@ class BaseTicks(ABC):
                 raise ValueError(f"Label at index {i} cannot be empty")
 
         # Validate locations
-        for i, location in enumerate(self._locations.values):
+        for i, location in enumerate(self._locations.get_values()):
             if not isinstance(location, (int, float)):
                 raise ValueError(
                     f"Location at index {i} must be numerical, got {type(location)}"
@@ -192,8 +192,8 @@ class BaseTicks(ABC):
                 )
 
             # Add the new ticks
-            self._labels.append(labels)
-            self._locations.append(locations)
+            self._labels.append_values(labels)
+            self._locations.append_values(locations)
 
             return True
 
@@ -236,8 +236,8 @@ class BaseTicks(ABC):
                     )
 
             # Remove ticks from both arrays
-            self._labels.remove(indices)
-            self._locations.remove(indices)
+            self._labels.remove_values(indices)
+            self._locations.remove_values(indices)
 
             return True
 
@@ -269,8 +269,8 @@ class BaseTicks(ABC):
         if len(self._labels) == 0:
             return f"{self.__class__.__name__}(empty)"
 
-        labels_preview = self._labels.values[:3]
-        locations_preview = self._locations.values[:3]
+        labels_preview = self._labels.get_values()[:3]
+        locations_preview = self._locations.get_values()[:3]
 
         if len(self._labels) <= 3:
             return (

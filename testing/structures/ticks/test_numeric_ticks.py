@@ -23,7 +23,7 @@ class TestNumericTicks:
         assert len(ticks.locations) == 5
 
         # Check that locations are in ascending order
-        locations = ticks.locations.values
+        locations = ticks.locations.get_values()
         assert locations == sorted(locations)
 
         # Check that first and last locations are close to min/max
@@ -45,7 +45,7 @@ class TestNumericTicks:
         ticks.set_ticks_from_range(0, 1, max_ticks=3, precision=3)
 
         # Check that labels have 3 decimal places
-        for label in ticks.labels.values:
+        for label in ticks.labels.get_values():
             if "." in label:
                 decimal_places = len(label.split(".")[1])
                 assert decimal_places <= 3
@@ -83,7 +83,7 @@ class TestNumericTicks:
         assert len(ticks.locations) > 0
 
         # Locations should be within the range
-        for location in ticks.locations.values:
+        for location in ticks.locations.get_values():
             assert 0 <= location <= 0.1
 
     def test_generate_ticks_from_range_large_range(self):
@@ -95,7 +95,7 @@ class TestNumericTicks:
         assert len(ticks.locations) == 5
 
         # Check that locations are reasonable
-        locations = ticks.locations.values
+        locations = ticks.locations.get_values()
         assert locations[0] >= 0
         assert locations[-1] <= 1000000
 
@@ -108,7 +108,7 @@ class TestNumericTicks:
         assert len(ticks.locations) == 5
 
         # Check that locations span the range
-        locations = ticks.locations.values
+        locations = ticks.locations.get_values()
         assert locations[0] >= -100
         assert locations[-1] <= 100
 
@@ -118,13 +118,13 @@ class TestNumericTicks:
 
         # First generation
         ticks.set_ticks_from_range(0, 100)
-        first_labels = ticks.labels.values.copy()
-        first_locations = ticks.locations.values.copy()
+        first_labels = ticks.labels.get_values().copy()
+        first_locations = ticks.locations.get_values().copy()
 
         # Second generation with different range
         ticks.set_ticks_from_range(0, 200, max_ticks=3)
-        second_labels = ticks.labels.values
-        second_locations = ticks.locations.values
+        second_labels = ticks.labels.get_values()
+        second_locations = ticks.locations.get_values()
 
         # Should be different
         assert first_labels != second_labels
@@ -152,7 +152,7 @@ class TestNumericTicks:
         ticks = NumericTicks()
         ticks.set_ticks_from_range(0, 100, max_ticks=6)
 
-        locations = ticks.locations.values
+        locations = ticks.locations.get_values()
 
         # MaxNLocator should produce "nice" numbers
         # Check that spacing is reasonable

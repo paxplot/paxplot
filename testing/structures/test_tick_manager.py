@@ -198,9 +198,9 @@ class TestTickManager:
 
         # Verify the configuration worked
         assert len(numeric_ticks) == 5
-        assert numeric_ticks.locations.values[0] == 0.0
+        assert numeric_ticks.locations.get_values()[0] == 0.0
         # The last tick might not be exactly 100.0 due to optimal tick generation
-        assert numeric_ticks.locations.values[-1] >= 80.0
+        assert numeric_ticks.locations.get_values()[-1] >= 80.0
 
     def test_integration_with_categorical_ticks(self):
         """Test integration with CategoricalTicks functionality."""
@@ -213,8 +213,8 @@ class TestTickManager:
 
         # Verify the configuration worked
         assert len(categorical_ticks) == 3
-        assert categorical_ticks.labels.values == categories
-        assert categorical_ticks.locations.values == [0, 1, 2]
+        assert categorical_ticks.labels.get_values() == categories
+        assert categorical_ticks.locations.get_values() == [0, 1, 2]
 
     def test_mixed_tick_types_management(self):
         """Test managing mixed tick types."""

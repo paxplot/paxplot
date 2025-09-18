@@ -27,8 +27,8 @@ class CategoricalTicks(BaseTicks):
     --------
     >>> ticks = CategoricalTicks()
     >>> ticks.set_ticks_from_categories(['Red', 'Blue', 'Green', 'Yellow'])
-    >>> print(ticks.labels.values)     # ['Red', 'Blue', 'Green', 'Yellow']
-    >>> print(ticks.locations.values)  # [0, 1, 2, 3]
+    >>> print(ticks.labels.get_values())     # ['Red', 'Blue', 'Green', 'Yellow']
+    >>> print(ticks.locations.get_values())  # [0, 1, 2, 3]
     """
 
     def __init__(self):
@@ -92,8 +92,8 @@ class CategoricalTicks(BaseTicks):
         if len(self._labels) == 0:
             return "CategoricalTicks(empty)"
 
-        labels_preview = self._labels.values[:3]
-        locations_preview = self._locations.values[:3]
+        labels_preview = self._labels.get_values()[:3]
+        locations_preview = self._locations.get_values()[:3]
 
         if len(self._labels) <= 3:
             return f"CategoricalTicks(labels={labels_preview}, locations={locations_preview})"

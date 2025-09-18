@@ -61,9 +61,9 @@ class Matrix:
     3
     >>> matrix.num_rows
     3
-    >>> matrix.get_numeric_array(0).values
+    >>> matrix.get_numeric_array(0).get_values()
     [1.0, 2.0, 3.0]
-    >>> matrix.get_categorical_array(1).values
+    >>> matrix.get_categorical_array(1).get_values()
     ['A', 'B', 'A']
     """
 
@@ -236,7 +236,7 @@ class Matrix:
 
         # Let the arrays handle all validation and NaN checking
         for column, value in zip(self._columns, row):
-            column.append([value])  # type: ignore
+            column.append_values([value])  # type: ignore
 
     def remove_data(self, indices: Sequence[int]) -> None:
         """Remove rows at the specified indices.
@@ -252,7 +252,7 @@ class Matrix:
             If any index is out of bounds.
         """
         for column in self._columns:
-            column.remove(indices)
+            column.remove_values(indices)
 
     def set_data(self, data: Sequence[Sequence[Union[str, int, float]]]) -> None:
         """Set new data for the matrix, replacing all existing data.

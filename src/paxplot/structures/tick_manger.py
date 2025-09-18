@@ -63,7 +63,7 @@ class TickManager:
     >>> categorical_ticks = manager.get_categorical_ticks(1)
     >>> categorical_ticks.set_ticks_from_categories(['A', 'B', 'C'])
     >>>
-    >>> print(manager.get_tick_collection(0).labels.values)  # ['0.0', '25.0', ...]
+    >>> print(manager.get_tick_collection(0).labels.get_values())  # ['0.0', '25.0', ...]
     """
 
     def __init__(self, tick_types: Sequence[TickType]):
