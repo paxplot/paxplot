@@ -1,6 +1,6 @@
-"""Matrix data structure for PaxPlot.
+"""Array manager data structure for PaxPlot.
 
-This module defines the Matrix class for managing collections of
+This module defines the ArrayManager class for managing collections of
 NumericalArray and CategoricalArray objects.
 """
 
@@ -26,46 +26,46 @@ class ColumnType(str, Enum):
     CATEGORICAL = "categorical"
 
 
-class Matrix:
+class ArrayManager:
     """
-    A matrix for managing collections of numerical and categorical arrays.
+    An array manager for managing collections of numerical and categorical arrays.
 
     This class provides a unified interface for managing multiple arrays
     of data, where each array can be either numerical or categorical.
-    The matrix ensures that all arrays have the same number of rows.
+    The array manager ensures that all arrays have the same number of rows.
 
     Parameters
     ----------
     arrays : Sequence[Union[NumericalArray, CategoricalArray]], optional
-        Pre-existing arrays to use. If None, creates empty matrix.
+        Pre-existing arrays to use. If None, creates empty array manager.
 
     Attributes
     ----------
     arrays : List[Union[NumericalArray, CategoricalArray]]
         The stored arrays.
     num_arrays : int
-        The number of arrays in the matrix.
+        The number of arrays in the array manager.
     num_rows : int
-        The number of rows in the matrix.
+        The number of rows in the array manager.
 
     Examples
     --------
     >>> # Initialize with existing arrays
     >>> numeric_array = NumericalArray([1, 2, 3])
     >>> categorical_array = CategoricalArray(['A', 'B', 'A'])
-    >>> matrix = Matrix([numeric_array, categorical_array])
-    >>> matrix.num_arrays
+    >>> array_manager = ArrayManager([numeric_array, categorical_array])
+    >>> array_manager.num_arrays
     2
-    >>> matrix.num_rows
+    >>> array_manager.num_rows
     3
-    >>> matrix.get_numeric_array(0).get_values()
+    >>> array_manager.get_numeric_array(0).get_values()
     [1.0, 2.0, 3.0]
-    >>> matrix.get_categorical_array(1).get_values()
+    >>> array_manager.get_categorical_array(1).get_values()
     ['A', 'B', 'A']
     >>>
     >>> # Or initialize empty and set from types
-    >>> matrix = Matrix()  # Empty
-    >>> matrix.set_arrays_from_types([ColumnType.NUMERIC, ColumnType.CATEGORICAL])
+    >>> array_manager = ArrayManager()  # Empty
+    >>> array_manager.set_arrays_from_types([ColumnType.NUMERIC, ColumnType.CATEGORICAL])
     """
 
     def __init__(
@@ -75,29 +75,6 @@ class Matrix:
         # Initialize with empty arrays first, then use set_arrays method
         self._arrays = []
         self.set_arrays(arrays)
-
-    @property
-    def arrays(self) -> List[Union[NumericalArray, CategoricalArray]]:
-        """Get the arrays as a list.
-
-        Returns
-        -------
-        List[Union[NumericalArray, CategoricalArray]]
-            The arrays as a list.
-        """
-        return self._arrays.copy()
-
-    @property
-    def num_arrays(self) -> int:
-        """Get the number of arrays in the matrix.
-
-        Returns
-        -------
-        int
-            The number of arrays.
-        """
-        return len(self._arrays)
-
 
     def get_array(
         self, index: int
@@ -121,7 +98,7 @@ class Matrix:
         """
         if index < 0 or index >= len(self._arrays):
             raise IndexError(
-                f"Array index {index} out of bounds for matrix with {len(self._arrays)} arrays"
+                f"Array index {index} out of bounds for array manager with {len(self._arrays)} arrays"
             )
         return self._arrays[index]
 
@@ -201,22 +178,12 @@ class Matrix:
         """
         if index < 0 or index >= len(self._arrays):
             raise IndexError(
-                f"Array index {index} out of bounds for matrix with {len(self._arrays)} arrays"
+                f"Array index {index} out of bounds for array manager with {len(self._arrays)} arrays"
             )
 
         if isinstance(self._arrays[index], NumericalArray):
             return ColumnType.NUMERIC
         return ColumnType.CATEGORICAL
-
-    def get_arrays(self) -> List[Union[NumericalArray, CategoricalArray]]:
-        """Get all arrays in the matrix.
-
-        Returns
-        -------
-        List[Union[NumericalArray, CategoricalArray]]
-            A copy of all arrays.
-        """
-        return self._arrays.copy()
 
     def set_arrays(
         self, 
@@ -227,7 +194,7 @@ class Matrix:
         Parameters
         ----------
         arrays : Sequence[Union[NumericalArray, CategoricalArray]], optional
-            The new arrays to set. If None, creates empty matrix.
+            The new arrays to set. If None, creates empty array manager.
 
         Raises
         ------
@@ -251,7 +218,7 @@ class Matrix:
         self, 
         array: Union[NumericalArray, CategoricalArray]
     ) -> None:
-        """Append a new array to the matrix.
+        """Append a new array to the array manager.
 
         Parameters
         ----------
@@ -296,13 +263,13 @@ class Matrix:
                 )
             if index < 0 or index >= len(self._arrays):
                 raise IndexError(
-                    f"Index {index} out of bounds for matrix with "
+                    f"Index {index} out of bounds for array manager with "
                     f"{len(self._arrays)} arrays"
                 )
             del self._arrays[index]
 
     def clear_arrays(self) -> None:
-        """Clear all arrays from the matrix."""
+        """Clear all arrays from the array manager."""
         self.set_arrays([])
 
     def set_arrays_from_types(
@@ -346,7 +313,7 @@ class Matrix:
         self._arrays = new_arrays
 
     def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
-        """Append a new row of data to the matrix.
+        """Append a new row of data to the array manager.
 
         Parameters
         ----------
@@ -384,7 +351,7 @@ class Matrix:
             array.remove_values(indices)
 
     def set_data(self, data: Sequence[Sequence[Union[str, int, float]]]) -> None:
-        """Set new data for the matrix, replacing all existing data.
+        """Set new data for the array manager, replacing all existing data.
 
         Parameters
         ----------
@@ -515,7 +482,7 @@ class Matrix:
         return ColumnType.CATEGORICAL
 
     def __len__(self) -> int:
-        """Get the number of arrays in the matrix.
+        """Get the number of arrays in the array manager.
 
         Returns
         -------
@@ -542,11 +509,33 @@ class Matrix:
         return self.get_array(index)
 
     def __repr__(self) -> str:
-        """Get a string representation of the matrix.
+        """Get a string representation of the array manager.
 
         Returns
         -------
         str
-            A string representation showing the matrix dimensions.
+            A string representation showing the array manager dimensions.
         """
-        return f"Matrix({self.num_arrays} arrays)"
+        return f"ArrayManager({self.num_arrays} arrays)"
+
+    @property
+    def num_arrays(self) -> int:
+        """Get the number of arrays in the array manager.
+
+        Returns
+        -------
+        int
+            The number of arrays.
+        """
+        return len(self._arrays)
+
+    @property
+    def arrays(self) -> List[Union[NumericalArray, CategoricalArray]]:
+        """_summary_
+
+        Returns
+        -------
+        List[Union[NumericalArray, CategoricalArray]]
+            _description_
+        """
+        return self._arrays.copy()
