@@ -6,7 +6,7 @@ for creating and managing plot structures in PaxPlot.
 
 from typing import List, Optional, Sequence, Union
 
-from ..structures.matrix import Matrix, ColumnType
+from ..structures.array_manager import ArrayManager, ArrayType
 from ..structures.tick_manger import TickManager, TickType
 from ..structures.labels.axis_label import AxisLabel
 from ..structures.limits.custom_axis_limit import CustomAxisLimit
@@ -88,10 +88,11 @@ class PlotModel:
         ValueError
             If the data structure is invalid (empty or inconsistent row lengths).
         """
-        # Initialize matrix with data directly
-        self._matrix = Matrix(data)
+        # Initialize array manager with data directly
+        self._array_manager = ArrayManager()
+        self._array_manager.set_values(data)
 
-        # Initialize other structures based on the matrix
+        # Initialize other structures based on the array manager
         self._initialize_structures()
 
     def get_axis_label(self, index: int) -> Optional[str]:
@@ -168,12 +169,12 @@ class PlotModel:
         IndexError
             If the index is out of bounds.
         """
-        if index < 0 or index >= self._matrix.num_columns:
+        if index < 0 or index >= self._array_manager.num_arrays:
             raise IndexError(
-                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
             )
 
-        return self._matrix.get_column_type(index).value
+        return self._array_manager.get_array_type(index).value
 
     def get_numeric_values(self, index: int) -> List[float]:
         """
@@ -196,17 +197,17 @@ class PlotModel:
         TypeError
             If the column is not numeric.
         """
-        if index < 0 or index >= self._matrix.num_columns:
+        if index < 0 or index >= self._array_manager.num_arrays:
             raise IndexError(
-                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
             )
 
-        if self._matrix.get_column_type(index) != ColumnType.NUMERIC:
+        if self._array_manager.get_array_type(index) != ArrayType.NUMERIC:
             raise TypeError(
-                f"Column {index} is not numeric, it is {self._matrix.get_column_type(index).value}"
+                f"Column {index} is not numeric, it is {self._array_manager.get_array_type(index).value}"
             )
 
-        return self._matrix.get_numeric_array(index).get_values()
+        return self._array_manager.get_numeric_array(index).get_values()
 
     def get_categorical_values(self, index: int) -> List[str]:
         """
@@ -229,18 +230,18 @@ class PlotModel:
         TypeError
             If the column is not categorical.
         """
-        if index < 0 or index >= self._matrix.num_columns:
+        if index < 0 or index >= self._array_manager.num_arrays:
             raise IndexError(
-                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
             )
 
-        if self._matrix.get_column_type(index) != ColumnType.CATEGORICAL:
-            column_type = self._matrix.get_column_type(index).value
+        if self._array_manager.get_array_type(index) != ArrayType.CATEGORICAL:
+            array_type = self._array_manager.get_array_type(index).value
             raise TypeError(
-                f"Column {index} is not categorical, it is {column_type}"
+                f"Column {index} is not categorical, it is {array_type}"
             )
 
-        return self._matrix.get_categorical_array(index).get_values()
+        return self._array_manager.get_categorical_array(index).get_values()
 
     def get_unique_values(self, index: int) -> Optional[List[str]]:
         """
@@ -263,18 +264,18 @@ class PlotModel:
         TypeError
             If the column is not categorical.
         """
-        if index < 0 or index >= self._matrix.num_columns:
+        if index < 0 or index >= self._array_manager.num_arrays:
             raise IndexError(
-                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
             )
 
-        if self._matrix.get_column_type(index) != ColumnType.CATEGORICAL:
-            column_type = self._matrix.get_column_type(index).value
+        if self._array_manager.get_array_type(index) != ArrayType.CATEGORICAL:
+            array_type = self._array_manager.get_array_type(index).value
             raise TypeError(
-                f"Column {index} is not categorical, it is {column_type}"
+                f"Column {index} is not categorical, it is {array_type}"
             )
 
-        categorical_array = self._matrix.get_categorical_array(index)
+        categorical_array = self._array_manager.get_categorical_array(index)
         return categorical_array.unique_values
 
     def get_tick_labels(self, index: int) -> List[str]:
@@ -296,12 +297,12 @@ class PlotModel:
         IndexError
             If the index is out of bounds.
         """
-        if index < 0 or index >= self._matrix.num_columns:
+        if index < 0 or index >= self._array_manager.num_arrays:
             raise IndexError(
-                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
             )
 
-        tick_collection = self._tick_manager.get_tick_collection(index)
+        tick_collection = self._tick_manager.get_ticks(index)
         return tick_collection.labels.get_values()
 
     def get_tick_locations(self, index: int) -> List[float]:
@@ -323,19 +324,19 @@ class PlotModel:
         IndexError
             If the index is out of bounds.
         """
-        if index < 0 or index >= self._matrix.num_columns:
+        if index < 0 or index >= self._array_manager.num_arrays:
             raise IndexError(
-                f"Index {index} out of bounds for model with {self._matrix.num_columns} columns"
+                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
             )
 
-        tick_collection = self._tick_manager.get_tick_collection(index)
+        tick_collection = self._tick_manager.get_ticks(index)
         return tick_collection.locations.get_values()
 
     def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
         """
-        Append a new row of data to the matrix and update all structures.
+        Append a new row of data to the array manager and update all structures.
 
-        This method adds a new row to the underlying matrix and automatically
+        This method adds a new row to the underlying array manager and automatically
         updates the tick manager, axis labels, and custom limits to maintain
         consistency. The tick manager will regenerate ticks based on the
         updated data.
@@ -350,14 +351,14 @@ class PlotModel:
         ValueError
             If the row length doesn't match the number of columns.
         """
-        self._matrix.append_data(row)
+        self._array_manager.append_values(row)
         self._initialize_structures()
 
     def remove_data(self, indices: Sequence[int]) -> None:
         """
         Remove rows at the specified indices and update all structures.
 
-        This method removes the specified rows from the underlying matrix
+        This method removes the specified rows from the underlying array manager
         and automatically updates the tick manager, axis labels, and custom
         limits to maintain consistency. The tick manager will regenerate
         ticks based on the updated data.
@@ -374,7 +375,7 @@ class PlotModel:
         ValueError
             If indices are not valid integers.
         """
-        self._matrix.remove_data(indices)
+        self._array_manager.remove_values(indices)
         self._initialize_structures()
 
     def set_data(
@@ -383,7 +384,7 @@ class PlotModel:
         """
         Set new data for the plot model, replacing all existing data and updating all structures.
 
-        This method replaces all existing data in the underlying matrix
+        This method replaces all existing data in the underlying array manager
         and automatically updates the tick manager, axis labels, and custom
         limits to maintain consistency. The tick manager will regenerate
         ticks based on the new data, and all associated structures will
@@ -400,7 +401,7 @@ class PlotModel:
         ValueError
             If the data structure is invalid (empty or inconsistent row lengths).
         """
-        self._matrix.set_data(data)
+        self._array_manager.set_values(data)
         self._initialize_structures()
 
     def set_axis_label(self, index: int, label: str) -> None:
@@ -518,7 +519,7 @@ class PlotModel:
         int
             The number of columns.
         """
-        return self._matrix.num_columns
+        return self._array_manager.num_arrays
 
     def get_row_count(self) -> int:
         """
@@ -529,7 +530,9 @@ class PlotModel:
         int
             The number of rows.
         """
-        return self._matrix.num_rows
+        if self._array_manager.num_arrays == 0:
+            return 0
+        return len(self._array_manager.get_array(0))
 
     def __len__(self) -> int:
         """
@@ -540,7 +543,7 @@ class PlotModel:
         int
             The number of columns.
         """
-        return self._matrix.num_columns
+        return self._array_manager.num_arrays
 
     def __getitem__(self, index: int):
         """
@@ -556,7 +559,7 @@ class PlotModel:
         Union[NumericalArray, CategoricalArray]
             The column at the specified index.
         """
-        return self._matrix[index]
+        return self._array_manager[index]
 
     def __repr__(self) -> str:
         """
@@ -567,8 +570,9 @@ class PlotModel:
         str
             A string representation showing the model dimensions and structure counts.
         """
+        row_count = self.get_row_count()
         return (
-            f"PlotModel({self._matrix.num_rows} rows, {self._matrix.num_columns} columns, "
+            f"PlotModel({row_count} rows, {self._array_manager.num_arrays} columns, "
             f"{len(self._axis_labels)} axis labels, {len(self._custom_limits)} custom limits)"
         )
 
@@ -576,33 +580,34 @@ class PlotModel:
         """
         Update all associated structures when data changes.
 
-        This method is called whenever the matrix data is modified to ensure
+        This method is called whenever the array manager data is modified to ensure
         all associated structures (TickManager, AxisLabels, CustomAxisLimits)
         are kept in sync with the current data.
         """
-        # Determine tick types from matrix column types
+        # Determine tick types from array manager array types
         tick_types = []
-        for i in range(self._matrix.num_columns):
-            column_type = self._matrix.get_column_type(i)
-            if column_type == ColumnType.NUMERIC:
+        for i in range(self._array_manager.num_arrays):
+            array_type = self._array_manager.get_array_type(i)
+            if array_type == ArrayType.NUMERIC:
                 tick_types.append(TickType.NUMERIC)
             else:  # CATEGORICAL
                 tick_types.append(TickType.CATEGORICAL)
 
         # Create new tick manager with appropriate types
-        self._tick_manager = TickManager(tick_types)
+        self._tick_manager = TickManager()
+        self._tick_manager.set_ticks_from_types(tick_types)
 
         # Generate ticks for each column based on data
         self._generate_ticks_from_data()
 
         # Update axis labels list to match column count
         self._axis_labels = [
-            AxisLabel() for _ in range(self._matrix.num_columns)
+            AxisLabel() for _ in range(self._array_manager.num_arrays)
         ]
 
         # Update custom limits list to match column count
         self._custom_limits = [
-            CustomAxisLimit() for _ in range(self._matrix.num_columns)
+            CustomAxisLimit() for _ in range(self._array_manager.num_arrays)
         ]
 
     def _generate_ticks_from_data(self) -> None:
@@ -610,15 +615,15 @@ class PlotModel:
         Generate ticks for each column based on the current data.
 
         This method populates the tick collections with appropriate tick data
-        based on the column types and values.
+        based on the array types and values.
         """
-        for i in range(self._matrix.num_columns):
-            column_type = self._matrix.get_column_type(i)
+        for i in range(self._array_manager.num_arrays):
+            array_type = self._array_manager.get_array_type(i)
 
-            if column_type == ColumnType.NUMERIC:
+            if array_type == ArrayType.NUMERIC:
                 # Generate numeric ticks
-                numeric_array = self._matrix.get_numeric_array(i)
-                if numeric_array.length > 0:
+                numeric_array = self._array_manager.get_numeric_array(i)
+                if len(numeric_array) > 0:
                     # Get non-NaN values for range calculation
                     non_nan_values = numeric_array.non_nan_values
                     if non_nan_values:
@@ -642,10 +647,10 @@ class PlotModel:
                                 [f"{min_val:.2f}"], [min_val]
                             )
 
-            elif column_type == ColumnType.CATEGORICAL:
+            elif array_type == ArrayType.CATEGORICAL:
                 # Generate categorical ticks
-                categorical_array = self._matrix.get_categorical_array(i)
-                if categorical_array.length > 0:
+                categorical_array = self._array_manager.get_categorical_array(i)
+                if len(categorical_array) > 0:
                     # Get unique categories (excluding NaN)
                     unique_categories = [
                         cat
