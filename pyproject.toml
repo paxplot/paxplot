@@ -42,8 +42,11 @@ where = ["src"]
 "paxplot" = ["data/tradeoff.csv", "data/hydroclimate_model_evaluation.csv"]
 
 [tool.black]
-line-length = 79
+line-length = 88
 target-version = ["py312"]
+
+[tool.pylint]
+max-line-length = 88
 
 [tool.pytest.ini_options]
 markers = [
