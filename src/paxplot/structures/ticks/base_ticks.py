@@ -6,7 +6,7 @@ functionality for all tick types including validation and basic operations.
 
 import math
 from abc import ABC
-from typing import Sequence, Union
+from typing import List, Sequence, Union
 
 from ..arrays.categorical_array import CategoricalArray
 from ..arrays.numerical_array import NumericalArray
@@ -34,17 +34,19 @@ class BaseTicks(ABC):
     """
 
     def __init__(
-        self, labels: Sequence[str], locations: Sequence[Union[float, int]]
+        self, 
+        labels: Union[Sequence[str], None] = None, 
+        locations: Union[Sequence[Union[float, int]], None] = None
     ):
         """
         Initialize BaseTicks with labels and locations.
 
         Parameters
         ----------
-        labels : Sequence[str]
-            The tick labels as strings.
-        locations : Sequence[Union[float, int]]
-            The tick positions on the axis.
+        labels : Sequence[str], optional
+            The tick labels as strings. If None, creates empty labels array.
+        locations : Sequence[Union[float, int]], optional
+            The tick positions on the axis. If None, creates empty locations array.
 
         Raises
         ------
@@ -118,17 +120,19 @@ class BaseTicks(ABC):
                 )
 
     def set_ticks(
-        self, labels: Sequence[str], locations: Sequence[Union[float, int]]
+        self, 
+        labels: Union[Sequence[str], None] = None, 
+        locations: Union[Sequence[Union[float, int]], None] = None
     ) -> None:
         """
         Set new tick labels and locations, replacing all existing ticks.
 
         Parameters
         ----------
-        labels : Sequence[str]
-            The new tick labels as strings.
-        locations : Sequence[Union[float, int]]
-            The new tick positions on the axis.
+        labels : Sequence[str], optional
+            The new tick labels as strings. If None, clears the labels array.
+        locations : Sequence[Union[float, int]], optional
+            The new tick positions on the axis. If None, clears the locations array.
 
         Raises
         ------
@@ -202,7 +206,90 @@ class BaseTicks(ABC):
             # For now, we'll just return False to indicate failure
             return False
 
-    def remove(self, indices: Sequence[int]) -> bool:
+    def get_tick_labels(self) -> List[str]:
+        """
+        Get all tick labels.
+
+        Returns
+        -------
+        List[str]
+            A copy of all tick labels.
+        """
+        return self._labels.get_values()
+
+    def get_tick_locations(self) -> List[Union[float, int]]:
+        """
+        Get all tick locations.
+
+        Returns
+        -------
+        List[Union[float, int]]
+            A copy of all tick locations.
+        """
+        return self._locations.get_values()
+
+    def append_ticks(
+        self, labels: Sequence[str], locations: Sequence[Union[float, int]]
+    ) -> bool:
+        """
+        Append multiple ticks with validation.
+
+        Parameters
+        ----------
+        labels : Sequence[str]
+            The new tick labels to append.
+        locations : Sequence[Union[float, int]]
+            The new tick locations to append.
+
+        Returns
+        -------
+        bool
+            True if ticks were appended successfully, False otherwise.
+
+        Raises
+        ------
+        ValueError
+            If labels and locations have different lengths or contain invalid values.
+        """
+        try:
+            # Validate new labels
+            for i, label in enumerate(labels):
+                if not isinstance(label, str):
+                    raise ValueError(
+                        f"New label at index {i} must be a string, got {type(label)}"
+                    )
+                if label.strip() == "":
+                    raise ValueError(f"New label at index {i} cannot be empty")
+
+            # Validate new locations
+            for i, location in enumerate(locations):
+                if not isinstance(location, (int, float)):
+                    raise ValueError(
+                        f"New location at index {i} must be numerical, got {type(location)}"
+                    )
+                if math.isnan(location) or math.isinf(location):
+                    raise ValueError(
+                        f"New location at index {i} must be finite, got {location}"
+                    )
+
+            if len(labels) != len(locations):
+                raise ValueError(
+                    f"New labels and locations must have the same length. "
+                    f"Got {len(labels)} labels and {len(locations)} locations."
+                )
+
+            # Add the new ticks
+            self._labels.append_values(labels)
+            self._locations.append_values(locations)
+
+            return True
+
+        except (ValueError, IndexError):
+            # Log the error or handle it as needed
+            # For now, we'll just return False to indicate failure
+            return False
+
+    def remove_ticks(self, indices: Sequence[int]) -> bool:
         """
         Remove ticks at specified indices.
 
@@ -245,6 +332,12 @@ class BaseTicks(ABC):
             # Log the error or handle it as needed
             # For now, we'll just return False to indicate failure
             return False
+
+    def clear_ticks(self) -> None:
+        """
+        Clear all ticks from the tick manager.
+        """
+        self.set_ticks([], [])
 
     def __len__(self) -> int:
         """

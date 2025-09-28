@@ -187,7 +187,7 @@ class TestCategoricalTicks:
         assert hasattr(ticks, "locations")
         assert hasattr(ticks, "validate")
         assert hasattr(ticks, "append")
-        assert hasattr(ticks, "remove")
+        assert hasattr(ticks, "remove_ticks")
 
         # Should be able to use BaseTicks methods after generating ticks
         ticks.set_ticks_from_categories(["Red", "Blue", "Green"])
@@ -198,7 +198,7 @@ class TestCategoricalTicks:
         assert len(ticks.labels) == 4
 
         # Test removing ticks
-        result = ticks.remove([0])
+        result = ticks.remove_ticks([0])
         assert result is True
         assert len(ticks.labels) == 3
 

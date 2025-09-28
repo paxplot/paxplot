@@ -173,7 +173,7 @@ class TestNumericTicks:
         assert hasattr(ticks, "locations")
         assert hasattr(ticks, "validate")
         assert hasattr(ticks, "append")
-        assert hasattr(ticks, "remove")
+        assert hasattr(ticks, "remove_ticks")
 
         # Should be able to use BaseTicks methods after generating ticks
         ticks.set_ticks_from_range(0, 100, max_ticks=3)
@@ -184,6 +184,6 @@ class TestNumericTicks:
         assert len(ticks.labels) == 4
 
         # Test removing ticks
-        result = ticks.remove([0])
+        result = ticks.remove_ticks([0])
         assert result is True
         assert len(ticks.labels) == 3

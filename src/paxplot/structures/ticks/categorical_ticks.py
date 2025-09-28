@@ -4,7 +4,7 @@ This module defines the CategoricalTicks class for managing categorical axis tic
 using category indices for positioning.
 """
 
-from typing import Sequence
+from typing import Sequence, Union
 
 from .base_ticks import BaseTicks
 
@@ -31,12 +31,23 @@ class CategoricalTicks(BaseTicks):
     >>> print(ticks.locations.get_values())  # [0, 1, 2, 3]
     """
 
-    def __init__(self):
+    def __init__(
+        self, 
+        labels: Union[Sequence[str], None] = None, 
+        locations: Union[Sequence[Union[float, int]], None] = None
+    ):
         """
-        Initialize CategoricalTicks with empty arrays.
+        Initialize CategoricalTicks with optional labels and locations.
+
+        Parameters
+        ----------
+        labels : Sequence[str], optional
+            The tick labels as strings. If None, creates empty labels array.
+        locations : Sequence[Union[float, int]], optional
+            The tick positions on the axis. If None, creates empty locations array.
         """
-        # Initialize with empty arrays
-        super().__init__([], [])
+        # Initialize with optional labels and locations
+        super().__init__(labels, locations)
 
     def set_ticks_from_categories(self, categories: Sequence[str]) -> None:
         """

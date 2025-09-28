@@ -126,7 +126,7 @@ class TestBaseTicks:
         locations = [0.0, 1.0, 2.0, 3.0]
         ticks = ConcreteTicks(labels, locations)
 
-        result = ticks.remove([1, 3])  # Remove B and D
+        result = ticks.remove_ticks([1, 3])  # Remove B and D
         assert result is True
         assert len(ticks.labels) == 2
         assert ticks.labels.get_values() == ["A", "C"]
@@ -138,7 +138,7 @@ class TestBaseTicks:
         locations = [0.0, 1.0, 2.0]
         ticks = ConcreteTicks(labels, locations)
 
-        result = ticks.remove([5])  # Out of bounds
+        result = ticks.remove_ticks([5])  # Out of bounds
         assert result is False
         # Original data should be unchanged
         assert len(ticks.labels) == 3
@@ -149,7 +149,7 @@ class TestBaseTicks:
         locations = [0.0, 1.0, 2.0]
         ticks = ConcreteTicks(labels, locations)
 
-        result = ticks.remove([-1])  # Negative index
+        result = ticks.remove_ticks([-1])  # Negative index
         assert result is False
         # Original data should be unchanged
         assert len(ticks.labels) == 3
