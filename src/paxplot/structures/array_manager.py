@@ -1,4 +1,4 @@
-"""Array manager data structure for PaxPlot.
+"""Array manager values structure for PaxPlot.
 
 This module defines the ArrayManager class for managing collections of
 NumericalArray and CategoricalArray objects.
@@ -17,9 +17,9 @@ class ArrayType(str, Enum):
     Parameters
     ----------
     NUMERIC : str
-        Array contains numerical data.
+        Array contains numerical values.
     CATEGORICAL : str
-        Array contains categorical (string) data.
+        Array contains categorical (string) values.
     """
 
     NUMERIC = "numeric"
@@ -31,7 +31,7 @@ class ArrayManager:
     An array manager for managing collections of numerical and categorical arrays.
 
     This class provides a unified interface for managing multiple arrays
-    of data, where each array can be either numerical or categorical.
+    of values, where each array can be either numerical or categorical.
     The array manager ensures that all arrays have the same number of rows.
 
     Parameters
@@ -312,13 +312,13 @@ class ArrayManager:
         
         self._arrays = new_arrays
 
-    def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
-        """Append a new row of data to the array manager.
+    def append_values(self, row: Sequence[Union[str, int, float]]) -> None:
+        """Append a new row of values to the array manager.
 
         Parameters
         ----------
         row : Sequence[Union[str, int, float]]
-            The row of data to append.
+            The row of values to append.
 
         Raises
         ------
@@ -334,7 +334,7 @@ class ArrayManager:
         for array, value in zip(self._arrays, row):
             array.append_values([value])  # type: ignore
 
-    def remove_data(self, indices: Sequence[int]) -> None:
+    def remove_values(self, indices: Sequence[int]) -> None:
         """Remove rows at the specified indices.
 
         Parameters
@@ -350,52 +350,52 @@ class ArrayManager:
         for array in self._arrays:
             array.remove_values(indices)
 
-    def set_data(self, data: Sequence[Sequence[Union[str, int, float]]]) -> None:
-        """Set new data for the array manager, replacing all existing data.
+    def set_values(self, values: Sequence[Sequence[Union[str, int, float]]]) -> None:
+        """Set new values for the array manager, replacing all existing values.
 
         Parameters
         ----------
-        data : Sequence[Sequence[Union[str, int, float]]]
-            The new data as a 2D sequence where each row is a sequence
+        values : Sequence[Sequence[Union[str, int, float]]]
+            The new values as a 2D sequence where each row is a sequence
             of values and each array should be consistently typed.
 
         Raises
         ------
         ValueError
-            If the data structure is invalid.
+            If the values structure is invalid.
         """
-        self._validate_data(data)
-        self._arrays = self._create_arrays(data)
+        self._validate_values(values)
+        self._arrays = self._create_arrays(values)
 
 
-    def clear_data(self) -> None:
-        """Clear all data from the arrays but keep the array objects."""
+    def clear_values(self) -> None:
+        """Clear all values from the arrays but keep the array objects."""
         for array in self._arrays:
             array.clear_values()
 
-    def _validate_data(
-        self, data: Sequence[Sequence[Union[str, int, float]]]
+    def _validate_values(
+        self, values: Sequence[Sequence[Union[str, int, float]]]
     ) -> None:
-        """Validate the input data structure.
+        """Validate the input values structure.
 
         Parameters
         ----------
-        data : Sequence[Sequence[Union[str, int, float]]]
-            The data to validate.
+        values : Sequence[Sequence[Union[str, int, float]]]
+            The values to validate.
 
         Raises
         ------
         ValueError
-            If the data structure is invalid.
+            If the values structure is invalid.
         """
-        if not data:
-            raise ValueError("Data cannot be empty")
+        if not values:
+            raise ValueError("Values cannot be empty")
 
-        if not isinstance(data[0], (list, tuple)):
-            raise ValueError("Data must be a 2D sequence")
+        if not isinstance(values[0], (list, tuple)):
+            raise ValueError("Values must be a 2D sequence")
 
-        row_length = len(data[0])
-        for i, row in enumerate(data):
+        row_length = len(values[0])
+        for i, row in enumerate(values):
             if not isinstance(row, (list, tuple)):
                 raise ValueError(f"Row {i} must be a sequence")
             if len(row) != row_length:
@@ -404,46 +404,46 @@ class ArrayManager:
                 )
 
     def _create_arrays(
-        self, data: Sequence[Sequence[Union[str, int, float]]]
+        self, values: Sequence[Sequence[Union[str, int, float]]]
     ) -> List[Union[NumericalArray, CategoricalArray]]:
-        """Create arrays from the input data.
+        """Create arrays from the input values.
 
         Parameters
         ----------
-        data : Sequence[Sequence[Union[str, int, float]]]
-            The input data.
+        values : Sequence[Sequence[Union[str, int, float]]]
+            The input values.
 
         Returns
         -------
         List[Union[NumericalArray, CategoricalArray]]
             The created arrays.
         """
-        if not data:
+        if not values:
             return []
 
-        num_arrays = len(data[0])
+        num_arrays = len(values[0])
         arrays = []
 
         for array_idx in range(num_arrays):
-            array_data = [row[array_idx] for row in data]
-            array_type = self.infer_array_type(array_data)
+            array_values = [row[array_idx] for row in values]
+            array_type = self.infer_array_type(array_values)
 
             if array_type == ArrayType.NUMERIC:
-                arrays.append(NumericalArray(array_data))  # type: ignore
+                arrays.append(NumericalArray(array_values))  # type: ignore
             else:
-                arrays.append(CategoricalArray(array_data))  # type: ignore
+                arrays.append(CategoricalArray(array_values))  # type: ignore
 
         return arrays
 
     def infer_array_type(
-        self, array_data: List[Union[str, int, float]]
+        self, array_values: List[Union[str, int, float]]
     ) -> ArrayType:
-        """Infer the type of an array based on its data.
+        """Infer the type of an array based on its values.
 
         Parameters
         ----------
-        array_data : List[Union[str, int, float]]
-            The data in the array.
+        array_values : List[Union[str, int, float]]
+            The values in the array.
 
         Returns
         -------
@@ -458,7 +458,7 @@ class ArrayManager:
         has_numeric = False
         has_categorical = False
 
-        for value in array_data:
+        for value in array_values:
             if value is None or (
                 isinstance(value, float) and str(value) == "nan"
             ):
@@ -475,7 +475,7 @@ class ArrayManager:
 
         if has_numeric and has_categorical:
             raise ValueError(
-                "Array contains mixed numeric and categorical data"
+                "Array contains mixed numeric and categorical values"
             )
         if has_numeric:
             return ArrayType.NUMERIC
