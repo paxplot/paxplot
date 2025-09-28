@@ -11,15 +11,15 @@ from .arrays.numerical_array import NumericalArray
 from .arrays.categorical_array import CategoricalArray
 
 
-class ColumnType(str, Enum):
-    """Represents the type of a column in the matrix.
+class ArrayType(str, Enum):
+    """Represents the type of an array in the array manager.
 
     Parameters
     ----------
     NUMERIC : str
-        Column contains numerical data.
+        Array contains numerical data.
     CATEGORICAL : str
-        Column contains categorical (string) data.
+        Array contains categorical (string) data.
     """
 
     NUMERIC = "numeric"
@@ -65,7 +65,7 @@ class ArrayManager:
     >>>
     >>> # Or initialize empty and set from types
     >>> array_manager = ArrayManager()  # Empty
-    >>> array_manager.set_arrays_from_types([ColumnType.NUMERIC, ColumnType.CATEGORICAL])
+    >>> array_manager.set_arrays_from_types([ArrayType.NUMERIC, ArrayType.CATEGORICAL])
     """
 
     def __init__(
@@ -108,7 +108,7 @@ class ArrayManager:
         Parameters
         ----------
         index : int
-            The index of the column to get.
+            The index of the array to get.
 
         Returns
         -------
@@ -120,9 +120,9 @@ class ArrayManager:
         IndexError
             If the index is out of bounds.
         TypeError
-            If the column at the specified index is not numerical.
+            If the array at the specified index is not numerical.
         """
-        if self.get_array_type(index) != ColumnType.NUMERIC:
+        if self.get_array_type(index) != ArrayType.NUMERIC:
             raise TypeError(
                 f"Array {index} is not numerical, it is {type(self._arrays[index]).__name__}"
             )
@@ -136,7 +136,7 @@ class ArrayManager:
         Parameters
         ----------
         index : int
-            The index of the column to get.
+            The index of the array to get.
 
         Returns
         -------
@@ -148,9 +148,9 @@ class ArrayManager:
         IndexError
             If the index is out of bounds.
         TypeError
-            If the column at the specified index is not categorical.
+            If the array at the specified index is not categorical.
         """
-        if self.get_array_type(index) != ColumnType.CATEGORICAL:
+        if self.get_array_type(index) != ArrayType.CATEGORICAL:
             raise TypeError(
                 f"Array {index} is not categorical, it is {type(self._arrays[index]).__name__}"
             )
@@ -158,7 +158,7 @@ class ArrayManager:
         assert isinstance(array, CategoricalArray)
         return array
 
-    def get_array_type(self, index: int) -> ColumnType:
+    def get_array_type(self, index: int) -> ArrayType:
         """Get the type of an array at the specified index.
 
         Parameters
@@ -168,7 +168,7 @@ class ArrayManager:
 
         Returns
         -------
-        ColumnType
+        ArrayType
             The type of the array.
 
         Raises
@@ -182,8 +182,8 @@ class ArrayManager:
             )
 
         if isinstance(self._arrays[index], NumericalArray):
-            return ColumnType.NUMERIC
-        return ColumnType.CATEGORICAL
+            return ArrayType.NUMERIC
+        return ArrayType.CATEGORICAL
 
     def set_arrays(
         self, 
@@ -274,41 +274,41 @@ class ArrayManager:
 
     def set_arrays_from_types(
         self, 
-        column_types: Sequence[ColumnType]
+        array_types: Sequence[ArrayType]
     ) -> None:
-        """Set new arrays from column types, creating empty arrays.
+        """Set new arrays from array types, creating empty arrays.
 
         Parameters
         ----------
-        column_types : Sequence[ColumnType]
+        array_types : Sequence[ArrayType]
             The types of arrays to create.
 
         Raises
         ------
         ValueError
-            If column_types is empty.
+            If array_types is empty.
         TypeError
-            If any element in column_types is not a ColumnType.
+            If any element in array_types is not an ArrayType.
         """
-        if not column_types:
-            raise ValueError("column_types cannot be empty")
+        if not array_types:
+            raise ValueError("array_types cannot be empty")
         
-        # Validate column types
-        for i, column_type in enumerate(column_types):
-            if not isinstance(column_type, ColumnType):
+        # Validate array types
+        for i, array_type in enumerate(array_types):
+            if not isinstance(array_type, ArrayType):
                 raise TypeError(
-                    f"column_type at index {i} must be a ColumnType, got {type(column_type)}"
+                    f"array_type at index {i} must be an ArrayType, got {type(array_type)}"
                 )
         
         # Create empty arrays based on types
         new_arrays = []
-        for column_type in column_types:
-            if column_type == ColumnType.NUMERIC:
+        for array_type in array_types:
+            if array_type == ArrayType.NUMERIC:
                 new_arrays.append(NumericalArray())
-            elif column_type == ColumnType.CATEGORICAL:
+            elif array_type == ArrayType.CATEGORICAL:
                 new_arrays.append(CategoricalArray())
             else:
-                raise ValueError(f"Unknown column type: {column_type}")
+                raise ValueError(f"Unknown array type: {array_type}")
         
         self._arrays = new_arrays
 
@@ -357,7 +357,7 @@ class ArrayManager:
         ----------
         data : Sequence[Sequence[Union[str, int, float]]]
             The new data as a 2D sequence where each row is a sequence
-            of values and each column should be consistently typed.
+            of values and each array should be consistently typed.
 
         Raises
         ------
@@ -426,39 +426,39 @@ class ArrayManager:
 
         for array_idx in range(num_arrays):
             array_data = [row[array_idx] for row in data]
-            array_type = self.infer_column_type(array_data)
+            array_type = self.infer_array_type(array_data)
 
-            if array_type == ColumnType.NUMERIC:
+            if array_type == ArrayType.NUMERIC:
                 arrays.append(NumericalArray(array_data))  # type: ignore
             else:
                 arrays.append(CategoricalArray(array_data))  # type: ignore
 
         return arrays
 
-    def infer_column_type(
-        self, column_data: List[Union[str, int, float]]
-    ) -> ColumnType:
-        """Infer the type of a column based on its data.
+    def infer_array_type(
+        self, array_data: List[Union[str, int, float]]
+    ) -> ArrayType:
+        """Infer the type of an array based on its data.
 
         Parameters
         ----------
-        column_data : List[Union[str, int, float]]
-            The data in the column.
+        array_data : List[Union[str, int, float]]
+            The data in the array.
 
         Returns
         -------
-        ColumnType
-            The inferred column type.
+        ArrayType
+            The inferred array type.
 
         Raises
         ------
         ValueError
-            If the column contains mixed types.
+            If the array contains mixed types.
         """
         has_numeric = False
         has_categorical = False
 
-        for value in column_data:
+        for value in array_data:
             if value is None or (
                 isinstance(value, float) and str(value) == "nan"
             ):
@@ -470,16 +470,16 @@ class ArrayManager:
                 has_categorical = True
             else:
                 raise ValueError(
-                    f"Column contains unsupported type: {type(value)}"
+                    f"Array contains unsupported type: {type(value)}"
                 )
 
         if has_numeric and has_categorical:
             raise ValueError(
-                "Column contains mixed numeric and categorical data"
+                "Array contains mixed numeric and categorical data"
             )
         if has_numeric:
-            return ColumnType.NUMERIC
-        return ColumnType.CATEGORICAL
+            return ArrayType.NUMERIC
+        return ArrayType.CATEGORICAL
 
     def __len__(self) -> int:
         """Get the number of arrays in the array manager.

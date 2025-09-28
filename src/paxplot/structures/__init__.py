@@ -9,7 +9,7 @@ This module contains the foundational data structures used by PaxPlot:
 
 from .arrays.numerical_array import NumericalArray
 from .arrays.categorical_array import CategoricalArray
-from .array_manager import ArrayManager
+from .array_manager import ArrayManager, ArrayType
 from .limits.custom_axis_limit import CustomAxisLimit
 from .tick_manger import TickManager, TickType
 
@@ -17,6 +17,7 @@ __all__ = [
     "NumericalArray",
     "CategoricalArray",
     "ArrayManager",
+    "ArrayType",
     "CustomAxisLimit",
     "TickManager",
     "TickType",
