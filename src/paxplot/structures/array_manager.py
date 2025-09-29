@@ -69,16 +69,14 @@ class ArrayManager:
     """
 
     def __init__(
-        self, 
-        arrays: Union[Sequence[Union[NumericalArray, CategoricalArray]], None] = None
+        self,
+        arrays: Union[Sequence[Union[NumericalArray, CategoricalArray]], None] = None,
     ):
         # Initialize with empty arrays first, then use set_arrays method
         self._arrays = []
         self.set_arrays(arrays)
 
-    def get_array(
-        self, index: int
-    ) -> Union[NumericalArray, CategoricalArray]:
+    def get_array(self, index: int) -> Union[NumericalArray, CategoricalArray]:
         """Get an array at the specified index.
 
         Parameters
@@ -98,7 +96,8 @@ class ArrayManager:
         """
         if index < 0 or index >= len(self._arrays):
             raise IndexError(
-                f"Array index {index} out of bounds for array manager with {len(self._arrays)} arrays"
+                f"Array index {index} out of bounds for array manager with "
+                f"{len(self._arrays)} arrays"
             )
         return self._arrays[index]
 
@@ -124,7 +123,8 @@ class ArrayManager:
         """
         if self.get_array_type(index) != ArrayType.NUMERIC:
             raise TypeError(
-                f"Array {index} is not numerical, it is {type(self._arrays[index]).__name__}"
+                f"Array {index} is not numerical, it is "
+                f"{type(self._arrays[index]).__name__}"
             )
         array = self.get_array(index)
         assert isinstance(array, NumericalArray)
@@ -152,7 +152,8 @@ class ArrayManager:
         """
         if self.get_array_type(index) != ArrayType.CATEGORICAL:
             raise TypeError(
-                f"Array {index} is not categorical, it is {type(self._arrays[index]).__name__}"
+                f"Array {index} is not categorical, it is "
+                f"{type(self._arrays[index]).__name__}"
             )
         array = self.get_array(index)
         assert isinstance(array, CategoricalArray)
@@ -178,7 +179,8 @@ class ArrayManager:
         """
         if index < 0 or index >= len(self._arrays):
             raise IndexError(
-                f"Array index {index} out of bounds for array manager with {len(self._arrays)} arrays"
+                f"Array index {index} out of bounds for array manager with "
+                f"{len(self._arrays)} arrays"
             )
 
         if isinstance(self._arrays[index], NumericalArray):
@@ -186,8 +188,8 @@ class ArrayManager:
         return ArrayType.CATEGORICAL
 
     def set_arrays(
-        self, 
-        arrays: Union[Sequence[Union[NumericalArray, CategoricalArray]], None] = None
+        self,
+        arrays: Union[Sequence[Union[NumericalArray, CategoricalArray]], None] = None,
     ) -> None:
         """Set new arrays, replacing all existing arrays.
 
@@ -203,7 +205,7 @@ class ArrayManager:
         """
         if arrays is None:
             arrays = []
-        
+
         # Validate arrays
         for i, array in enumerate(arrays):
             if not isinstance(array, (NumericalArray, CategoricalArray)):
@@ -211,13 +213,10 @@ class ArrayManager:
                     f"Array at index {i} must be NumericalArray or CategoricalArray, "
                     f"got {type(array)}"
                 )
-        
+
         self._arrays = list(arrays)
 
-    def append_arrays(
-        self, 
-        array: Union[NumericalArray, CategoricalArray]
-    ) -> None:
+    def append_arrays(self, array: Union[NumericalArray, CategoricalArray]) -> None:
         """Append a new array to the array manager.
 
         Parameters
@@ -235,7 +234,7 @@ class ArrayManager:
                 f"Array must be NumericalArray or CategoricalArray, "
                 f"got {type(array)}"
             )
-        
+
         self._arrays.append(array)
 
     def remove_arrays(self, indices: Sequence[int]) -> None:
@@ -255,12 +254,10 @@ class ArrayManager:
         """
         # Convert to list and sort in reverse order to avoid index shifting
         indices_list = sorted(indices, reverse=True)
-        
+
         for index in indices_list:
             if not isinstance(index, int):
-                raise ValueError(
-                    f"Index must be an integer, got {type(index)}"
-                )
+                raise ValueError(f"Index must be an integer, got {type(index)}")
             if index < 0 or index >= len(self._arrays):
                 raise IndexError(
                     f"Index {index} out of bounds for array manager with "
@@ -272,10 +269,7 @@ class ArrayManager:
         """Clear all arrays from the array manager."""
         self.set_arrays([])
 
-    def set_arrays_from_types(
-        self, 
-        array_types: Sequence[ArrayType]
-    ) -> None:
+    def set_arrays_from_types(self, array_types: Sequence[ArrayType]) -> None:
         """Set new arrays from array types, creating empty arrays.
 
         Parameters
@@ -292,14 +286,15 @@ class ArrayManager:
         """
         if not array_types:
             raise ValueError("array_types cannot be empty")
-        
+
         # Validate array types
         for i, array_type in enumerate(array_types):
             if not isinstance(array_type, ArrayType):
                 raise TypeError(
-                    f"array_type at index {i} must be an ArrayType, got {type(array_type)}"
+                    f"array_type at index {i} must be an ArrayType, "
+                    f"got {type(array_type)}"
                 )
-        
+
         # Create empty arrays based on types
         new_arrays = []
         for array_type in array_types:
@@ -309,7 +304,7 @@ class ArrayManager:
                 new_arrays.append(CategoricalArray())
             else:
                 raise ValueError(f"Unknown array type: {array_type}")
-        
+
         self._arrays = new_arrays
 
     def append_values(self, row: Sequence[Union[str, int, float]]) -> None:
@@ -327,7 +322,8 @@ class ArrayManager:
         """
         if len(row) != self.num_arrays:
             raise ValueError(
-                f"Row length {len(row)} doesn't match number of arrays {self.num_arrays}"
+                f"Row length {len(row)} doesn't match number of arrays "
+                f"{self.num_arrays}"
             )
 
         # Let the arrays handle all validation and NaN checking
@@ -366,7 +362,6 @@ class ArrayManager:
         """
         self._validate_values(values)
         self._arrays = self._create_arrays(values)
-
 
     def clear_values(self) -> None:
         """Clear all values from the arrays but keep the array objects."""
@@ -435,9 +430,7 @@ class ArrayManager:
 
         return arrays
 
-    def infer_array_type(
-        self, array_values: List[Union[str, int, float]]
-    ) -> ArrayType:
+    def infer_array_type(self, array_values: List[Union[str, int, float]]) -> ArrayType:
         """Infer the type of an array based on its values.
 
         Parameters
@@ -459,9 +452,7 @@ class ArrayManager:
         has_categorical = False
 
         for value in array_values:
-            if value is None or (
-                isinstance(value, float) and str(value) == "nan"
-            ):
+            if value is None or (isinstance(value, float) and str(value) == "nan"):
                 # Skip NaN values in type inference
                 continue
             if isinstance(value, (int, float)):
@@ -469,14 +460,10 @@ class ArrayManager:
             elif isinstance(value, str):
                 has_categorical = True
             else:
-                raise ValueError(
-                    f"Array contains unsupported type: {type(value)}"
-                )
+                raise ValueError(f"Array contains unsupported type: {type(value)}")
 
         if has_numeric and has_categorical:
-            raise ValueError(
-                "Array contains mixed numeric and categorical values"
-            )
+            raise ValueError("Array contains mixed numeric and categorical values")
         if has_numeric:
             return ArrayType.NUMERIC
         return ArrayType.CATEGORICAL
@@ -491,9 +478,7 @@ class ArrayManager:
         """
         return len(self._arrays)
 
-    def __getitem__(
-        self, index: int
-    ) -> Union[NumericalArray, CategoricalArray]:
+    def __getitem__(self, index: int) -> Union[NumericalArray, CategoricalArray]:
         """Get an array at the specified index.
 
         Parameters

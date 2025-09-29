@@ -28,7 +28,10 @@ class TestArrayManager:
 
     def test_init_with_invalid_array_raises_error(self):
         """Test initialization with invalid array raises error."""
-        with pytest.raises(TypeError, match="Array at index 0 must be NumericalArray or CategoricalArray"):
+        with pytest.raises(
+            TypeError,
+            match="Array at index 0 must be NumericalArray or CategoricalArray",
+        ):
             ArrayManager(["invalid"])  # type: ignore
 
     def test_arrays_property_returns_copy(self):
@@ -126,7 +129,9 @@ class TestArrayManager:
         numeric_array = NumericalArray([1, 2])
         categorical_array = CategoricalArray(["A", "B"])
         array_manager = ArrayManager([numeric_array, categorical_array])
-        with pytest.raises(ValueError, match="Row length 1 doesn't match number of arrays 2"):
+        with pytest.raises(
+            ValueError, match="Row length 1 doesn't match number of arrays 2"
+        ):
             array_manager.append_values([3])  # Missing second value
 
     def test_remove_values(self):
@@ -238,7 +243,6 @@ class TestArrayManager:
         array_type = array_manager.infer_array_type(array_data)
         assert array_type == ArrayType.CATEGORICAL
 
-
     def test_comprehensive_operations(self):
         """Test comprehensive operations."""
         # Create arrays with mixed values including NaN
@@ -343,9 +347,7 @@ class TestArrayManagerNaNSupport:
         categorical_col = array_manager.get_categorical_array(1)
         assert categorical_col.has_nan is True  # Still has NaN from third row
         assert categorical_col.nan_count == 1
-        assert categorical_col.nan_indices == [
-            1
-        ]  # Index shifted after removal
+        assert categorical_col.nan_indices == [1]  # Index shifted after removal
         assert categorical_col.unique_values == ["A", "<NaN>"]
 
     def test_array_manager_handles_mixed_nan_types(self):
@@ -393,7 +395,7 @@ class TestArrayManagerNaNSupport:
         """Test setting arrays from types."""
         array_manager = ArrayManager()
         array_manager.set_arrays_from_types([ArrayType.NUMERIC, ArrayType.CATEGORICAL])
-        
+
         assert array_manager.num_arrays == 2
         assert isinstance(array_manager.get_array(0), NumericalArray)
         assert isinstance(array_manager.get_array(1), CategoricalArray)
@@ -407,7 +409,9 @@ class TestArrayManagerNaNSupport:
     def test_set_arrays_from_types_invalid_type_raises_error(self):
         """Test setting arrays from invalid type raises error."""
         array_manager = ArrayManager()
-        with pytest.raises(TypeError, match="array_type at index 0 must be an ArrayType"):
+        with pytest.raises(
+            TypeError, match="array_type at index 0 must be an ArrayType"
+        ):
             array_manager.set_arrays_from_types(["invalid"])  # type: ignore
 
     def test_append_arrays(self):
@@ -415,7 +419,7 @@ class TestArrayManagerNaNSupport:
         numeric_array = NumericalArray([1, 2])
         array_manager = ArrayManager([numeric_array])
         assert array_manager.num_arrays == 1
-        
+
         categorical_array = CategoricalArray(["A", "B"])
         array_manager.append_arrays(categorical_array)
         assert array_manager.num_arrays == 2
@@ -424,7 +428,9 @@ class TestArrayManagerNaNSupport:
     def test_append_arrays_invalid_type_raises_error(self):
         """Test appending invalid array type raises error."""
         array_manager = ArrayManager()
-        with pytest.raises(TypeError, match="Array must be NumericalArray or CategoricalArray"):
+        with pytest.raises(
+            TypeError, match="Array must be NumericalArray or CategoricalArray"
+        ):
             array_manager.append_arrays("invalid")  # type: ignore
 
     def test_remove_arrays(self):
@@ -433,7 +439,7 @@ class TestArrayManagerNaNSupport:
         categorical_array = CategoricalArray(["A", "B"])
         array_manager = ArrayManager([numeric_array, categorical_array])
         assert array_manager.num_arrays == 2
-        
+
         array_manager.remove_arrays([1])
         assert array_manager.num_arrays == 1
         assert isinstance(array_manager.get_array(0), NumericalArray)
@@ -444,7 +450,7 @@ class TestArrayManagerNaNSupport:
         categorical_array = CategoricalArray(["A", "B"])
         array_manager = ArrayManager([numeric_array, categorical_array])
         assert array_manager.num_arrays == 2
-        
+
         array_manager.clear_arrays()
         assert array_manager.num_arrays == 0
 
@@ -453,7 +459,7 @@ class TestArrayManagerNaNSupport:
         array_manager = ArrayManager()
         values = [[1, "A"], [2, "B"], [3, "C"]]
         array_manager.set_values(values)
-        
+
         assert array_manager.num_arrays == 2
         assert isinstance(array_manager.get_array(0), NumericalArray)
         assert isinstance(array_manager.get_array(1), CategoricalArray)
@@ -483,7 +489,7 @@ class TestArrayManagerNaNSupport:
         numeric_array = NumericalArray([1, 2])
         categorical_array = CategoricalArray(["A", "B"])
         array_manager = ArrayManager([numeric_array, categorical_array])
-        
+
         array_manager.clear_values()
         assert len(array_manager.get_array(0)) == 0
         assert len(array_manager.get_array(1)) == 0
