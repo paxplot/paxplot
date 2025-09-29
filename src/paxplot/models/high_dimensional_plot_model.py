@@ -7,7 +7,7 @@ for creating and managing plot structures in PaxPlot.
 from typing import List, Optional, Sequence, Union
 
 from ..structures.array_manager import ArrayManager, ArrayType
-from ..structures.tick_manger import TickManager, TickType
+from ..structures.tick_manager import TickManager, TickType
 from ..structures.labels.axis_label import AxisLabel
 from ..structures.limits.custom_axis_limit import CustomAxisLimit
 

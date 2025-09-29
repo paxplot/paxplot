@@ -11,7 +11,7 @@ from .arrays.numerical_array import NumericalArray
 from .arrays.categorical_array import CategoricalArray
 from .array_manager import ArrayManager, ArrayType
 from .limits.custom_axis_limit import CustomAxisLimit
-from .tick_manger import TickManager, TickType
+from .tick_manager import TickManager, TickType
 
 __all__ = [
     "NumericalArray",

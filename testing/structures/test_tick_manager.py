@@ -1,7 +1,7 @@
 """Tests for TickManager."""
 
 import pytest
-from paxplot.structures.tick_manger import TickManager, TickType
+from paxplot.structures.tick_manager import TickManager, TickType
 from paxplot.structures.ticks.numeric_ticks import NumericTicks
 from paxplot.structures.ticks.categorical_ticks import CategoricalTicks
 
