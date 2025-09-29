@@ -16,10 +16,10 @@ class HighDimensionalPlotModel:
     """
     Main interface for creating and managing plot structures.
 
-    The HighDimensionalPlotModel serves as the primary interface for users to interact with
-    PaxPlot values. It manages an ArrayManager for values storage and automatically
-    creates and maintains associated structures including TickManager,
-    AxisLabels, and CustomAxisLimits.
+    The HighDimensionalPlotModel serves as the primary interface for users to
+    interact with PaxPlot values. It manages an ArrayManager for values storage
+    and automatically creates and maintains associated structures including
+    TickManager, AxisLabels, and CustomAxisLimits.
 
     Parameters
     ----------
@@ -90,7 +90,7 @@ class HighDimensionalPlotModel:
         self._tick_manager = TickManager([])
         self._axis_labels = []
         self._custom_limits = []
-        
+
         if values is not None:
             self.set_values(values)
 
@@ -139,7 +139,8 @@ class HighDimensionalPlotModel:
         Returns
         -------
         List[CustomAxisLimit]
-            List of custom axis limits, one for each column. Initially all limits are None.
+            List of custom axis limits, one for each column. Initially all limits
+            are None.
         """
         return self._custom_limits
 
@@ -190,11 +191,10 @@ class HighDimensionalPlotModel:
         self._array_manager.remove_values(indices)
         self._initialize_structures()
 
-    def set_values(
-        self, values: Sequence[Sequence[Union[str, int, float]]]
-    ) -> None:
+    def set_values(self, values: Sequence[Sequence[Union[str, int, float]]]) -> None:
         """
-        Set new values for the plot model, replacing all existing values and updating all structures.
+        Set new values for the plot model, replacing all existing values and
+        updating all structures.
 
         This method replaces all existing values in the underlying array manager
         and automatically updates the tick manager, axis labels, and custom
@@ -238,7 +238,8 @@ class HighDimensionalPlotModel:
         """
         if index < 0 or index >= len(self._axis_labels):
             raise IndexError(
-                f"Index {index} out of bounds for model with {len(self._axis_labels)} columns"
+                f"Index {index} out of bounds for model with "
+                f"{len(self._axis_labels)} columns"
             )
 
         return self._axis_labels[index].label
@@ -263,7 +264,8 @@ class HighDimensionalPlotModel:
         """
         if index < 0 or index >= len(self._axis_labels):
             raise IndexError(
-                f"Index {index} out of bounds for model with {len(self._axis_labels)} columns"
+                f"Index {index} out of bounds for model with "
+                f"{len(self._axis_labels)} columns"
             )
 
         if not label or not label.strip():
@@ -287,15 +289,14 @@ class HighDimensionalPlotModel:
         """
         if index < 0 or index >= len(self._axis_labels):
             raise IndexError(
-                f"Index {index} out of bounds for model with {len(self._axis_labels)} columns"
+                f"Index {index} out of bounds for model with "
+                f"{len(self._axis_labels)} columns"
             )
 
         self._axis_labels[index].label = None
 
     # Custom Limit Methods
-    def get_custom_limit(
-        self, index: int
-    ) -> tuple[Optional[float], Optional[float]]:
+    def get_custom_limit(self, index: int) -> tuple[Optional[float], Optional[float]]:
         """
         Get the custom axis limits for a specific column.
 
@@ -316,7 +317,8 @@ class HighDimensionalPlotModel:
         """
         if index < 0 or index >= len(self._custom_limits):
             raise IndexError(
-                f"Index {index} out of bounds for model with {len(self._custom_limits)} columns"
+                f"Index {index} out of bounds for model with "
+                f"{len(self._custom_limits)} columns"
             )
 
         limit = self._custom_limits[index]
@@ -351,12 +353,11 @@ class HighDimensionalPlotModel:
         """
         if index < 0 or index >= len(self._custom_limits):
             raise IndexError(
-                f"Index {index} out of bounds for model with {len(self._custom_limits)} columns"
+                f"Index {index} out of bounds for model with "
+                f"{len(self._custom_limits)} columns"
             )
 
-        self._custom_limits[index] = CustomAxisLimit(
-            min_val=min_val, max_val=max_val
-        )
+        self._custom_limits[index] = CustomAxisLimit(min_val=min_val, max_val=max_val)
 
     def clear_custom_limit(self, index: int) -> None:
         """
@@ -374,7 +375,8 @@ class HighDimensionalPlotModel:
         """
         if index < 0 or index >= len(self._custom_limits):
             raise IndexError(
-                f"Index {index} out of bounds for model with {len(self._custom_limits)} columns"
+                f"Index {index} out of bounds for model with "
+                f"{len(self._custom_limits)} columns"
             )
 
         self._custom_limits[index] = CustomAxisLimit()
@@ -391,7 +393,6 @@ class HighDimensionalPlotModel:
         """
         return self._array_manager.num_arrays
 
-
     def __repr__(self) -> str:
         """
         Get a string representation of the plot model.
@@ -406,8 +407,10 @@ class HighDimensionalPlotModel:
         else:
             row_count = len(self._array_manager.get_array(0))
         return (
-            f"HighDimensionalPlotModel({row_count} rows, {self._array_manager.num_arrays} columns, "
-            f"{len(self._axis_labels)} axis labels, {len(self._custom_limits)} custom limits)"
+            f"HighDimensionalPlotModel({row_count} rows, "
+            f"{self._array_manager.num_arrays} columns, "
+            f"{len(self._axis_labels)} axis labels, "
+            f"{len(self._custom_limits)} custom limits)"
         )
 
     # Private Methods
@@ -479,20 +482,12 @@ class HighDimensionalPlotModel:
 
                         # Only generate ticks if we have a valid range
                         if min_val != max_val:
-                            numeric_ticks = (
-                                self._tick_manager.get_numeric_ticks(i)
-                            )
-                            numeric_ticks.set_ticks_from_range(
-                                min_val, max_val
-                            )
+                            numeric_ticks = self._tick_manager.get_numeric_ticks(i)
+                            numeric_ticks.set_ticks_from_range(min_val, max_val)
                         else:
                             # Single value case - create a simple tick
-                            numeric_ticks = (
-                                self._tick_manager.get_numeric_ticks(i)
-                            )
-                            numeric_ticks.set_ticks(
-                                [f"{min_val:.2f}"], [min_val]
-                            )
+                            numeric_ticks = self._tick_manager.get_numeric_ticks(i)
+                            numeric_ticks.set_ticks([f"{min_val:.2f}"], [min_val])
 
             elif array_type == ArrayType.CATEGORICAL:
                 # Generate categorical ticks
@@ -500,14 +495,8 @@ class HighDimensionalPlotModel:
                 if len(categorical_array) > 0:
                     # Get unique categories (excluding NaN)
                     unique_categories = [
-                        cat
-                        for cat in categorical_array.unique_values
-                        if cat != "<NaN>"
+                        cat for cat in categorical_array.unique_values if cat != "<NaN>"
                     ]
                     if unique_categories:
-                        categorical_ticks = (
-                            self._tick_manager.get_categorical_ticks(i)
-                        )
-                        categorical_ticks.set_ticks_from_categories(
-                            unique_categories
-                        )
+                        categorical_ticks = self._tick_manager.get_categorical_ticks(i)
+                        categorical_ticks.set_ticks_from_categories(unique_categories)

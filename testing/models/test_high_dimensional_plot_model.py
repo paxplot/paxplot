@@ -34,7 +34,7 @@ class TestHighDimensionalPlotModel:
     def test_init_with_no_values_creates_empty_model(self):
         """Test initialization with no values creates empty model."""
         plot_model = HighDimensionalPlotModel()
-        
+
         assert len(plot_model) == 0
         assert plot_model.array_manager.num_arrays == 0
         assert len(plot_model.axis_labels) == 0
@@ -256,7 +256,9 @@ class TestHighDimensionalPlotModel:
         custom_limits = plot_model.custom_limits
         assert len(custom_limits) == 3
         # Initially all limits should be None
-        assert all(limit.min_val is None and limit.max_val is None for limit in custom_limits)
+        assert all(
+            limit.min_val is None and limit.max_val is None for limit in custom_limits
+        )
 
     def test_get_axis_label_valid(self):
         """Test get_axis_label method with valid index."""
@@ -386,4 +388,6 @@ class TestHighDimensionalPlotModel:
         custom_limits = plot_model.custom_limits
         assert len(custom_limits) == 3
         # Initially all limits should be None
-        assert all(limit.min_val is None and limit.max_val is None for limit in custom_limits)
+        assert all(
+            limit.min_val is None and limit.max_val is None for limit in custom_limits
+        )
