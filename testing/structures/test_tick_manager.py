@@ -266,7 +266,9 @@ class TestTickManager:
         categorical_ticks1 = CategoricalTicks()
         numeric_ticks2 = NumericTicks()
         categorical_ticks2 = CategoricalTicks()
-        manager = TickManager([numeric_ticks1, categorical_ticks1, numeric_ticks2, categorical_ticks2])
+        manager = TickManager(
+            [numeric_ticks1, categorical_ticks1, numeric_ticks2, categorical_ticks2]
+        )
 
         # Configure numeric ticks
         manager.get_numeric_ticks(0).set_ticks_from_range(0, 50)
@@ -274,9 +276,7 @@ class TestTickManager:
 
         # Configure categorical ticks
         manager.get_categorical_ticks(1).set_ticks_from_categories(["A", "B"])
-        manager.get_categorical_ticks(3).set_ticks_from_categories(
-            ["X", "Y", "Z"]
-        )
+        manager.get_categorical_ticks(3).set_ticks_from_categories(["X", "Y", "Z"])
 
         # Verify all configurations
         assert len(manager.get_numeric_ticks(0)) > 0
@@ -290,7 +290,9 @@ class TestTickManager:
         categorical_ticks1 = CategoricalTicks()
         numeric_ticks2 = NumericTicks()
         categorical_ticks2 = CategoricalTicks()
-        manager = TickManager([numeric_ticks1, categorical_ticks1, numeric_ticks2, categorical_ticks2])
+        manager = TickManager(
+            [numeric_ticks1, categorical_ticks1, numeric_ticks2, categorical_ticks2]
+        )
 
         # Remove the second tick (index 1)
         manager.remove_ticks([1])
@@ -315,7 +317,7 @@ class TestTickManager:
         """Test setting ticks from types."""
         manager = TickManager()
         manager.set_ticks_from_types([TickType.NUMERIC, TickType.CATEGORICAL])
-        
+
         assert manager.num_ticks == 2
         assert isinstance(manager.get_ticks(0), NumericTicks)
         assert isinstance(manager.get_ticks(1), CategoricalTicks)
@@ -337,7 +339,7 @@ class TestTickManager:
         numeric_ticks = NumericTicks()
         manager = TickManager([numeric_ticks])
         assert manager.num_ticks == 1
-        
+
         categorical_ticks = CategoricalTicks()
         manager.append_ticks(categorical_ticks)
         assert manager.num_ticks == 2
@@ -346,7 +348,9 @@ class TestTickManager:
     def test_append_ticks_invalid_type_raises_error(self):
         """Test appending invalid tick type raises error."""
         manager = TickManager()
-        with pytest.raises(TypeError, match="Tick must be NumericTicks or CategoricalTicks"):
+        with pytest.raises(
+            TypeError, match="Tick must be NumericTicks or CategoricalTicks"
+        ):
             manager.append_ticks("invalid")  # type: ignore
 
     def test_clear_ticks(self):
@@ -355,7 +359,7 @@ class TestTickManager:
         categorical_ticks = CategoricalTicks()
         manager = TickManager([numeric_ticks, categorical_ticks])
         assert manager.num_ticks == 2
-        
+
         manager.clear_ticks()
         assert manager.num_ticks == 0
 
@@ -364,12 +368,14 @@ class TestTickManager:
         numeric_ticks = NumericTicks()
         categorical_ticks = CategoricalTicks()
         manager = TickManager()
-        
+
         assert manager.infer_tick_type(numeric_ticks) == TickType.NUMERIC
         assert manager.infer_tick_type(categorical_ticks) == TickType.CATEGORICAL
 
     def test_infer_tick_type_invalid_raises_error(self):
         """Test inferring tick type with invalid tick raises error."""
         manager = TickManager()
-        with pytest.raises(TypeError, match="Tick must be NumericTicks or CategoricalTicks"):
+        with pytest.raises(
+            TypeError, match="Tick must be NumericTicks or CategoricalTicks"
+        ):
             manager.infer_tick_type("invalid")  # type: ignore

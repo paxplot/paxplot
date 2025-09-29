@@ -70,8 +70,7 @@ class TickManager:
     """
 
     def __init__(
-        self, 
-        ticks: Union[Sequence[Union[NumericTicks, CategoricalTicks]], None] = None
+        self, ticks: Union[Sequence[Union[NumericTicks, CategoricalTicks]], None] = None
     ):
         """
         Initialize TickManager with ticks.
@@ -90,10 +89,7 @@ class TickManager:
         self._ticks: List[Union[NumericTicks, CategoricalTicks]] = []
         self.set_ticks(ticks)
 
-
-    def get_ticks(
-        self, index: int
-    ) -> Union[NumericTicks, CategoricalTicks]:
+    def get_ticks(self, index: int) -> Union[NumericTicks, CategoricalTicks]:
         """Get a tick at the specified index.
 
         Parameters
@@ -141,9 +137,7 @@ class TickManager:
         """
         if self.get_tick_type(index) != TickType.NUMERIC:
             tick_type = type(self._ticks[index]).__name__
-            raise TypeError(
-                f"Tick {index} is not numeric, it is {tick_type}"
-            )
+            raise TypeError(f"Tick {index} is not numeric, it is {tick_type}")
         tick = self.get_ticks(index)
         assert isinstance(tick, NumericTicks)
         return tick
@@ -170,9 +164,7 @@ class TickManager:
         """
         if self.get_tick_type(index) != TickType.CATEGORICAL:
             tick_type = type(self._ticks[index]).__name__
-            raise TypeError(
-                f"Tick {index} is not categorical, it is {tick_type}"
-            )
+            raise TypeError(f"Tick {index} is not categorical, it is {tick_type}")
         tick = self.get_ticks(index)
         assert isinstance(tick, CategoricalTicks)
         return tick
@@ -251,8 +243,7 @@ class TickManager:
         return f"TickManager({len(self._ticks)} ticks: {', '.join(type_info)})"
 
     def set_ticks(
-        self, 
-        ticks: Union[Sequence[Union[NumericTicks, CategoricalTicks]], None] = None
+        self, ticks: Union[Sequence[Union[NumericTicks, CategoricalTicks]], None] = None
     ) -> None:
         """Set new ticks, replacing all existing ticks.
 
@@ -268,7 +259,7 @@ class TickManager:
         """
         if ticks is None:
             ticks = []
-        
+
         # Validate ticks
         for i, tick in enumerate(ticks):
             if not isinstance(tick, (NumericTicks, CategoricalTicks)):
@@ -276,13 +267,10 @@ class TickManager:
                     f"Tick at index {i} must be NumericTicks or CategoricalTicks, "
                     f"got {type(tick)}"
                 )
-        
+
         self._ticks = list(ticks)
 
-    def set_ticks_from_types(
-        self, 
-        tick_types: Sequence[TickType]
-    ) -> None:
+    def set_ticks_from_types(self, tick_types: Sequence[TickType]) -> None:
         """Set new ticks from tick types, creating empty ticks.
 
         Parameters
@@ -299,14 +287,14 @@ class TickManager:
         """
         if not tick_types:
             raise ValueError("tick_types cannot be empty")
-        
+
         # Validate tick types
         for i, tick_type in enumerate(tick_types):
             if not isinstance(tick_type, TickType):
                 raise TypeError(
                     f"tick_type at index {i} must be a TickType, got {type(tick_type)}"
                 )
-        
+
         # Create empty ticks based on types
         new_ticks = []
         for tick_type in tick_types:
@@ -316,13 +304,10 @@ class TickManager:
                 new_ticks.append(CategoricalTicks())
             else:
                 raise ValueError(f"Unknown tick type: {tick_type}")
-        
+
         self._ticks = new_ticks
 
-    def append_ticks(
-        self, 
-        tick: Union[NumericTicks, CategoricalTicks]
-    ) -> None:
+    def append_ticks(self, tick: Union[NumericTicks, CategoricalTicks]) -> None:
         """Append a new tick to the manager.
 
         Parameters
@@ -337,10 +322,9 @@ class TickManager:
         """
         if not isinstance(tick, (NumericTicks, CategoricalTicks)):
             raise TypeError(
-                f"Tick must be NumericTicks or CategoricalTicks, "
-                f"got {type(tick)}"
+                f"Tick must be NumericTicks or CategoricalTicks, " f"got {type(tick)}"
             )
-        
+
         self._ticks.append(tick)
 
     def remove_ticks(self, indices: Sequence[int]) -> None:
@@ -360,12 +344,10 @@ class TickManager:
         """
         # Convert to list and sort in reverse order to avoid index shifting
         indices_list = sorted(indices, reverse=True)
-        
+
         for index in indices_list:
             if not isinstance(index, int):
-                raise ValueError(
-                    f"Index must be an integer, got {type(index)}"
-                )
+                raise ValueError(f"Index must be an integer, got {type(index)}")
             if index < 0 or index >= len(self._ticks):
                 raise IndexError(
                     f"Index {index} out of bounds for manager with "
@@ -377,10 +359,7 @@ class TickManager:
         """Clear all ticks from the manager."""
         self.set_ticks([])
 
-    def infer_tick_type(
-        self, 
-        tick: Union[NumericTicks, CategoricalTicks]
-    ) -> TickType:
+    def infer_tick_type(self, tick: Union[NumericTicks, CategoricalTicks]) -> TickType:
         """Infer the type of a tick.
 
         Parameters
@@ -395,13 +374,11 @@ class TickManager:
         """
         if isinstance(tick, NumericTicks):
             return TickType.NUMERIC
-        elif isinstance(tick, CategoricalTicks):
+        if isinstance(tick, CategoricalTicks):
             return TickType.CATEGORICAL
-        else:
-            raise TypeError(
-                f"Tick must be NumericTicks or CategoricalTicks, "
-                f"got {type(tick)}"
-            )
+        raise TypeError(
+            f"Tick must be NumericTicks or CategoricalTicks, " f"got {type(tick)}"
+        )
 
     @property
     def ticks(self) -> List[Union[NumericTicks, CategoricalTicks]]:
