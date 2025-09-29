@@ -61,15 +61,11 @@ class TestCategoricalTicks:
         ticks = CategoricalTicks()
 
         # Test with non-string categories
-        with pytest.raises(
-            ValueError, match="Category at index 0 must be a string"
-        ):
+        with pytest.raises(ValueError, match="Category at index 0 must be a string"):
             ticks.set_ticks_from_categories([123, "Blue"])
 
         # Test with empty string categories
-        with pytest.raises(
-            ValueError, match="Category at index 1 cannot be empty"
-        ):
+        with pytest.raises(ValueError, match="Category at index 1 cannot be empty"):
             ticks.set_ticks_from_categories(["Red", "", "Blue"])
 
     def test_generate_ticks_from_categories_regeneration(self):
@@ -159,9 +155,7 @@ class TestCategoricalTicks:
         repr_str = repr(ticks)
 
         assert "CategoricalTicks" in repr_str
-        assert (
-            "labels=['Category_0', 'Category_1', 'Category_2']..." in repr_str
-        )
+        assert "labels=['Category_0', 'Category_1', 'Category_2']..." in repr_str
         assert "locations=[0.0, 1.0, 2.0]..." in repr_str
 
     def test_categorical_array_integration(self):
@@ -209,7 +203,9 @@ class TestCategoricalTicks:
         ticks.set_ticks_from_categories(categories)
 
         # Test direct access for lookups
-        blue_index = ticks.locations.get_values()[ticks.labels.get_values().index("Blue")]
+        blue_index = ticks.locations.get_values()[
+            ticks.labels.get_values().index("Blue")
+        ]
         assert blue_index == 1
 
         green_category = ticks.labels.get_values()[2]

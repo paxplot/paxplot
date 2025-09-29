@@ -34,9 +34,9 @@ class BaseTicks(ABC):
     """
 
     def __init__(
-        self, 
-        labels: Union[Sequence[str], None] = None, 
-        locations: Union[Sequence[Union[float, int]], None] = None
+        self,
+        labels: Union[Sequence[str], None] = None,
+        locations: Union[Sequence[Union[float, int]], None] = None,
     ):
         """
         Initialize BaseTicks with labels and locations.
@@ -84,7 +84,8 @@ class BaseTicks(ABC):
 
     def validate(self) -> None:
         """
-        Validate that labels and locations arrays have matching lengths and valid values.
+        Validate that labels and locations arrays have matching
+        lengths and valid values.
 
         Raises
         ------
@@ -120,9 +121,9 @@ class BaseTicks(ABC):
                 )
 
     def set_ticks(
-        self, 
-        labels: Union[Sequence[str], None] = None, 
-        locations: Union[Sequence[Union[float, int]], None] = None
+        self,
+        labels: Union[Sequence[str], None] = None,
+        locations: Union[Sequence[Union[float, int]], None] = None,
     ) -> None:
         """
         Set new tick labels and locations, replacing all existing ticks.
@@ -182,7 +183,8 @@ class BaseTicks(ABC):
             for i, location in enumerate(locations):
                 if not isinstance(location, (int, float)):
                     raise ValueError(
-                        f"New location at index {i} must be numerical, got {type(location)}"
+                        f"New location at index {i} must be numerical, "
+                        f"got {type(location)}"
                     )
                 if math.isnan(location) or math.isinf(location):
                     raise ValueError(
@@ -265,7 +267,8 @@ class BaseTicks(ABC):
             for i, location in enumerate(locations):
                 if not isinstance(location, (int, float)):
                     raise ValueError(
-                        f"New location at index {i} must be numerical, got {type(location)}"
+                        f"New location at index {i} must be numerical, "
+                        f"got {type(location)}"
                     )
                 if math.isnan(location) or math.isinf(location):
                     raise ValueError(
@@ -314,12 +317,11 @@ class BaseTicks(ABC):
             # Validate indices
             for index in indices:
                 if not isinstance(index, int):
-                    raise ValueError(
-                        f"Index must be an integer, got {type(index)}"
-                    )
+                    raise ValueError(f"Index must be an integer, got {type(index)}")
                 if index < 0 or index >= len(self._labels):
                     raise IndexError(
-                        f"Index {index} out of bounds for array of length {len(self._labels)}"
+                        f"Index {index} out of bounds for array of length "
+                        f"{len(self._labels)}"
                     )
 
             # Remove ticks from both arrays

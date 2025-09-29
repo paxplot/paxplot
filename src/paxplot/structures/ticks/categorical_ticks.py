@@ -4,7 +4,7 @@ This module defines the CategoricalTicks class for managing categorical axis tic
 using category indices for positioning.
 """
 
-from typing import Sequence, Union
+from typing import Sequence
 
 from .base_ticks import BaseTicks
 
@@ -31,23 +31,6 @@ class CategoricalTicks(BaseTicks):
     >>> print(ticks.locations.get_values())  # [0, 1, 2, 3]
     """
 
-    def __init__(
-        self, 
-        labels: Union[Sequence[str], None] = None, 
-        locations: Union[Sequence[Union[float, int]], None] = None
-    ):
-        """
-        Initialize CategoricalTicks with optional labels and locations.
-
-        Parameters
-        ----------
-        labels : Sequence[str], optional
-            The tick labels as strings. If None, creates empty labels array.
-        locations : Sequence[Union[float, int]], optional
-            The tick positions on the axis. If None, creates empty locations array.
-        """
-        # Initialize with optional labels and locations
-        super().__init__(labels, locations)
 
     def set_ticks_from_categories(self, categories: Sequence[str]) -> None:
         """
@@ -98,7 +81,8 @@ class CategoricalTicks(BaseTicks):
         Returns
         -------
         str
-            A string representation showing the number of ticks and first few categories.
+            A string representation showing the number of ticks and first few
+            categories.
         """
         if len(self._labels) == 0:
             return "CategoricalTicks(empty)"
@@ -107,5 +91,7 @@ class CategoricalTicks(BaseTicks):
         locations_preview = self._locations.get_values()[:3]
 
         if len(self._labels) <= 3:
-            return f"CategoricalTicks(labels={labels_preview}, locations={locations_preview})"
-        return f"CategoricalTicks(labels={labels_preview}..., locations={locations_preview}...)"
+            return (f"CategoricalTicks(labels={labels_preview}, "
+                    f"locations={locations_preview})")
+        return (f"CategoricalTicks(labels={labels_preview}..., "
+                f"locations={locations_preview}...)")

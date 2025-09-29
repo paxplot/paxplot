@@ -4,7 +4,7 @@ This module defines the NumericTicks class for managing numerical axis ticks
 using matplotlib's MaxNLocator for optimal tick generation.
 """
 
-from typing import Sequence, Union
+from typing import Union
 
 from matplotlib.ticker import MaxNLocator
 
@@ -33,23 +33,6 @@ class NumericTicks(BaseTicks):
     >>> print(ticks.locations.get_values())  # [0.0, 25.0, 50.0, 75.0, 100.0]
     """
 
-    def __init__(
-        self, 
-        labels: Union[Sequence[str], None] = None, 
-        locations: Union[Sequence[Union[float, int]], None] = None
-    ):
-        """
-        Initialize NumericTicks with optional labels and locations.
-
-        Parameters
-        ----------
-        labels : Sequence[str], optional
-            The tick labels as strings. If None, creates empty labels array.
-        locations : Sequence[Union[float, int]], optional
-            The tick positions on the axis. If None, creates empty locations array.
-        """
-        # Initialize with optional labels and locations
-        super().__init__(labels, locations)
 
     def set_ticks_from_range(
         self,
@@ -125,5 +108,10 @@ class NumericTicks(BaseTicks):
         locations_preview = self._locations.get_values()[:3]
 
         if len(self._labels) <= 3:
-            return f"NumericTicks(labels={labels_preview}, locations={locations_preview})"
-        return f"NumericTicks(labels={labels_preview}..., locations={locations_preview}...)"
+            return (
+                f"NumericTicks(labels={labels_preview}, locations={locations_preview})"
+            )
+        return (
+            f"NumericTicks(labels={labels_preview}..., "
+            f"locations={locations_preview}...)"
+        )

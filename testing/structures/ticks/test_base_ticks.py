@@ -42,9 +42,7 @@ class TestBaseTicks:
         labels = ["A", "", "C"]
         locations = [0.0, 1.0, 2.0]
 
-        with pytest.raises(
-            ValueError, match="Label at index 1 cannot be empty"
-        ):
+        with pytest.raises(ValueError, match="Label at index 1 cannot be empty"):
             ConcreteTicks(labels, locations)
 
     def test_init_with_invalid_locations(self):
@@ -52,9 +50,7 @@ class TestBaseTicks:
         labels = ["A", "B", "C"]
         locations = [0.0, float("inf"), 2.0]
 
-        with pytest.raises(
-            ValueError, match="Location at index 1 must be finite"
-        ):
+        with pytest.raises(ValueError, match="Location at index 1 must be finite"):
             ConcreteTicks(labels, locations)
 
     def test_init_with_nan_locations(self):
@@ -62,9 +58,7 @@ class TestBaseTicks:
         labels = ["A", "B", "C"]
         locations = [0.0, float("nan"), 2.0]
 
-        with pytest.raises(
-            ValueError, match="Location at index 1 must be finite"
-        ):
+        with pytest.raises(ValueError, match="Location at index 1 must be finite"):
             ConcreteTicks(labels, locations)
 
     def test_validate_success(self):
