@@ -13,7 +13,7 @@ class TestBaseArray:
     def test_base_array_cannot_be_instantiated(self):
         """Test that BaseArray cannot be instantiated directly."""
         with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-            BaseArray([1, 2, 3])
+            BaseArray([1, 2, 3])  # type: ignore
 
     def test_numerical_array_inherits_base_functionality(self):
         """Test that NumericalArray inherits base functionality correctly."""
@@ -48,7 +48,7 @@ class TestBaseArray:
     def test_shared_nan_handling_works_consistently(self):
         """Test that NaN handling works consistently across array types."""
         numeric_array = NumericalArray([1.0, None, 3.0])
-        categorical_array = CategoricalArray(["A", None, "B"])
+        categorical_array = CategoricalArray(["A", None, "B"])  # type: ignore
 
         # Both should have NaN
         assert numeric_array.has_nan is True
@@ -210,7 +210,7 @@ class TestBaseArray:
         assert array.length == 5
 
         # Set values with NaN
-        array.set_values(["A", None, "B"])
+        array.set_values(["A", None, "B"])  # type: ignore
         assert array.get_values() == ["A", "<NaN>", "B"]
         assert array.unique_values == ["A", "<NaN>", "B"]
         assert array.has_nan is True
@@ -221,18 +221,14 @@ class TestBaseArray:
         # Test NumericalArray validation
         numeric_array = NumericalArray([1, 2, 3])
 
-        with pytest.raises(
-            ValueError, match="Value at index 0 must be numerical"
-        ):
+        with pytest.raises(ValueError, match="Value at index 0 must be numerical"):
             numeric_array.set_values(["invalid", 2, 3])
 
         # Test CategoricalArray validation
         categorical_array = CategoricalArray(["A", "B", "C"])
 
-        with pytest.raises(
-            ValueError, match="Value at index 0 must be a string"
-        ):
-            categorical_array.set_values([123, "B", "C"])
+        with pytest.raises(ValueError, match="Value at index 0 must be a string"):
+            categorical_array.set_values([123, "B", "C"])  # type: ignore
 
     def test_set_values_empty_sequence(self):
         """Test set_values with empty sequence."""

@@ -83,11 +83,7 @@ class BaseArray(ABC, Generic[T]):
         """
         if not self._has_nan:
             return []
-        return [
-            i
-            for i, value in enumerate(self._values)
-            if self._is_nan_value(value)
-        ]
+        return [i for i, value in enumerate(self._values) if self._is_nan_value(value)]
 
     @property
     def non_nan_values(self) -> List[T]:
@@ -100,9 +96,7 @@ class BaseArray(ABC, Generic[T]):
         """
         if not self._has_nan:
             return self._values.copy()
-        return [
-            value for value in self._values if not self._is_nan_value(value)
-        ]
+        return [value for value in self._values if not self._is_nan_value(value)]
 
     @property
     def length(self) -> int:
@@ -154,12 +148,11 @@ class BaseArray(ABC, Generic[T]):
 
         for index in indices_list:
             if not isinstance(index, int):
-                raise ValueError(
-                    f"Index must be an integer, got {type(index)}"
-                )
+                raise ValueError(f"Index must be an integer, got {type(index)}")
             if index < 0 or index >= len(self._values):
                 raise IndexError(
-                    f"Index {index} out of bounds for array of length {len(self._values)}"
+                    f"Index {index} out of bounds for array of length "
+                    f"{len(self._values)}"
                 )
             del self._values[index]
 
@@ -262,8 +255,12 @@ class BaseArray(ABC, Generic[T]):
         return any(self._is_nan_value(value) for value in self._values)
 
     @abstractmethod
-    def _validate_and_convert(self, values: Union[Sequence, None] = None) -> tuple[List[T], bool]:
-        """Validate and convert values to the appropriate type, also computing NaN state.
+    def _validate_and_convert(
+        self, values: Union[Sequence, None] = None
+    ) -> tuple[List[T], bool]:
+        """Validate and convert values to the appropriate type.
+
+        Also computes NaN state during validation.
 
         Parameters
         ----------

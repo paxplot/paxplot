@@ -94,7 +94,8 @@ class CategoricalArray(BaseArray[str]):
         ----------
         values : Sequence[str], optional
             The new categorical values to set. Can include None, float('nan'),
-            or numpy.nan which will be converted to "<NaN>" string. If None, creates empty array.
+            or numpy.nan which will be converted to "<NaN>" string. If None,
+            creates empty array.
 
         Raises
         ------
@@ -125,8 +126,9 @@ class CategoricalArray(BaseArray[str]):
         Parameters
         ----------
         values : Sequence[str], optional
-            The values to validate and convert. Can include None, float('nan'),
-            or numpy.nan which will be converted to "<NaN>" string. If None, returns empty list.
+            The values to validate and convert. Can include None, float('nan'), or
+            numpy.nan, which will be converted to the "<NaN>" string. If None,
+            returns an empty list.
 
         Returns
         -------
@@ -151,7 +153,8 @@ class CategoricalArray(BaseArray[str]):
             else:
                 if not isinstance(value, str):
                     raise ValueError(
-                        f"Value at index {i} must be a string, got {type(value)}: {value}"
+                        f"Value at index {i} must be a string, "
+                        f"got {type(value)}: {value}"
                     )
                 converted_values.append(value)
 

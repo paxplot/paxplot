@@ -52,7 +52,8 @@ class NumericalArray(BaseArray[float]):
         ----------
         values : Sequence[Union[float, int]], optional
             The values to validate and convert. Can include None, float('nan'),
-            or numpy.nan which will be converted to float('nan'). If None, returns empty list.
+            or numpy.nan which will be converted to float('nan').
+            If None, returns empty list.
 
         Returns
         -------
@@ -77,7 +78,8 @@ class NumericalArray(BaseArray[float]):
             else:
                 if not isinstance(value, (int, float)):
                     raise ValueError(
-                        f"Value at index {i} must be numerical, got {type(value)}: {value}"
+                        f"Value at index {i} must be numerical, "
+                        f"got {type(value)}: {value}"
                     )
                 converted_values.append(float(value))
 
@@ -127,9 +129,7 @@ class NumericalArray(BaseArray[float]):
 
         non_nan_values = self.non_nan_values
         if not non_nan_values:
-            raise ValueError(
-                "Cannot compute min of array containing only NaN values"
-            )
+            raise ValueError("Cannot compute min of array containing only NaN values")
 
         return min(non_nan_values)
 
@@ -152,9 +152,7 @@ class NumericalArray(BaseArray[float]):
 
         non_nan_values = self.non_nan_values
         if not non_nan_values:
-            raise ValueError(
-                "Cannot compute max of array containing only NaN values"
-            )
+            raise ValueError("Cannot compute max of array containing only NaN values")
 
         return max(non_nan_values)
 
