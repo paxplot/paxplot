@@ -17,34 +17,42 @@ class PlotModel:
     Main interface for creating and managing plot structures.
 
     The PlotModel serves as the primary interface for users to interact with
-    PaxPlot data. It provides a clean API for managing data, axis labels,
-    and custom limits without exposing internal implementation details.
+    PaxPlot values. It manages an ArrayManager for values storage and automatically
+    creates and maintains associated structures including TickManager,
+    AxisLabels, and CustomAxisLimits.
 
     Parameters
     ----------
-    data : Sequence[Sequence[Union[str, int, float]]]
-        Initial data as a 2D sequence where each row is a sequence of values
-        and each column should be consistently typed.
+    values : Sequence[Sequence[Union[str, int, float]]], optional
+        Initial values as a 2D sequence where each row is a sequence of values
+        and each column should be consistently typed. If None, creates an
+        empty model that can be populated later.
 
     Examples
     --------
-    >>> # Initialize with data
-    >>> data = [
+    >>> # Initialize with values
+    >>> values = [
     ...     [1, 'A', 2.5],
     ...     [2, 'B', 3.0],
     ...     [3, 'A', 1.5]
     ... ]
-    >>> plot_model = PlotModel(data)
-    >>> print(plot_model.get_column_count())  # 3
-    >>> print(plot_model.get_row_count())     # 3
+    >>> plot_model = PlotModel(values)
+    >>> print(plot_model.array_manager.num_arrays)  # 3
+    >>> print(plot_model.array_manager.get_array(0).length)  # 3
     >>>
-    >>> # Append new data
-    >>> plot_model.append_data([4, 'C', 2.0])
-    >>> print(plot_model.get_row_count())     # 4
+    >>> # Append new values
+    >>> plot_model.append_values([4, 'C', 2.0])
+    >>> print(plot_model.array_manager.get_array(0).length)  # 4
     >>>
-    >>> # Remove data by indices
-    >>> plot_model.remove_data([0, 2])
-    >>> print(plot_model.get_row_count())     # 2
+    >>> # Remove values by indices
+    >>> plot_model.remove_values([0, 2])
+    >>> print(plot_model.array_manager.get_array(0).length)  # 2
+    >>>
+    >>> # Access structures
+    >>> array_manager = plot_model.array_manager
+    >>> tick_manager = plot_model.tick_manager
+    >>> axis_labels = plot_model.axis_labels
+    >>> custom_limits = plot_model.custom_limits
     >>>
     >>> # Manage axis labels
     >>> plot_model.set_axis_label(0, "X Values")
@@ -59,42 +67,156 @@ class PlotModel:
     >>> plot_model.clear_custom_limit(0)
     >>> min_val, max_val = plot_model.get_custom_limit(0)
     >>> print(f"Limits: {min_val} to {max_val}")  # Limits: None to None
-    >>>
-    >>> # Access data values
-    >>> column_type = plot_model.get_column_type(0)  # "numeric"
-    >>> numeric_values = plot_model.get_numeric_values(0)  # [1.0, 2.0, 3.0]
-    >>> categorical_values = plot_model.get_categorical_values(1)  # ['A', 'B', 'A']
-    >>> unique_vals = plot_model.get_unique_values(1)  # ['A', 'B']
-    >>>
-    >>> # Access tick information
-    >>> tick_labels = plot_model.get_tick_labels(0)  # ['1.0', '2.0', '3.0']
-    >>> tick_locations = plot_model.get_tick_locations(0)  # [1.0, 2.0, 3.0]
     """
 
     def __init__(
-        self, data: Sequence[Sequence[Union[str, int, float]]]
+        self, values: Optional[Sequence[Sequence[Union[str, int, float]]]] = None
     ) -> None:
         """
-        Initialize PlotModel with initial data.
+        Initialize PlotModel with optional initial values.
 
         Parameters
         ----------
-        data : Sequence[Sequence[Union[str, int, float]]]
-            Initial data as a 2D sequence where each row is a sequence
+        values : Sequence[Sequence[Union[str, int, float]]], optional
+            Initial values as a 2D sequence. If None, creates an empty model.
+
+        Raises
+        ------
+        ValueError
+            If the values structure is invalid (empty or inconsistent row lengths).
+        """
+        # Initialize with empty structures first, then use set_values method
+        self._array_manager = ArrayManager([])
+        self._tick_manager = TickManager([])
+        self._axis_labels = []
+        self._custom_limits = []
+        
+        if values is not None:
+            self.set_values(values)
+
+    # Properties
+    @property
+    def array_manager(self) -> ArrayManager:
+        """
+        Get the underlying array manager.
+
+        Returns
+        -------
+        ArrayManager
+            The array manager containing all values columns.
+        """
+        return self._array_manager
+
+    @property
+    def tick_manager(self) -> TickManager:
+        """
+        Get the tick manager for all columns.
+
+        Returns
+        -------
+        TickManager
+            The tick manager containing tick collections for each column.
+        """
+        return self._tick_manager
+
+    @property
+    def axis_labels(self) -> List[AxisLabel]:
+        """
+        Get the list of axis labels.
+
+        Returns
+        -------
+        List[AxisLabel]
+            List of axis labels, one for each column. Initially all labels are None.
+        """
+        return self._axis_labels
+
+    @property
+    def custom_limits(self) -> List[CustomAxisLimit]:
+        """
+        Get the list of custom axis limits.
+
+        Returns
+        -------
+        List[CustomAxisLimit]
+            List of custom axis limits, one for each column. Initially all limits are None.
+        """
+        return self._custom_limits
+
+    # Data Management Methods
+    def append_values(self, row: Sequence[Union[str, int, float]]) -> None:
+        """
+        Append a new row of values to the array manager and update all structures.
+
+        This method adds a new row to the underlying array manager and automatically
+        updates the tick manager, axis labels, and custom limits to maintain
+        consistency. The tick manager will regenerate ticks based on the
+        updated values.
+
+        Parameters
+        ----------
+        row : Sequence[Union[str, int, float]]
+            The row of values to append. Must have the same length as existing columns.
+
+        Raises
+        ------
+        ValueError
+            If the row length doesn't match the number of columns.
+        """
+        self._array_manager.append_values(row)
+        self._initialize_structures()
+
+    def remove_values(self, indices: Sequence[int]) -> None:
+        """
+        Remove rows at the specified indices and update all structures.
+
+        This method removes the specified rows from the underlying array manager
+        and automatically updates the tick manager, axis labels, and custom
+        limits to maintain consistency. The tick manager will regenerate
+        ticks based on the updated values.
+
+        Parameters
+        ----------
+        indices : Sequence[int]
+            The indices of rows to remove.
+
+        Raises
+        ------
+        IndexError
+            If any index is out of bounds.
+        ValueError
+            If indices are not valid integers.
+        """
+        self._array_manager.remove_values(indices)
+        self._initialize_structures()
+
+    def set_values(
+        self, values: Sequence[Sequence[Union[str, int, float]]]
+    ) -> None:
+        """
+        Set new values for the plot model, replacing all existing values and updating all structures.
+
+        This method replaces all existing values in the underlying array manager
+        and automatically updates the tick manager, axis labels, and custom
+        limits to maintain consistency. The tick manager will regenerate
+        ticks based on the new values, and all associated structures will
+        be reset to their initial state.
+
+        Parameters
+        ----------
+        values : Sequence[Sequence[Union[str, int, float]]]
+            The new values as a 2D sequence where each row is a sequence
             of values and each column should be consistently typed.
 
         Raises
         ------
         ValueError
-            If the data structure is invalid (empty or inconsistent row lengths).
+            If the values structure is invalid (empty or inconsistent row lengths).
         """
-        # Initialize array manager with data directly
-        self._array_manager = ArrayManager()
-        self._array_manager.set_values(data)
-
-        # Initialize other structures based on the array manager
+        self._array_manager.set_values(values)
         self._initialize_structures()
 
+    # Axis Label Methods
     def get_axis_label(self, index: int) -> Optional[str]:
         """
         Get the axis label for a specific column.
@@ -120,289 +242,6 @@ class PlotModel:
             )
 
         return self._axis_labels[index].label
-
-    def get_custom_limit(
-        self, index: int
-    ) -> tuple[Optional[float], Optional[float]]:
-        """
-        Get the custom axis limits for a specific column.
-
-        Parameters
-        ----------
-        index : int
-            The index of the column to get limits for.
-
-        Returns
-        -------
-        tuple[Optional[float], Optional[float]]
-            A tuple of (min_value, max_value), where either can be None if not set.
-
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
-        """
-        if index < 0 or index >= len(self._custom_limits):
-            raise IndexError(
-                f"Index {index} out of bounds for model with {len(self._custom_limits)} columns"
-            )
-
-        limit = self._custom_limits[index]
-        return limit.min_val, limit.max_val
-
-    def get_column_type(self, index: int) -> str:
-        """
-        Get the type of a column.
-
-        Parameters
-        ----------
-        index : int
-            The index of the column to get the type for.
-
-        Returns
-        -------
-        str
-            The column type: "numeric" or "categorical".
-
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
-        """
-        if index < 0 or index >= self._array_manager.num_arrays:
-            raise IndexError(
-                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
-            )
-
-        return self._array_manager.get_array_type(index).value
-
-    def get_numeric_values(self, index: int) -> List[float]:
-        """
-        Get numeric values from a column.
-
-        Parameters
-        ----------
-        index : int
-            The index of the column to get values from.
-
-        Returns
-        -------
-        List[float]
-            The numeric values from the column.
-
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
-        TypeError
-            If the column is not numeric.
-        """
-        if index < 0 or index >= self._array_manager.num_arrays:
-            raise IndexError(
-                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
-            )
-
-        if self._array_manager.get_array_type(index) != ArrayType.NUMERIC:
-            raise TypeError(
-                f"Column {index} is not numeric, it is {self._array_manager.get_array_type(index).value}"
-            )
-
-        return self._array_manager.get_numeric_array(index).get_values()
-
-    def get_categorical_values(self, index: int) -> List[str]:
-        """
-        Get categorical values from a column.
-
-        Parameters
-        ----------
-        index : int
-            The index of the column to get values from.
-
-        Returns
-        -------
-        List[str]
-            The categorical values from the column.
-
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
-        TypeError
-            If the column is not categorical.
-        """
-        if index < 0 or index >= self._array_manager.num_arrays:
-            raise IndexError(
-                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
-            )
-
-        if self._array_manager.get_array_type(index) != ArrayType.CATEGORICAL:
-            array_type = self._array_manager.get_array_type(index).value
-            raise TypeError(
-                f"Column {index} is not categorical, it is {array_type}"
-            )
-
-        return self._array_manager.get_categorical_array(index).get_values()
-
-    def get_unique_values(self, index: int) -> Optional[List[str]]:
-        """
-        Get the unique values for a categorical column.
-
-        Parameters
-        ----------
-        index : int
-            The index of the column to get unique values for.
-
-        Returns
-        -------
-        Optional[List[str]]
-            The unique values for categorical columns, None for numeric columns.
-
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
-        TypeError
-            If the column is not categorical.
-        """
-        if index < 0 or index >= self._array_manager.num_arrays:
-            raise IndexError(
-                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
-            )
-
-        if self._array_manager.get_array_type(index) != ArrayType.CATEGORICAL:
-            array_type = self._array_manager.get_array_type(index).value
-            raise TypeError(
-                f"Column {index} is not categorical, it is {array_type}"
-            )
-
-        categorical_array = self._array_manager.get_categorical_array(index)
-        return categorical_array.unique_values
-
-    def get_tick_labels(self, index: int) -> List[str]:
-        """
-        Get tick labels for a column.
-
-        Parameters
-        ----------
-        index : int
-            The index of the column to get tick labels for.
-
-        Returns
-        -------
-        List[str]
-            The tick labels for the column.
-
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
-        """
-        if index < 0 or index >= self._array_manager.num_arrays:
-            raise IndexError(
-                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
-            )
-
-        tick_collection = self._tick_manager.get_ticks(index)
-        return tick_collection.labels.get_values()
-
-    def get_tick_locations(self, index: int) -> List[float]:
-        """
-        Get tick locations for a column.
-
-        Parameters
-        ----------
-        index : int
-            The index of the column to get tick locations for.
-
-        Returns
-        -------
-        List[float]
-            The tick locations for the column.
-
-        Raises
-        ------
-        IndexError
-            If the index is out of bounds.
-        """
-        if index < 0 or index >= self._array_manager.num_arrays:
-            raise IndexError(
-                f"Index {index} out of bounds for model with {self._array_manager.num_arrays} columns"
-            )
-
-        tick_collection = self._tick_manager.get_ticks(index)
-        return tick_collection.locations.get_values()
-
-    def append_data(self, row: Sequence[Union[str, int, float]]) -> None:
-        """
-        Append a new row of data to the array manager and update all structures.
-
-        This method adds a new row to the underlying array manager and automatically
-        updates the tick manager, axis labels, and custom limits to maintain
-        consistency. The tick manager will regenerate ticks based on the
-        updated data.
-
-        Parameters
-        ----------
-        row : Sequence[Union[str, int, float]]
-            The row of data to append. Must have the same length as existing columns.
-
-        Raises
-        ------
-        ValueError
-            If the row length doesn't match the number of columns.
-        """
-        self._array_manager.append_values(row)
-        self._initialize_structures()
-
-    def remove_data(self, indices: Sequence[int]) -> None:
-        """
-        Remove rows at the specified indices and update all structures.
-
-        This method removes the specified rows from the underlying array manager
-        and automatically updates the tick manager, axis labels, and custom
-        limits to maintain consistency. The tick manager will regenerate
-        ticks based on the updated data.
-
-        Parameters
-        ----------
-        indices : Sequence[int]
-            The indices of rows to remove.
-
-        Raises
-        ------
-        IndexError
-            If any index is out of bounds.
-        ValueError
-            If indices are not valid integers.
-        """
-        self._array_manager.remove_values(indices)
-        self._initialize_structures()
-
-    def set_data(
-        self, data: Sequence[Sequence[Union[str, int, float]]]
-    ) -> None:
-        """
-        Set new data for the plot model, replacing all existing data and updating all structures.
-
-        This method replaces all existing data in the underlying array manager
-        and automatically updates the tick manager, axis labels, and custom
-        limits to maintain consistency. The tick manager will regenerate
-        ticks based on the new data, and all associated structures will
-        be reset to their initial state.
-
-        Parameters
-        ----------
-        data : Sequence[Sequence[Union[str, int, float]]]
-            The new data as a 2D sequence where each row is a sequence
-            of values and each column should be consistently typed.
-
-        Raises
-        ------
-        ValueError
-            If the data structure is invalid (empty or inconsistent row lengths).
-        """
-        self._array_manager.set_values(data)
-        self._initialize_structures()
 
     def set_axis_label(self, index: int, label: str) -> None:
         """
@@ -452,6 +291,36 @@ class PlotModel:
             )
 
         self._axis_labels[index].label = None
+
+    # Custom Limit Methods
+    def get_custom_limit(
+        self, index: int
+    ) -> tuple[Optional[float], Optional[float]]:
+        """
+        Get the custom axis limits for a specific column.
+
+        Parameters
+        ----------
+        index : int
+            The index of the column to get limits for.
+
+        Returns
+        -------
+        tuple[Optional[float], Optional[float]]
+            A tuple of (min_value, max_value), where either can be None if not set.
+
+        Raises
+        ------
+        IndexError
+            If the index is out of bounds.
+        """
+        if index < 0 or index >= len(self._custom_limits):
+            raise IndexError(
+                f"Index {index} out of bounds for model with {len(self._custom_limits)} columns"
+            )
+
+        limit = self._custom_limits[index]
+        return limit.min_val, limit.max_val
 
     def set_custom_limit(
         self,
@@ -510,30 +379,7 @@ class PlotModel:
 
         self._custom_limits[index] = CustomAxisLimit()
 
-    def get_column_count(self) -> int:
-        """
-        Get the number of columns in the model.
-
-        Returns
-        -------
-        int
-            The number of columns.
-        """
-        return self._array_manager.num_arrays
-
-    def get_row_count(self) -> int:
-        """
-        Get the number of rows in the model.
-
-        Returns
-        -------
-        int
-            The number of rows.
-        """
-        if self._array_manager.num_arrays == 0:
-            return 0
-        return len(self._array_manager.get_array(0))
-
+    # Special Methods
     def __len__(self) -> int:
         """
         Get the number of columns in the model.
@@ -545,21 +391,6 @@ class PlotModel:
         """
         return self._array_manager.num_arrays
 
-    def __getitem__(self, index: int):
-        """
-        Get a column at the specified index.
-
-        Parameters
-        ----------
-        index : int
-            The index of the column to get.
-
-        Returns
-        -------
-        Union[NumericalArray, CategoricalArray]
-            The column at the specified index.
-        """
-        return self._array_manager[index]
 
     def __repr__(self) -> str:
         """
@@ -570,19 +401,23 @@ class PlotModel:
         str
             A string representation showing the model dimensions and structure counts.
         """
-        row_count = self.get_row_count()
+        if self._array_manager.num_arrays == 0:
+            row_count = 0
+        else:
+            row_count = len(self._array_manager.get_array(0))
         return (
             f"PlotModel({row_count} rows, {self._array_manager.num_arrays} columns, "
             f"{len(self._axis_labels)} axis labels, {len(self._custom_limits)} custom limits)"
         )
 
+    # Private Methods
     def _initialize_structures(self) -> None:
         """
-        Update all associated structures when data changes.
+        Update all associated structures when values change.
 
-        This method is called whenever the array manager data is modified to ensure
+        This method is called whenever the array manager values are modified to ensure
         all associated structures (TickManager, AxisLabels, CustomAxisLimits)
-        are kept in sync with the current data.
+        are kept in sync with the current values.
         """
         # Determine tick types from array manager array types
         tick_types = []
@@ -597,22 +432,34 @@ class PlotModel:
         self._tick_manager = TickManager()
         self._tick_manager.set_ticks_from_types(tick_types)
 
-        # Generate ticks for each column based on data
-        self._generate_ticks_from_data()
+        # Generate ticks for each column based on values
+        self._generate_ticks_from_values()
 
         # Update axis labels list to match column count
-        self._axis_labels = [
-            AxisLabel() for _ in range(self._array_manager.num_arrays)
-        ]
+        old_axis_labels = self._axis_labels.copy()
+        self._axis_labels = []
+        for i in range(self._array_manager.num_arrays):
+            if i < len(old_axis_labels):
+                # Preserve existing label
+                self._axis_labels.append(old_axis_labels[i])
+            else:
+                # Create new label for new column
+                self._axis_labels.append(AxisLabel())
 
         # Update custom limits list to match column count
-        self._custom_limits = [
-            CustomAxisLimit() for _ in range(self._array_manager.num_arrays)
-        ]
+        old_custom_limits = self._custom_limits.copy()
+        self._custom_limits = []
+        for i in range(self._array_manager.num_arrays):
+            if i < len(old_custom_limits):
+                # Preserve existing limit
+                self._custom_limits.append(old_custom_limits[i])
+            else:
+                # Create new limit for new column
+                self._custom_limits.append(CustomAxisLimit())
 
-    def _generate_ticks_from_data(self) -> None:
+    def _generate_ticks_from_values(self) -> None:
         """
-        Generate ticks for each column based on the current data.
+        Generate ticks for each column based on the current values.
 
         This method populates the tick collections with appropriate tick data
         based on the array types and values.
