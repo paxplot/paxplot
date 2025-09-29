@@ -1,16 +1,16 @@
-"""Tests for PlotModel."""
+"""Tests for HighDimensionalPlotModel."""
 
 import pytest
-from paxplot.models.plot_model import PlotModel
+from paxplot.models.high_dimensional_plot_model import HighDimensionalPlotModel
 
 
-class TestPlotModel:
-    """Test cases for PlotModel."""
+class TestHighDimensionalPlotModel:
+    """Test cases for HighDimensionalPlotModel."""
 
     def test_init_with_valid_values(self):
         """Test initialization with valid values."""
         values = [[1, "A", 2.5], [2, "B", 3.0], [3, "A", 1.5]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         assert len(plot_model) == 3
         assert plot_model.array_manager.num_arrays == 3
@@ -18,22 +18,22 @@ class TestPlotModel:
     def test_init_with_empty_values_raises_error(self):
         """Test initialization with empty values raises error."""
         with pytest.raises(ValueError):
-            PlotModel([])
+            HighDimensionalPlotModel([])
 
     def test_init_with_invalid_values_raises_error(self):
         """Test initialization with invalid values raises error."""
         with pytest.raises(ValueError):
-            PlotModel([1, 2, 3])  # type: ignore
+            HighDimensionalPlotModel([1, 2, 3])  # type: ignore
 
     def test_init_with_uneven_rows_raises_error(self):
         """Test initialization with uneven rows raises error."""
         values = [[1, "A", 2.5], [2, "B"], [3, "A", 1.5]]  # Missing third column
         with pytest.raises(ValueError):
-            PlotModel(values)
+            HighDimensionalPlotModel(values)
 
     def test_init_with_no_values_creates_empty_model(self):
         """Test initialization with no values creates empty model."""
-        plot_model = PlotModel()
+        plot_model = HighDimensionalPlotModel()
         
         assert len(plot_model) == 0
         assert plot_model.array_manager.num_arrays == 0
@@ -43,7 +43,7 @@ class TestPlotModel:
     def test_append_values_valid(self):
         """Test appending valid values."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         initial_rows = len(plot_model.array_manager.get_array(0))
         plot_model.append_values([3, "C", 1.5])
@@ -54,7 +54,7 @@ class TestPlotModel:
     def test_append_values_invalid_length_raises_error(self):
         """Test appending values with invalid length raises error."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(ValueError):
             plot_model.append_values([1, "A"])  # Wrong length
@@ -62,7 +62,7 @@ class TestPlotModel:
     def test_remove_values_valid(self):
         """Test removing valid values."""
         values = [[1, "A", 2.5], [2, "B", 3.0], [3, "C", 1.5]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         initial_rows = len(plot_model.array_manager.get_array(0))
         plot_model.remove_values([0, 2])
@@ -73,7 +73,7 @@ class TestPlotModel:
     def test_remove_values_invalid_index_raises_error(self):
         """Test removing values with invalid index raises error."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(IndexError):
             plot_model.remove_values([10])  # Out of bounds
@@ -81,7 +81,7 @@ class TestPlotModel:
     def test_set_values_valid(self):
         """Test setting valid values."""
         initial_values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(initial_values)
+        plot_model = HighDimensionalPlotModel(initial_values)
 
         new_values = [[10, "X", 1.1], [20, "Y", 2.2], [30, "Z", 3.3]]
         plot_model.set_values(new_values)
@@ -92,7 +92,7 @@ class TestPlotModel:
     def test_set_values_invalid_raises_error(self):
         """Test setting invalid values raises error."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(ValueError):
             plot_model.set_values([])
@@ -100,7 +100,7 @@ class TestPlotModel:
     def test_set_axis_label_valid(self):
         """Test setting valid axis label."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         plot_model.set_axis_label(0, "Index")
         plot_model.set_axis_label(1, "Category")
@@ -111,7 +111,7 @@ class TestPlotModel:
     def test_set_axis_label_invalid_index_raises_error(self):
         """Test setting axis label with invalid index raises error."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(IndexError):
             plot_model.set_axis_label(10, "Invalid")
@@ -119,7 +119,7 @@ class TestPlotModel:
     def test_set_axis_label_empty_raises_error(self):
         """Test setting empty axis label raises error."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(ValueError):
             plot_model.set_axis_label(0, "")
@@ -127,7 +127,7 @@ class TestPlotModel:
     def test_set_axis_label_whitespace_only_raises_error(self):
         """Test setting whitespace-only axis label raises error."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(ValueError):
             plot_model.set_axis_label(0, "   ")
@@ -135,7 +135,7 @@ class TestPlotModel:
     def test_clear_axis_label_valid(self):
         """Test clearing valid axis label."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         plot_model.set_axis_label(0, "Index")
         assert plot_model.get_axis_label(0) == "Index"
@@ -146,7 +146,7 @@ class TestPlotModel:
     def test_clear_axis_label_invalid_index_raises_error(self):
         """Test clearing axis label with invalid index raises error."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(IndexError):
             plot_model.clear_axis_label(10)
@@ -154,7 +154,7 @@ class TestPlotModel:
     def test_set_custom_limit_valid(self):
         """Test setting valid custom limits."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         plot_model.set_custom_limit(0, min_val=0.0, max_val=10.0)
         plot_model.set_custom_limit(2, min_val=1.0, max_val=5.0)
@@ -169,7 +169,7 @@ class TestPlotModel:
     def test_set_custom_limit_partial(self):
         """Test setting partial custom limits."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         plot_model.set_custom_limit(0, min_val=0.0)
         plot_model.set_custom_limit(2, max_val=5.0)
@@ -184,7 +184,7 @@ class TestPlotModel:
     def test_set_custom_limit_invalid_index_raises_error(self):
         """Test setting custom limit with invalid index raises error."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(IndexError):
             plot_model.set_custom_limit(10, min_val=0.0)
@@ -192,7 +192,7 @@ class TestPlotModel:
     def test_set_custom_limit_invalid_values_raises_error(self):
         """Test setting custom limit with invalid values raises error."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(ValueError):
             plot_model.set_custom_limit(0, min_val=10.0, max_val=5.0)
@@ -200,7 +200,7 @@ class TestPlotModel:
     def test_clear_custom_limit_valid(self):
         """Test clearing valid custom limit."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         plot_model.set_custom_limit(0, min_val=0.0, max_val=10.0)
         min_val, max_val = plot_model.get_custom_limit(0)
@@ -213,7 +213,7 @@ class TestPlotModel:
     def test_clear_custom_limit_invalid_index_raises_error(self):
         """Test clearing custom limit with invalid index raises error."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(IndexError):
             plot_model.clear_custom_limit(10)
@@ -222,7 +222,7 @@ class TestPlotModel:
     def test_array_manager_property(self):
         """Test array_manager property access."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         array_manager = plot_model.array_manager
         assert array_manager.num_arrays == 3
@@ -231,7 +231,7 @@ class TestPlotModel:
     def test_tick_manager_property(self):
         """Test tick_manager property access."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         tick_manager = plot_model.tick_manager
         assert tick_manager is not None
@@ -241,7 +241,7 @@ class TestPlotModel:
     def test_axis_labels_property(self):
         """Test axis_labels property access."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         axis_labels = plot_model.axis_labels
         assert len(axis_labels) == 3
@@ -251,7 +251,7 @@ class TestPlotModel:
     def test_custom_limits_property(self):
         """Test custom_limits property access."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         custom_limits = plot_model.custom_limits
         assert len(custom_limits) == 3
@@ -261,7 +261,7 @@ class TestPlotModel:
     def test_get_axis_label_valid(self):
         """Test get_axis_label method with valid index."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         # Initially no label
         assert plot_model.get_axis_label(0) is None
@@ -273,7 +273,7 @@ class TestPlotModel:
     def test_get_axis_label_invalid_index_raises_error(self):
         """Test get_axis_label with invalid index raises error."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(IndexError):
             plot_model.get_axis_label(10)
@@ -281,7 +281,7 @@ class TestPlotModel:
     def test_get_custom_limit_valid(self):
         """Test get_custom_limit method with valid index."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         # Initially no limits
         min_val, max_val = plot_model.get_custom_limit(0)
@@ -297,7 +297,7 @@ class TestPlotModel:
     def test_get_custom_limit_invalid_index_raises_error(self):
         """Test get_custom_limit with invalid index raises error."""
         values = [[1, "A"], [2, "B"]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         with pytest.raises(IndexError):
             plot_model.get_custom_limit(10)
@@ -305,24 +305,24 @@ class TestPlotModel:
     def test_len_dunder(self):
         """Test __len__ method."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         assert len(plot_model) == 3
 
     def test_repr_dunder(self):
         """Test __repr__ method."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         repr_str = repr(plot_model)
-        assert "PlotModel" in repr_str
+        assert "HighDimensionalPlotModel" in repr_str
         assert "2 rows" in repr_str
         assert "3 columns" in repr_str
 
     def test_structures_updated_after_values_modification(self):
         """Test that structures are updated after values modification."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         # Set some labels and limits
         plot_model.set_axis_label(0, "Index")
@@ -343,7 +343,7 @@ class TestPlotModel:
     def test_structures_updated_after_append(self):
         """Test that structures are updated after append."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         initial_axis_labels = len(plot_model.axis_labels)
         initial_custom_limits = len(plot_model.custom_limits)
@@ -357,7 +357,7 @@ class TestPlotModel:
     def test_structures_updated_after_remove(self):
         """Test that structures are updated after remove."""
         values = [[1, "A", 2.5], [2, "B", 3.0], [3, "C", 1.5]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         initial_axis_labels = len(plot_model.axis_labels)
         initial_custom_limits = len(plot_model.custom_limits)
@@ -371,7 +371,7 @@ class TestPlotModel:
     def test_axis_labels_initialized_with_defaults(self):
         """Test that axis labels are initialized with defaults."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         axis_labels = plot_model.axis_labels
         assert len(axis_labels) == 3
@@ -381,7 +381,7 @@ class TestPlotModel:
     def test_custom_limits_initialized_with_defaults(self):
         """Test that custom limits are initialized with defaults."""
         values = [[1, "A", 2.5], [2, "B", 3.0]]
-        plot_model = PlotModel(values)
+        plot_model = HighDimensionalPlotModel(values)
 
         custom_limits = plot_model.custom_limits
         assert len(custom_limits) == 3

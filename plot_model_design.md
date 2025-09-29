@@ -1,21 +1,21 @@
-# PlotModel Design Document
+# HighDimensionalPlotModel Design Document
 
 ## Overview
 
-The `PlotModel` class serves as the main interface for creating and managing plot structures in PaxPlot. It coordinates values management through an ArrayManager and automatically creates associated structures including TickManager, AxisLabels, and CustomAxisLimits.
+The `HighDimensionalPlotModel` class serves as the main interface for creating and managing plot structures in PaxPlot. It coordinates values management through an ArrayManager and automatically creates associated structures including TickManager, AxisLabels, and CustomAxisLimits.
 
 ## Core Concept
 
-Every time values are modified (initialization, append, or remove operations), the PlotModel automatically updates all associated structures to maintain consistency across the plot components.
+Every time values are modified (initialization, append, or remove operations), the HighDimensionalPlotModel automatically updates all associated structures to maintain consistency across the plot components.
 
 ## Class Design
 
 ```python
-class PlotModel:
+class HighDimensionalPlotModel:
     """
     Main interface for creating and managing plot structures.
 
-    The PlotModel serves as the primary interface for users to interact with
+    The HighDimensionalPlotModel serves as the primary interface for users to interact with
     PaxPlot values. It manages an ArrayManager for values storage and automatically
     creates and maintains associated structures including TickManager,
     AxisLabels, and CustomAxisLimits.
@@ -44,7 +44,7 @@ class PlotModel:
         self, values: Optional[Sequence[Sequence[Union[str, int, float]]]] = None
     ) -> None:
         """
-        Initialize PlotModel with optional initial values.
+        Initialize HighDimensionalPlotModel with optional initial values.
 
         Parameters
         ----------
@@ -274,7 +274,7 @@ class PlotModel:
 
 ```python
 # Create model with values
-plot_model = PlotModel(values)
+plot_model = HighDimensionalPlotModel(values)
 
 # Modify values
 plot_model.append_values(more_values)
@@ -292,7 +292,7 @@ limits = plot_model.custom_limits
 
 - The underlying values management happens through the ArrayManager class
 - Initialization follows the established pattern: create empty structures first, then use `set_values()` method
-- Every time values are modified, the PlotModel calls internal methods to update:
+- Every time values are modified, the HighDimensionalPlotModel calls internal methods to update:
   - TickManager (regenerates ticks based on current values)
   - AxisLabels (maintains list structure)
   - CustomAxisLimits (maintains list structure)

@@ -4,6 +4,6 @@ This module contains user-friendly interfaces that coordinate
 all the underlying components.
 """
 
-from .plot_model import PlotModel
+from .high_dimensional_plot_model import HighDimensionalPlotModel
 
-__all__ = ["PlotModel"]
+__all__ = ["HighDimensionalPlotModel"]

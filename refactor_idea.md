@@ -304,11 +304,11 @@ class CustomAxisLimit:
 
 ### Plot Model
 
-#### `PlotModel`
+#### `HighDimensionalPlotModel`
 User-friendly interface that coordinates all components.
 
 ```python
-class PlotModel:
+class HighDimensionalPlotModel:
     """Main interface for creating and managing plot structures."""
     
     def __init__(self, data: Optional[Sequence[Sequence[Union[str, int, float]]]] = None):
@@ -426,13 +426,13 @@ class MatplotlibRenderData:
     customizations: Dict[str, Any]
     
     @classmethod
-    def from_plot_model(cls, plot_model: PlotModel, 
+    def from_plot_model(cls, plot_model: HighDimensionalPlotModel, 
                        customizations: Dict[str, Any] = None) -> 'MatplotlibRenderData':
         """Create render data from plot model with embedded normalization.
         
         Parameters
         ----------
-        plot_model : PlotModel
+        plot_model : HighDimensionalPlotModel
             The plot model containing data and structures.
         customizations : Dict[str, Any], optional
             Rendering customizations to apply.
@@ -480,13 +480,13 @@ class PlotlyRenderData:
     layout_config: Dict[str, Any]
     
     @classmethod
-    def from_plot_model(cls, plot_model: PlotModel, 
+    def from_plot_model(cls, plot_model: HighDimensionalPlotModel, 
                        customizations: Dict[str, Any] = None) -> 'PlotlyRenderData':
         """Create render data from plot model with embedded normalization.
         
         Parameters
         ----------
-        plot_model : PlotModel
+        plot_model : HighDimensionalPlotModel
             The plot model containing data and structures.
         customizations : Dict[str, Any], optional
             Rendering customizations to apply.
@@ -582,7 +582,7 @@ class PaxPlot:
     
     Attributes
     ----------
-    _plot_model : Optional[PlotModel]
+    _plot_model : Optional[HighDimensionalPlotModel]
         The underlying plot model containing data and structures.
     _renderers : Dict[str, BaseRenderer]
         Dictionary of registered renderers by name.
@@ -847,7 +847,7 @@ new_figures = plot.show()  # Fresh figures with new data
    - `TickManager`, `CustomAxisLimit`, `AxisLabel`
 
 2. **Plot Model** (Next)
-   - `PlotModel` class coordinating all structures
+   - `HighDimensionalPlotModel` class coordinating all structures
    - Automatic structure updates on data changes
 
 3. **Renderer System** (Next)

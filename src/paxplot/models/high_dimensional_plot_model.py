@@ -1,6 +1,6 @@
-"""Plot model for PaxPlot.
+"""High-dimensional plot model for PaxPlot.
 
-This module defines the PlotModel class that serves as the main interface
+This module defines the HighDimensionalPlotModel class that serves as the main interface
 for creating and managing plot structures in PaxPlot.
 """
 
@@ -12,11 +12,11 @@ from ..structures.labels.axis_label import AxisLabel
 from ..structures.limits.custom_axis_limit import CustomAxisLimit
 
 
-class PlotModel:
+class HighDimensionalPlotModel:
     """
     Main interface for creating and managing plot structures.
 
-    The PlotModel serves as the primary interface for users to interact with
+    The HighDimensionalPlotModel serves as the primary interface for users to interact with
     PaxPlot values. It manages an ArrayManager for values storage and automatically
     creates and maintains associated structures including TickManager,
     AxisLabels, and CustomAxisLimits.
@@ -36,7 +36,7 @@ class PlotModel:
     ...     [2, 'B', 3.0],
     ...     [3, 'A', 1.5]
     ... ]
-    >>> plot_model = PlotModel(values)
+    >>> plot_model = HighDimensionalPlotModel(values)
     >>> print(plot_model.array_manager.num_arrays)  # 3
     >>> print(plot_model.array_manager.get_array(0).length)  # 3
     >>>
@@ -73,7 +73,7 @@ class PlotModel:
         self, values: Optional[Sequence[Sequence[Union[str, int, float]]]] = None
     ) -> None:
         """
-        Initialize PlotModel with optional initial values.
+        Initialize HighDimensionalPlotModel with optional initial values.
 
         Parameters
         ----------
@@ -406,7 +406,7 @@ class PlotModel:
         else:
             row_count = len(self._array_manager.get_array(0))
         return (
-            f"PlotModel({row_count} rows, {self._array_manager.num_arrays} columns, "
+            f"HighDimensionalPlotModel({row_count} rows, {self._array_manager.num_arrays} columns, "
             f"{len(self._axis_labels)} axis labels, {len(self._custom_limits)} custom limits)"
         )
 
